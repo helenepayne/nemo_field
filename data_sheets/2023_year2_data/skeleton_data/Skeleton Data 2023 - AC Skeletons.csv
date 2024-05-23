@@ -1,4 +1,4 @@
-Transect,Segment,side,Gen (G1 = —; G2 = X),Recipient,Plant_ID,Fitness (y/n),Skeleton Weights (mg),Notes (complete or incomplete),Chosen for Pulverization? (y/n)
+Transect,Segment,side,Gen,Recipient,Plant_ID,Fitness (y/n),Skeleton_Weights,Notes (complete or incomplete),Chosen for Pulverization? (y/n)
 1,1,L,G1,AC_057,2,y,7.72,c,y
 1,1,R,G2,AC_130,2,y,20.93,c,y
 1,2,L,G2,AC_215,5,y,12.06,c,y

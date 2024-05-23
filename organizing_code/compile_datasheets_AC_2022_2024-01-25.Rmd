@@ -250,7 +250,7 @@ f_AClong_3 <- f_AClong_2 %>%
   mutate(Fl_4.21 = case_when(Fl_4.9 == "2022-04-22" ~ "2022-04-22",
                              Fl_4.21 == "2022-04-22" ~ "2022-04-22",
                              Fl_4.21 == "2022-04-21" ~ "2022-04-22")) %>% 
-  mutate(Fl_4.9 = case_when(Fl_4.9 == "2022-04-09" ~ "2022-04-09",
+  mutate(Fl_4.9 = case_when(Fl_4.9 == "2022-04-09" ~ "2022-04-09",#assuming 4/21 and 4/22 are the same flowering date
                             TRUE ~ as.character(NA))) %>%  # "TRUE" ~ means "if none of the previous conditions are met, then assign value as follows: (in this case, as a character variable with the value "NA")
   mutate(Fl_6.22 = case_when(Fl_6.22 == 19165 ~ "2022-06-22",
                              TRUE ~ as.character(NA)))
@@ -411,6 +411,8 @@ AC_fruitprod_2 <- AC_fruitprod_1 %>%
 
 # Seed count data (viable seeds)
 # only seed count data are retained from this spreadsheet to minimize errors
+AC_seedct_test <- read_csv(here::here("data_sheets", "fruit_seed_counts_final", "AC-seed-count_2023-02-05.csv"))
+
 AC_seedct_1 <- read_csv(here::here("data_sheets", "fruit_seed_counts_final", "AC-seed-count_2023-02-05.csv"), skip = 2) %>% 
   select(-c(3, 6, 7, 9:29)) %>% # No need to include columns in AC_fruitprod_1 that aren't needed for merging or that are extraneous (columns 9-29)
   rename(Recipient = `Recipient for Sorting`, Plant_ID = `Plant number of fitness plant (when chosen)`, seed_ct = `Total number of viable seeds counted across multiple dates`)
@@ -469,7 +471,6 @@ AC_seedmass_3 <- AC_seedmass_2 %>%
 # AC_seedmass_2 also has n=546 obs.  Using na.rm = TRUE does not eliminate any rows
 
 ## Merge with fruit/seed count data frame
-
 AC_fruitseed_ct3 <- merge(AC_fruitseed_ct2, AC_seedmass_3, by = c("Transect", "Sequence", "Recipient", "Plant_ID"), all.x = TRUE)
 #all.x means that any fitness plant x ID combos that don't match up won't be included.
 
@@ -931,9 +932,6 @@ sum(!is.na(AC_merged_df_fl3$d13C)) # 266 rows have d13C values, because each seg
 
 ```
 
-
-##### Segment-wide estimates for skeleton weight, corolla area & diameter  
-
 **Skeleton Weight**  
 
 *subset(x, select)*
@@ -956,10 +954,8 @@ skel_weights_seg1 <- merge(AC_GermFlow_3, skel_weights_all, by = c("Recipient", 
 sum(!is.na(skel_weights_seg1$AG_biomass_mg)) # n=433 (One watered plant is missing relative to skel_weights_all; Transect W2, Recipient AC_085, Plant 4
 
 # Count number of rows with each TRUE/FALSE/NA combination of logical vectors.
-
-skel_weights_seg1 %>% count(FitP, Rep_FitP)
-
-skel_weights_seg1 %>% count(FitP, Rep_FitP, any_FitP)
+test1 <- skel_weights_seg1 %>% count(FitP, Rep_FitP)
+test2 <- skel_weights_seg1 %>% count(FitP, Rep_FitP, any_FitP)
 
 # Test comparison
 
@@ -967,7 +963,6 @@ skel_weights_test_comp <- anti_join(skel_weights_all, skel_weights_seg1, by = c(
 
 
 #Highlight ALL DUPES (multiple measures within a segment)
-
 skel_weights_duped <- skel_weights_seg1 %>% 
   mutate(duped1 = duplicated(subset(skel_weights_seg1, select = c("Block", "Transect", "Sequence", "Donor", "Recipient"))), # Assigns TRUE to all but the FIRST of two or more skeletons weighed from the same segment (with the same combination of Block, Transect, Sequence, and Donor)
          duped2 = duplicated(subset(skel_weights_seg1, select = c("Block", "Transect", "Sequence", "Donor", "Recipient")), fromLast = TRUE), # Assigns TRUE to ALL but the LAST of two or more skeletons weighed from the same segment (with the same combination of Block, Transect, Sequence, and Donor)
@@ -985,11 +980,16 @@ skel_weights_duped %>% count(FitP, Rep_FitP, any_FitP)
 
 # skel_weights_duped has 433 observations.  Now, let's remove unnecessary replicates, but keep the necessary replicates (where there is a skeleton weight for a segment even if it isn't from the original selected FITNESS plant)
 
+
+
+#Filter out Replicated Plants when a Main plant is available (non-watered transects only)
+#Note: Non-main FitPs (replicated) retained when only when a single measure taken from a segment, but duplicates (2+) of replicated plants are removed
 skel_weights_unduped1 <- skel_weights_duped %>% 
-  filter(case_when(duped == TRUE & Replicated == "R" & Block != "W" ~ FitP == TRUE, # If a row is duplicated, represents a segment with replicates, AND is in an UNwatered block, then the statement FitP == TRUE is evaluated as either TRUE or FALSE, which would be the output value.  If FitP = TRUE, filtering will RETAIN these rows.  These will represent the originally assiged Fitness plant when replicates (Non-fitness plants) are available for the segment
-                   
+  filter(case_when(duped == TRUE & Replicated == "R" & Block != "W" ~ FitP == TRUE,
+          # If a row is duplicated, represents a segment with replicates, AND is in an UNwatered block, then the statement FitP == TRUE is evaluated as either TRUE or FALSE, which would be the output value.  If FitP = TRUE, filtering will RETAIN these rows.  These will represent the originally assiged Fitness plant when replicates (Non-fitness plants) are available for the segment
+
                    TRUE ~ any_FitP == TRUE)) # %>% #If the previous condition is FALSE (meaning that EITHER there are no duplicates OR no replicates, or the Block is Watered), then any_FitP == TRUE will be evaluated.  If any_FitP is TRUE in this group, then filtering will retain the row
-  # filter(Block != "W")
+  filter(Block != "W")
 
 skel_weights_unduped1 %>% count(FitP, Rep_FitP, any_FitP)
 
@@ -1001,12 +1001,12 @@ skel_weights_unduped1 %>% count(FitP, Rep_FitP, any_FitP)
 
 
 #Randomly selected F plants - one measure per available segment, including watered plots
-
+view(skel_weights_duped)
 skel_weights_seg_RAND <- skel_weights_duped %>% 
   group_by(Block, Transect, Recipient) %>% 
   slice_sample(n = 1) %>%  #select ONE random row for each combo of block, transect, recipient
   select(-c(duped, Plant_ID)) %>%
-  ungroup()#  %>% # Need to include ungroup() in order for count function (see belw) to work.
+  #ungroup()#  %>% # Need to include ungroup() in order for count function (see belw) to work.
   #filter(Block != "W") 
  # select(Block:Recipient) #temp filter
 #Confirms # obs = # segments (n = 310) --- confirmed
@@ -1014,7 +1014,7 @@ skel_weights_seg_RAND <- skel_weights_duped %>%
 # skel_weights_seg_RAND has 269 observations (w/o W)
 # skel_weights_seg_RAND has 310 observations (w/W)
 
-skel_weights_seg_RAND %>% count(FitP, Rep_FitP, any_FitP) # COUNT function not working
+# skel_weights_seg_RAND %>% count(FitP, Rep_FitP, any_FitP) # COUNT function not working
 
 
 # Anti-join to see missing observations.  This anti-join function compares two dataframes and returns all of the rows in x (the first data frame) that are not present in y (the second date frame). Here, there is 1 plant in skel_weights_seg_RAND (n=269) that is NOT in skel_weights_unduped1 (n=268)
