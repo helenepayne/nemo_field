@@ -78,7 +78,7 @@ In the csv file, select all data with dates (visit dates, leaf sampling, and flo
 
 ```{r message = FALSE}
 
-AC_flr_df <- read_csv(file = here::here( "data_sheets", "2023_year2_data", "flowering_checks", "AC_flowercheck_data_2023-03-15 - AC_flowercheck_data_v1.csv"), na = c("", "NA")) 
+AC_flr_df <- read_csv(file = here::here( "data_sheets", "2023_year2_data", "flowering_checks", "AC_flowercheck_data_2023-03-15 - AC_flowercheck_data_v1.csv"), na = c("", "NA"))
 
 
 AC_flr2 <- AC_flr_df %>% 
@@ -207,7 +207,9 @@ skel_weights_AC <- read_csv(here::here("data_sheets", "2023_year2_data",  "skele
   rename(position = side, Gen = 4, Fitness = 7, skel_weight_mg = 8, complete_incomplete = 9, selected = 10) %>% 
   arrange(Transect, Segment, position) %>% 
   mutate(SegPos = paste(Segment, position, sep = "")) %>% 
-  select(Transect, SegPos, Gen,  Recipient, Plant_ID, Fitness, skel_weight_mg) #complete/selected not included
+  select(Transect, SegPos, Gen,  Recipient, Plant_ID, Fitness, skel_weight_mg)  %>%  #complete/selected not included
+  mutate(Recipient = case_when(Recipient %in% c("AC_159", "AC_159A", "AC_159B") ~ "AC_159",
+                               TRUE ~ Recipient)) #rename 159 - letters were added to mark
 
 skel_weights_AC_2 <- skel_weights_AC %>% 
     mutate(Recipient = case_when(Recipient %in% c("AC_159", "AC_159A", "AC_159B") ~ "AC_159",
@@ -265,7 +267,9 @@ AC_merged_3 <- merge(AC_merged_2, AC_seedmass_1, by = c("Transect", "SegPos", "R
 ```{r eval = FALSE}
 corollas_AC <- read_csv(here::here("data_sheets", "corolla_measures", "AC Corolla Diameters 2023.csv"), skip = 1) %>% 
   rename(Transect = 1, Recipient = 2, Gen = 3, Plant_ID = 5, SegPos = 6, corolla_diam_mm = 7, photo_date = 8) %>% 
-  select(Transect, Recipient, Gen, Plant_ID, SegPos, corolla_diam_mm, photo_date)
+  select(Transect, Recipient, Gen, Plant_ID, SegPos, corolla_diam_mm, photo_date) %>% 
+  mutate(Recipient = case_when(Recipient %in% c("AC_159", "AC_159A", "AC_159B") ~ "AC_159",
+                               TRUE ~ Recipient)) #rename 159 - letters were added to mark
 
 corollas_AC2 <- corollas_AC %>% 
   filter(!is.na(corolla_diam_mm)) %>% 
@@ -275,7 +279,6 @@ corollas_AC2 <- corollas_AC %>%
   select(-Recipient_num, -Plant_ID) %>% 
   arrange(Transect, Recipient, photo_date) %>% 
   distinct(Transect, Recipient, .keep_all = TRUE) #Keep only the earliest photo date data for duplicates
-#Only about 13 duplicate observations removed
 #remove plant ID bc we used NF plants occasionally to obtain corolla diameter
 
 
@@ -343,11 +346,11 @@ mutate(Recipient = gsub('-', '_', substr(sample_ID, 1, 6)),
 AC_merged_7 <- merge(AC_merged_6, AC_d13C_2023_2, by = c("Recipient", "Transect", "Gen", "SegPos"), all.x = TRUE)
 #Merge by Recipient and Transect only: genotype-wide estimates of d13C since some plants were NF
 
+# Subset to exclude rows where d13C is NA
+testdf <- AC_merged_7 %>% 
+  filter(F_plant == "TRUE") %>% #417 observations in both testdf and AC_d13C_2023_2
+  filter(!is.na(d13C))   # Exclude rows where d13C is NA
 
-
-#check that all data made it (266 obs)
-#testdf <- AC_merged_df_fl3 %>% 
-#  filter(!is.na(d13C))
 ```
 
 <br>  
@@ -480,7 +483,7 @@ write_csv(AC_mastersheet_v1_2023, here::here("data_sheets", "compiled_sheets", "
 ## Fitness Plants Only
 #
 
-AC_mastersheet_F_mains_2023 <-  AC_mastersheet_v1 %>% 
+AC_mastersheet_F_mains_2023 <-  AC_mastersheet_v1_2023 %>% 
   filter(F_plant == TRUE) #Only main fitness plants
 
 ##Note: remaining NA values for fitness measures (mean seeds per fruit; est seed production) are the results of 0 closed fruit counts. Treat these as 0 fitness or as NAs to remove???
