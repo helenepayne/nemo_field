@@ -46,8 +46,6 @@ BO_donors2 <- BO_donors %>%
   mutate(Donor = as.character(str_c("BO_", Donor_num))) %>% 
   select(-Recipient_num, -Donor_num)
 
-
-
 #Multiple matches, merge only unique pairs for Donor
 BO_Fitness_2 <- merge(BO_Fitness, unique(BO_donors2[c("Donor", "Recipient")]), by = c("Recipient"), all.x = TRUE) %>% 
   mutate(SegPos = paste(Segment, position, sep = "")) %>% 
@@ -222,20 +220,17 @@ skelcheck <- merge(BO_Fitness_2, skel_weights_BO_2, by = c("Transect", "SegPos",
 Merge trait data processed thus far
 ```{r}
 #merging the skeleton data for each individual plant
-BO_merged_1 <- merge(BO_flowering, skel_weights_BO, by = c("Transect", "SegPos", "Gen", "Recipient", "Plant_ID"), all.x = TRUE) %>% select(-Fitness) %>% arrange(Transect, Sequence, SegPos)
+BO_merged_1 <- merge(BO_flowering, skel_weights_BO, by = c("Transect", "SegPos", "Gen", "Recipient", "Plant_ID"), all.x = TRUE)  %>% select(-c(Fitness, FD_01:FD_05, LeafD, FLR_P, Skeleton, Notes)) %>% arrange(Transect, Sequence, SegPos)
 
 #merging the skeleton data for the entire segment
 BO_merged_1.5 <- merge(BO_merged_1, skel_weights_BO_2, by = c("Transect", "SegPos", "Gen", "Recipient"), all.x = TRUE) %>% select(-Fitness)%>% arrange(Transect, Sequence, SegPos)
 
 ####<-left off here
-BO_merged_2 <- merge(BO_merged_1.5, BO_fruit_seeds_2, by = c("Sequence", "Transect", "SegPos", "Gen", "Recipient", "Donor", "Plant_ID"), all.x = TRUE) %>% select(-c(FD_01:FD_05, N_CLOSED_fruit_D1:N_total_seeds_D6, Notes))  %>% arrange(Transect, Sequence, SegPos) %>% 
-  select(Sequence, Transect, SegPos, Gen, Donor, Recipient, Plant_ID, F_plant, everything(), -32)
-
+BO_merged_2 <- merge(BO_merged_1.5, BO_fruit_seeds_2, by = c("Sequence", "Transect", "SegPos", "Gen", "Recipient", "Donor", "Plant_ID"), all.x = TRUE) %>% select(-c(N_CLOSED_fruit_D1:N_total_seeds_D6, Sym))  %>% arrange(Transect, Sequence, SegPos) %>% 
+  select(Sequence, Transect, SegPos, Gen, Donor, Recipient, Plant_ID, F_plant, everything(), -28)
 ```
 
-
 <br>  
-
 
 
 #### Seed Weights  
@@ -395,6 +390,17 @@ isotope_comparison <- anti_join(BO_d13C_2023, BO_merged_8, by = c("sample_ID", "
 Checking a variety of IDs and trait data to make sure everything lines up.  
 
 ```{r eval = FALSE}
+
+#Chec for duplicates
+BO_dup_check <- BO_merged_8 %>% 
+  mutate(duped1 = duplicated(select(BO_merged_8, c(sample_ID))),
+         duped2 = duplicated(select(BO_merged_8, c(sample_ID)), fromLast = TRUE),
+         duped = case_when(duped1|duped2 == TRUE ~ TRUE,
+                           TRUE ~ FALSE)) %>% #highlight all duplicates
+  select(-c(duped1, duped2)) %>%
+  filter(duped == "TRUE")
+# No "TRUE"s found, so no duplicates, no need to remove them
+
 ##Check for mismatched (fitness) plants
 
 BO_Echeck1 <- BO_merged_8 %>% 

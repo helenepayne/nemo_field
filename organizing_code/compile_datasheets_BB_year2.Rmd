@@ -240,6 +240,7 @@ BB_merge_test <- merge(BB_Fitness_2.5, BB_fruit_seeds, by = c("Location", "SegPo
 
 
 BB_fruit_seeds_2 <- merge(BB_Fitness_2.5, BB_fruit_seeds, by = c("Location", "SegPos", "Gen", "Recipient", "Fit_plant"), all.x = TRUE) %>% 
+ select(-c(latitude, longitude)) %>% 
   rename(Plant_ID = Fit_plant) %>% #Rename Plant ID for merging below AFTER double-checking fitness plants)
   mutate(ALL_closed_fruit = case_when(Recipient == "BB_070" & SegPos == "223R" ~ 0,
                                       Recipient == "BB_070" & SegPos == "224R" ~ 0,
@@ -293,16 +294,17 @@ skelcheck <- merge(BB_Fitness_2.5, skel_weights_BB_2, by = c("Location", "SegPos
 **TEMP MERGED DATA FRAME**  
 Merge trait data processed thus far, and make sure everything is entered for the entire segment
 
+
 ```{r}
 
 #merging the skeleton data for each individual plant
-BB_merged_1 <- merge(BB_flowering, skel_weights_BB_2, by = c("Location", "SegPos", "Gen", "Recipient", "Plant_ID"), all.x = TRUE) %>% select(-c(Skeleton:Fitness)) %>% arrange(Location, Sequence, SegPos)
+BB_merged_1 <- merge(BB_flowering, skel_weights_BB_2, by = c("Location", "SegPos", "Gen", "Recipient", "Plant_ID"), all.x = TRUE) %>% select(-c(Fitness, FD_01:FD_05, LeafD, FLR_P, Skeleton, Notes)) %>% arrange(Location, Sequence, SegPos)
 
 #merging the skeleton data for the entire segment
-BB_merged_1.5 <- merge(BB_merged_1, skel_weights_BB_3, by = c("Location", "SegPos", "Gen", "Recipient"), all.x = TRUE) %>% select(-Fitness)%>% arrange(Location, Sequence, SegPos)
+BB_merged_1.5 <- merge(BB_merged_1, skel_weights_BB_3, by = c("Location", "SegPos", "Gen", "Recipient"), all.x = TRUE) %>% select(-c(Fitness))%>% arrange(Location, Sequence, SegPos)
 
-BB_merged_2 <- merge(BB_merged_1.5, BB_fruit_seeds_2, by = c("Sequence", "Location", "SegPos", "Gen", "Recipient", "Donor", "Plant_ID"), all.x = TRUE) %>% select(-c(FD_01:FD_05, N_CLOSED_fruit_D1:N_total_seeds_D8))  %>% arrange(Location, Sequence, SegPos) %>% 
-  select(Sequence, Location, SegPos, Gen, Donor, Recipient, Plant_ID, F_plant, everything(), -37)
+BB_merged_2 <- merge(BB_merged_1.5, BB_fruit_seeds_2, by = c("Sequence", "Location", "SegPos", "Gen", "Recipient", "Donor", "Plant_ID"), all.x = TRUE) %>% select(-c(N_CLOSED_fruit_D1:N_total_seeds_D8, Sym))  %>% arrange(Location, Sequence, SegPos) %>% 
+  select(Sequence, Location, SegPos, Gen, Donor, Recipient, Plant_ID, F_plant, everything(), -34)
 
 #add in latitude/longitude per segment
 BB_planting_2 <- BB_planting  %>%
@@ -468,6 +470,18 @@ isotope_comparison <- anti_join(BB_d13C_2023, BB_merged_8, by = c("sample_ID", "
 **Error checks**:
 
 ```{r eval = FALSE}
+
+#Chec for duplicates
+BB_dup_check <- BB_merged_8 %>% 
+  mutate(duped1 = duplicated(select(BB_merged_8, c(sample_ID))),
+         duped2 = duplicated(select(BB_merged_8, c(sample_ID)), fromLast = TRUE),
+         duped = case_when(duped1|duped2 == TRUE ~ TRUE,
+                           TRUE ~ FALSE)) %>% #highlight all duplicates
+  select(-c(duped1, duped2)) %>%
+  filter(duped == "TRUE")
+# No "TRUE"s found, so no duplicates, no need to remove them
+
+
 ##Check for mismatched (fitness) plants
 
 BB_Echeck1 <- BB_merged_8 %>% 
