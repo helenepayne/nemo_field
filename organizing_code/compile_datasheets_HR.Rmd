@@ -432,6 +432,9 @@ skel_weights_all <- rbind(skel_weights_HR, skel_weights_HR_W) %>%
 #Merge with full data set
 HR_merged_df5 <- merge(HR_merged_df4, skel_weights_all, by = c("Transect", "Recipient", "Plant_ID"), all.x = TRUE)
 
+HR_skel_check <- HR_merged_df5 %>% 
+  filter(!is.na(AG_biomass_mg)) 
+
 ```
 
 
@@ -455,7 +458,9 @@ corollas_HR2 <- corollas_HR %>%
 
 ## Merge with main data 
 HR_merged_df6 <- merge(HR_merged_df5, corollas_HR2, by = c("Transect", "Recipient", "Plant_ID"), all.x = TRUE)
-  
+
+HR_corolla_check <- HR_merged_df6 %>% 
+  filter(!is.na(corolla_diam_mm)) 
 ```
 
 
@@ -505,9 +510,14 @@ HR_merged_df7b <- merge(HR_merged_df7, leaves_HR_ind, by = c("Block", "Transect"
 
 # make sure all measurements merged in
 HR_NFleaves <- HR_merged_df7b %>% 
-  filter(!is.na(leaf_dryweight_mg)) #fewer than 501 obs as 4 entries were mislabeled - not included in merged df
-
+  filter(!is.na(leaf_dryweight_mg)) #499 observations, fewer than 501 obs as 2 entries were mislabeled and cannot be determined- they were not included in merged df
+ 
+#use antijoin to determine which plants they are 
+  HR_leaves_check <- anti_join(leaves_HR, HR_NFleaves, by = c("Block", "Transect", "Recipient", "leaf_dryweight_mg")) %>% 
+  select(leaf_dryweight_mg, Block, Transect, Recipient)
 ```
+
+
 
 Error checks:
 
@@ -524,6 +534,7 @@ HR_Echeck2 <- HR_merged_df7b %>%
 ##NA/NaN/Info values for mean seeds/est seed prod
 HR_Echeck3 <- HR_merged_df7b %>% 
   filter(any_FitP == TRUE & is.na(as.numeric(mean_seeds_per_fruit)))
+#60 observations but all are supposed to be NAs bc no closed fruits
 
 
 HR_Echeck4 <- HR_merged_df7b %>% 
@@ -606,7 +617,7 @@ HR_merged_df_fl2 <- HR_merged_df_flC %>%
 ### d13C data  
 
 ```{r}
-Nemo_d13C <- read_csv(here::here("data_sheets", "isotope_data", "Nemophila_d13C_230511.csv")) %>% 
+Nemo_d13C <- read_csv(here::here("data_sheets", "isotope_data", "d13C_2022.csv")) %>% 
   select(1,2,3,5,6,9) %>% 
   rename(sample_ID = 1, d13C = 2, totalC_ug = 3, sample_weight_mg = 6)
 #Save as UTF-8 file from excel to avoid import error
@@ -627,7 +638,7 @@ HR_merged_df_fl3 <- merge(HR_merged_df_fl2, Nemo_d13_HR2, by = c("Recipient", "T
 #Merge by Recipient and Transect only: genotype-wide estimates of d13C since some plants were NF
 
 
-#check that all data made it (266 obs)
+#check that all data made it (354 obs, this matches up!)
 testdf <- HR_merged_df_fl3 %>% 
   filter(!is.na(d13C))
 

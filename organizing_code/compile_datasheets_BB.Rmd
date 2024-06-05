@@ -436,6 +436,14 @@ skel_weights_all_BB <- rbind(skel_weights_BB, skel_weights_BB_W) %>%
 #Merge with full data set
 BB_merged_df5 <- merge(BB_merged_df4, skel_weights_all_BB, by = c("Location", "Recipient", "Plant_ID"), all.x = TRUE)
 
+BB_skel_check <- BB_merged_df5 %>% 
+  filter(!is.na(AG_biomass_mg))
+
+#how to check if maternal ID didn't match up
+BB_skel_check_2 <- anti_join(skel_weights_all_BB, BB_merged_df5, by = c("Location", "Recipient", "AG_biomass_mg")) %>% 
+  select(AG_biomass_mg, Location, Recipient)
+
+
 ```
 
 
@@ -459,8 +467,19 @@ corollas_BB2 <- corollas_BB %>%
 #Only about 6 duplicate observations removed
 
 
-## Merge with main data 
-BB_merged_df6 <- merge(BB_merged_df5, corollas_BB2, by = c("Block", "Location", "Recipient", "Plant_ID"), all.x = TRUE)
+## Merge with main data, Cannot include block bc of the watering transects
+BB_merged_df6 <- merge(BB_merged_df5, corollas_BB2, by = c("Location", "Recipient", "Plant_ID"), all.x = TRUE) %>%
+  select(-Block.y) %>%
+  rename(Block = 4)
+
+
+#double-check they were all merged
+BB_corolla_check <- BB_merged_df6 %>% 
+  filter(!is.na(corolla_diam_mm)) #529 obs
+
+#how to check if maternal ID didn't match up
+BB_corolla_check_2 <- anti_join(corollas_BB2, BB_corolla_check, by = c("Location", "Recipient", "corolla_diam_mm")) %>% 
+  select(corolla_diam_mm, Location, Recipient)
   
 ```
 
@@ -515,6 +534,11 @@ BB_NFleaves <- BB_merged_df7b %>%
   filter(!is.na(leaf_dryweight_mg)) %>% 
   arrange(FitP)
 # Should be all/mostly NF
+# Everything is accounted for 
+ 
+#use antijoin to determine which plants they are 
+BB_leaves_check <- anti_join(leaves_BB_ind, BB_NFleaves, by = c("Location", "Recipient", "leaf_dryweight_mg")) %>% 
+  select(leaf_dryweight_mg, Location, Recipient)
 
 ```
 
@@ -534,10 +558,12 @@ BB_Echeck2 <- BB_merged_df7b %>%
 ##NA/NaN/Info values for mean seeds/est seed prod
 BB_Echeck3 <- BB_merged_df7b %>% 
   filter(any_FitP == TRUE & is.na(as.numeric(mean_seeds_per_fruit)))
-######Loc. 16 ID BB_166 plant 5 shows up as NA for seed count??
+#311 observations
+
 
 BB_Echeck4 <- BB_merged_df7b %>% 
   filter(any_FitP == TRUE & !is.finite(mean_seeds_per_fruit))
+#311 observations
 
 ## Check for NA seed counts for fitness plants (when fruit production > 0)
 BB_Echeck5 <- BB_merged_df7b %>% 
@@ -619,7 +645,7 @@ BB_merged_df_fl2 <- BB_merged_df_flC %>%
 ### d13C data  
 
 ```{r}
-Nemo_d13C <- read_csv(here::here("data_sheets", "isotope_data", "Nemophila_d13C_230511.csv")) %>% 
+Nemo_d13C <- read_csv(here::here("data_sheets", "isotope_data", "d13C_2022.csv")) %>% 
   select(1,2,3,5,6,9) %>% 
   rename(sample_ID = 1, d13C = 2, totalC_ug = 3, sample_weight_mg = 6)
 #Save as UTF-8 file from excel to avoid import error
@@ -656,6 +682,7 @@ BB_merged_df_fl3 <- merge(BB_merged_df_fl2, Nemo_d13_BB2.5, by = c("Recipient", 
 #check that all data made it (203 obs)
 testdf <- BB_merged_df_fl3 %>% 
   filter(!is.na(d13C))
+#203 vs 203
 
 
 
@@ -673,8 +700,6 @@ BB_merged_df_fl3b <- merge(BB_merged_df_fl3, Nemo_d13_BB3, by = c("Recipient", "
 d13C_check_BB <- BB_merged_df_fl3b %>% 
   filter(FitP == TRUE) %>% 
   filter(!is.na(d13C_SEG))
-#7 main Fit plants using Rep FitP d13C
-
 
 ```
 

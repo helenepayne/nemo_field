@@ -417,6 +417,13 @@ skel_weights_all2 <- distinct(skel_weights_all)
 BO_merged_df5 <- merge(BO_merged_df4, skel_weights_all2, by = c("Transect", "Recipient", "Plant_ID"), all.x = TRUE)
 #obs == 3504
 
+BO_skel_check <- BO_merged_df5 %>% 
+  filter(!is.na(AG_biomass_mg))
+#210 vs 209, one skel missing, This skeleton came from a plant that never flowered or fruited, so would not be included in the data anyways.
+
+#how to check what maternal ID didn't match up
+BO_skel_check_2 <- anti_join(skel_weights_all2, BO_skel_check, by = c("Transect", "Recipient", "AG_biomass_mg")) %>% 
+  select(AG_biomass_mg, Transect, Recipient)
 ```
 
 
@@ -439,6 +446,10 @@ corollas_BO2 <- corollas_BO %>%
 
 ## Merge with main data 
 BO_merged_df6 <- merge(BO_merged_df5, corollas_BO2, by = c("Transect", "Recipient", "Plant_ID"), all.x = TRUE)
+
+#double-check they were all merged
+BO_corolla_check <- BO_merged_df6 %>% 
+  filter(!is.na(corolla_diam_mm)) #507 obs
 
 ```
 
@@ -497,6 +508,13 @@ BO_NFleaves <- BO_merged_df7b %>%
 #Find mislabeled entry
 #which(duplicated(select(BO_NFleaves, c(Block, Transect, Recipient, Plant_ID)))) #Duplicate of W2 BO_295 plant 8 - fixed above
 
+# make sure all measurements merged in
+BO_NFleaves <- BO_merged_df7b %>% 
+  filter(!is.na(leaf_dryweight_mg)) #499 observations, fewer than 501 obs as 2 entries were mislabeled and cannot be determined- they were not included in merged df
+ 
+#use antijoin to determine which plants they are 
+BO_leaves_check <- anti_join(leaves_BO_ind, BO_NFleaves, by = c("Block", "Transect", "Recipient", "leaf_dryweight_mg")) %>% 
+  select(leaf_dryweight_mg, Block, Transect, Recipient)
 ```
 
 Error checks:
@@ -514,7 +532,7 @@ BO_Echeck2 <- BO_merged_df7b %>%
 ##NA/NaN/Info values for mean seeds/est seed prod
 BO_Echeck3 <- BO_merged_df7b %>% 
   filter(any_FitP == TRUE & is.na(as.numeric(mean_seeds_per_fruit)))
-
+#262 observations but all are supposed to be NAs bc no closed fruits
 
 BO_Echeck4 <- BO_merged_df7b %>% 
   filter(any_FitP == TRUE & !is.finite(mean_seeds_per_fruit))
@@ -597,7 +615,7 @@ BO_merged_df_fl2 <- BO_merged_df_flC %>%
 ### d13C data  
 
 ```{r}
-Nemo_d13C <- read_csv(here::here("data_sheets", "isotope_data", "Nemophila_d13C_230511.csv")) %>% 
+Nemo_d13C <- read_csv(here::here("data_sheets", "isotope_data", "d13C_2022.csv")) %>% 
   select(1,2,3,5,6,9) %>% 
   rename(sample_ID = 1, d13C = 2, totalC_ug = 3, sample_weight_mg = 6)
 #Save as UTF-8 file from excel to avoid import error
@@ -635,7 +653,7 @@ BO_merged_df_fl3b <- merge(BO_merged_df_fl3, Nemo_d13_BO3, by = c("Recipient", "
 #Check merge
 d13C_check_BO <- BO_merged_df_fl3b %>% 
   filter(FitP == TRUE) %>% 
-  filter(!is.na(d13C_SEG))
+  filter(!is.na(d13C_SEG)) #196 observations in both df's
 
 ```
 

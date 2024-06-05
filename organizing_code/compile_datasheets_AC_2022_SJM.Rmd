@@ -1,5 +1,5 @@
 ---
-title: "Compile Flower, Fruit, and Seed count data sheets"
+title: "Compile Flower, Fruit, and Seed count data sheets_AC_2023"
 output: html_notebook
 author: Devin Gamble (with additional annotations & code by Susan Mazer)
 editor_options: 
@@ -38,14 +38,14 @@ AC_germ_df1 <- read_csv(here::here("data_sheets", "germination_checks_2021-2022"
   rename(Block = 'Block (1-3)', Transect = 'Transect (1-9)', Sequence = 'Sequence (1-321)', Donor = "Pollen Donor ID", Recipient = "Maternal Sibship", Stage = 'mm/dd') %>% 
   filter(!Stage == "Flow Date")   #Remove empty flowering date rows
 
-View(AC_germ_df1)
+#View(AC_germ_df1)
 #Reshape data sheet to 'long' format
 AC_germ_df2 <- AC_germ_df1 %>% 
   pivot_longer(cols = c('1':'10'),
                names_to = 'Plant_ID',
                values_to = 'Germ_Date') 
 
-View(AC_germ_df2)
+#View(AC_germ_df2)
 ##Fix typos in date values
 ##Excel auto-populated year as 2022 when in fact the year in which germination occurred should be 2021!
 unique(AC_germ_df2$Germ_Date)
@@ -140,7 +140,7 @@ AC_germ_W2 <- AC_germ_W1 %>%
                names_to = 'Plant_ID',
                values_to = 'Germ_Date') 
 
-View(AC_germ_W2)
+#View(AC_germ_W2)
 #
 ##Fix typos in date values
 unique(AC_germ_W2$Germ_Date) #no typos here
@@ -236,7 +236,7 @@ f_AClong_2 <- f_AClong %>%
   select(Transect, Recipient, Recipient_num, Plant_ID, everything()) %>% 
   select(-Recipient_num)
 
-View(f_AClong_2)
+#View(f_AClong_2)
 ##Fix Dates:  there are a few instances in which, for example, for plants first observed to flower on 2022-04-21, the date was incorrectly entered in the column for 4.9 (2022-04-09)
 
 # So, the code below, in the column called "Fl_4.21", plants observed to be in flower on 2022-04-21 are recorded as 2022-04-21 and plants observed to be in flower on 2022-04-22 are recorded as 2022-04-22, even when 2022-04-22 was erroneously placed in the Fl_4.9 column.  
@@ -280,7 +280,7 @@ AC_GermFlow_1 <- left_join(AC_germ_full, f_AClong_3, by = c("Recipient", "Transe
 head(AC_GermFlow_1)
 #Double-check that observation (row) numbers match up. Note that watered Transects only have 8 Plant_IDs per segment.
 
-View(AC_GermFlow_1)
+#View(AC_GermFlow_1)
 
 unique(AC_GermFlow_1$LEAF) # Leaves collected on four dates
 
@@ -305,7 +305,6 @@ AC_Fplants %>% count(Replicated) # n=103
 tail(AC_Fplants)
 # There are 363 Fitness Plants in 2022 for AC
 
-tail(AC_Fplants)
 #Adjust Recipient names to match three-digit format
 AC_Fplants2 <- AC_Fplants %>% 
   mutate(Recipient_num = sprintf("%03d", (parse_number(Recipient)))) %>% 
@@ -373,7 +372,7 @@ AC_GermFlow_2 <- merge(AC_GermFlow_1, AC_Fplants2) %>%
 # Any_FitP is TRUE for rows representing either the SELECTED fitness plant OR a BACK-UP Fitness plant.  
 
 
-View(AC_GermFlow_2)
+#View(AC_GermFlow_2)
 
 #Tidy up
 AC_GermFlow_3 <- AC_GermFlow_2 %>% 
@@ -381,7 +380,7 @@ AC_GermFlow_3 <- AC_GermFlow_2 %>%
   arrange(Transect, Sequence, Recipient, Plant_ID)
 
 
-View(AC_GermFlow_3) # This data frame will be very useful for selecting Fitness plants and/or Fitness+Backup plants
+#View(AC_GermFlow_3) # This data frame will be very useful for selecting Fitness plants and/or Fitness+Backup plants
 
 ```
 
@@ -420,7 +419,7 @@ head(AC_seedct_1)
 #merge data
 AC_fruitseed_ct1 <- left_join(AC_fruitprod_2, AC_seedct_1, by = c("Sequence", "Transect", "Recipient", "Plant_ID")) # left_join ensures retaining all rows in AC_fruitprod_2, although the two dataframes merged here already contain the same number of observations (n=545).  Note that this number is higher than the number of "selected" fitness plants, so it must include fruit and seed counts of some replicates.
 
-View(AC_fruitseed_ct1)
+#View(AC_fruitseed_ct1)
 
 # summary variables, tidying up
 AC_fruitseed_ct2 <- AC_fruitseed_ct1 %>% 
@@ -496,7 +495,7 @@ AC_merged_df1 <- merge(AC_GermFlow_3, AC_fruitseed_ct3, by = c("Transect", "Sequ
   mutate(closed_fruits_F = as.numeric(closed_fruits_F),
          total_fruits_F = as.numeric(total_fruits_F)) #correct counts to numeric values
 
-View(AC_merged_df1)
+#View(AC_merged_df1)
 
 #Correct Fruit NAs (but not seed count NAs) to 0s in cases where no fruit data were entered (fitness and non-fitness plants):
 AC_merged_df2 <- AC_merged_df1 %>% 
@@ -506,7 +505,7 @@ AC_merged_df2 <- AC_merged_df1 %>%
 
 # WARNING:  All non-fitness plants are now scored as 0 for closed_fruits, total_fruits, and seed_ct, even if they might have produced seeds. So, these plants must not be used for any fitness measures.  That should be fine because it's easy to filter these data only for selected and back-up fitness plants by using columns (FitP, Rep_FitP, and any_FitP)
 
-View(AC_merged_df2)
+#View(AC_merged_df2)
 #Calculate mean seeds per fruit, total_est_seed prod
 #variables renamed later
 AC_merged_df3 <- AC_merged_df2 %>% 
@@ -514,11 +513,9 @@ AC_merged_df3 <- AC_merged_df2 %>%
          total_est_seed_production = mean_seeds_per_fruit*total_fruits_F) # equals lifetime fecundity
 #More fitness variables calculated later
 
-View(AC_merged_df3)
+#View(AC_merged_df3)
 
 # IMPORTANT:  mean_seeds_per_fruit and Total_est_seed_prod have NAs/NaNs for when there were no closed fruits (and therefore no seed count) (fitness plants only) because mean_seeds_per_fruit cannot be calculated in the absence of closed fruits.  mean_seeds_per_fruit is required for the estimate of Total_est_seed_prod.  So, when closed_F = 0, mean_seeds_per_fruit and Total_est_seed_prod cannot be calculated.
-
-
 
 ```
 
@@ -572,7 +569,7 @@ AC_NFskels <- AC_merged_df4 %>%
   arrange(FitP) # Display so that the selected fitness plants are shown first
 # 71/434 are Replicated Fitness plants, not main F plants
 
-View(AC_NFskels)
+#View(AC_NFskels)
 ```
 
 
@@ -622,14 +619,14 @@ AC_NFcorollas <- AC_merged_df5 %>%
   filter(!is.na(corolla_diam_mm)) %>% 
   arrange(FitP)
 
-View(AC_NFcorollas)
+#View(AC_NFcorollas)
 #245/582 are Replicated Fitness & NF plants, not main F plants (157 totally NF plants = plants that are NA for FitP)
 
 AC_NFcorollas <- AC_merged_df5 %>% 
   filter(!is.na(corolla_diam_mm)) %>% 
   arrange(Rep_FitP)
 
-View(AC_NFcorollas)
+#View(AC_NFcorollas)
 ```
 
 
@@ -657,7 +654,7 @@ leaves_AC <- read_csv(here::here("data_sheets", "leaf_data", "AC_SLA_data_202305
   
 # NA coercion for "No photo" entered in area column.  Fine for this to be "NA" becuase no leaf area is available for it
 
-View(leaves_AC)
+#View(leaves_AC)
 #Eliminate Duplicates
 #Randomly select one leaf to be analyzed per transect x maternal ID combo
 leaves_AC_duped <- leaves_AC %>% 
@@ -713,7 +710,7 @@ AC_NFleaves <- AC_merged_df6b %>%
 # Should be all/mostly NF -- 
 # IMPORTANT:  Rows 294-299 (n=5) are FITNESS PLANTS -- not sure why leaves were collected from them.
 
-View(AC_NFleaves)
+#View(AC_NFleaves)
 
 ```
 
@@ -747,7 +744,7 @@ AC_Echeck5 <- AC_merged_df6b %>%
 ##NAs present here before setting seed_ct NAs to 0 were from fitness plants that had 0 closed fruit.  Now, all seed_counts are 0 instead of NA, but if 0 closed fruit, then mean_seeds_per_fruit and est_seed_prod will be NaN.
 
 
-View(AC_Echeck5)
+#View(AC_Echeck5)
 #Seed mass
 AC_Echeck6 <- AC_merged_df6b %>% 
   filter(any_FitP == FALSE & !is.na(msm_all)) # Do any plants that are NOT fitness plants have a mean_seed_mass value?  No.
@@ -784,7 +781,7 @@ AC_merged_df_fl <- AC_merged_df6b %>%
          LFD = do.call(pmax, c(select(., starts_with('Fl_')), na.rm = TRUE)), #last flowering date
          fl_duration = as.numeric(LFD - FFD)) #Flowering duration
 
-View(AC_merged_df_fl) # n=3546 obs. with 73 variables
+#View(AC_merged_df_fl) # n=3546 obs. with 73 variables
 
 ```
 
@@ -828,7 +825,7 @@ AC_merged_df_flC <- AC_merged_df_flB %>%
          prod_filled_seeds = case_when(any_FitP == TRUE & seed_ct > 0 ~ 1, #plants that survived to produce fruit with viable seeds (0 or 1)
                                        any_FitP == TRUE & seed_ct == 0 ~ 0))  #else = 0 
   
-View(AC_merged_df_flC)
+#View(AC_merged_df_flC)
 
 #Calculate Fecundity success (0 or 1)
 
@@ -880,8 +877,54 @@ pattern = a regular expression. If this is "^0+", str_remove will REMOVE LEADING
 
 str_remove will look at each element in the character vector and remove the first character(s) in the element that match the pattern
 
+
 ```{r message = FALSE}
-Nemo_d13C <- read_csv(here::here("data_sheets", "isotope_data", "Nemophila_d13C_230511.csv")) %>% 
+Nemo_d13C <- read_csv(here::here("data_sheets", "isotope_data", "d13C_2022.csv")) %>% 
+  select(1,2,3,5,6,9) %>% 
+  rename(sample_ID = 1, d13C = 2, totalC_ug = 3, sample_weight_mg = 6)
+#Save as UTF-8 file from excel to avoid import error
+
+#filter to AC samples
+Nemo_d13C_AC <- Nemo_d13C %>% 
+  filter(grepl('AC', sample_ID))
+
+#unravel sample ID
+Nemo_d13_AC2 <- Nemo_d13C_AC %>% 
+  mutate(Recipient = gsub('-', '_', substr(sample_ID, 1, 6)), 
+         Transect = as.numeric(str_remove(substr(sample_ID, 8, 10), "^0+")),
+         Plant_ID = as.numeric(substr(sample_ID, 12,13))) %>% 
+  select(Transect, Recipient, Plant_ID, d13C, sample_weight_mg) #un-un-select Plant_ID
+
+
+#Merge
+AC_merged_df_fl3 <- merge(AC_merged_df_fl2, Nemo_d13_AC2, by = c("Recipient", "Transect", "Plant_ID"), all.x = TRUE) #add Pland ID to merge by
+
+
+#check that all data made it (266 obs)
+#testdf <- AC_merged_df_fl3 %>% 
+#  filter(!is.na(d13C))
+
+#Check d13C for F/NF plants... 
+AC_NFd13C <- AC_merged_df_fl3 %>% 
+  filter(!is.na(d13C)) %>% 
+  arrange(FitP)
+#includes 10 Rep Fs; rest main F
+
+
+#Create segment-wide estimate of d13C:
+Nemo_d13_AC2b <- Nemo_d13_AC2 %>% 
+  rename(d13C_SEG = d13C) %>% #rename for seg-wide measure
+  select(Transect, Recipient, d13C_SEG) #un-select Plant_ID, dryweight of sample
+
+
+AC_merged_df_fl3b <- merge(AC_merged_df_fl3, Nemo_d13_AC2b, by = c("Recipient", "Transect"), all.x = TRUE) 
+#Merge by Recipient and Transect only: segment-wide estimates of d13C since some plants were NF
+
+```
+
+
+```{r message = FALSE}
+Nemo_d13C <- read_csv(here::here("data_sheets", "isotope_data", "d13C_2022.csv")) %>% 
   select(1,2,3,5,6,9) %>% 
   rename(sample_ID = 1, d13C = 2, totalC_ug = 3, sample_weight_mg = 6)
 #Save as UTF-8 file from excel to avoid import error
@@ -893,7 +936,7 @@ Nemo_d13C_AC <- Nemo_d13C %>%
 
 class(Nemo_d13C$sample_ID) # character vector
 #unravel sample ID
-Nemo_d13_AC2 <- Nemo_d13C_AC %>% 
+Nemo_d13_AC2 <- Nemo_d13C_AC %>%
   mutate(Recipient = gsub('-', '_', substr(sample_ID, 1, 6)), # gsub function will replace hyphens(-) with underscores(_) in a character vector.  In this case, the character vector is sample_ID.  The replacement is for any portion of the substring (the content of the character string) between digits 1 and 6.
          Transect = as.numeric(str_remove(substr(sample_ID, 8, 10), "^0+")), # Creates Transect variable by first using substr() to find the 8th-10th digits of the sample_ID column, and then removing the leading 0s using str_remove() and "^0+"
          Plant_ID = as.numeric(substr(sample_ID, 12,13))) %>% # Creates Plant_ID variable that contains the 12th-13th digits of the sample_ID column.  The as.numeric() function removes leading 0s when present.
@@ -901,7 +944,7 @@ Nemo_d13_AC2 <- Nemo_d13C_AC %>%
 
 
 #Merge
-AC_merged_df_fl3 <- merge(AC_merged_df_fl2, Nemo_d13_AC2, by = c("Recipient", "Transect", "Plant_ID"), all.x = TRUE) #add Plant_ID to merge by
+AC_merged_df7 <- merge(AC_merged_df6b, Nemo_d13_AC2, by = c("Recipient", "Transect", "Plant_ID"), all.x = TRUE) #add Plant_ID to merge by
 
 
 #check that all data made it (266 obs)
@@ -909,7 +952,7 @@ AC_merged_df_fl3 <- merge(AC_merged_df_fl2, Nemo_d13_AC2, by = c("Recipient", "T
 #  filter(!is.na(d13C))
 
 #Check d13C for F/NF plants... 
-AC_NFd13C <- AC_merged_df_fl3 %>% 
+AC_NFd13C <- AC_merged_df7 %>% 
   filter(!is.na(d13C)) %>%  # Extract only those fitness plants with isotope data
   arrange(FitP) # Sort by FitP (TRUE/FALSE)
 #includes 10 Replicate Fitness plants (n=10); the remaining are the selected fitenss plants (n=256)
@@ -921,7 +964,7 @@ Nemo_d13_AC2b <- Nemo_d13_AC2 %>%
   select(Transect, Recipient, d13C_SEG) #un-select Plant_ID, dryweight of sample
 
 
-AC_merged_df_fl3b <- merge(AC_merged_df_fl3, Nemo_d13_AC2b, by = c("Recipient", "Transect"), all.x = TRUE) 
+AC_merged_df_fl3 <- merge(AC_merged_df_fl2, Nemo_d13_AC2b, by = c("Recipient", "Transect"), all.x = TRUE) 
 # Merge by Recipient and Transect only: This will include data from the 10 non-fitness plants, assigning their isotope values to the entire segment (to all Plant_IDs in the segment).
 
 sum(!is.na(AC_merged_df_fl3b$d13C_SEG)) # 2660 rows have d13C values because each segment is represented by the same d13C value for each Plant_ID
@@ -945,7 +988,7 @@ x = object to be subsetted (in the code below, it's the dataframe, skel_weights_
 select = columns to select from the data frame
 
 ```{r}
-#Merge to identify MAIN fitness plants.  Merge skeleton weights with long-form data set containing germination, flowering data, and fitness plant categories (FitP, Rep_FitP, and any_FitP)
+#Merge to identify MAIN fitness plants. Merge skeleton weights with long-form data set containing germination, flowering data, and fitness plant categories (FitP, Rep_FitP, and any_FitP)
 
 sum(!is.na(skel_weights_all$AG_biomass_mg)) # n=434
 
