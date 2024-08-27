@@ -1,0 +1,3026 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\usepackage[margin=1in]{geometry}
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+\hypersetup{
+  pdftitle={Aster\_Hastings},
+  pdfauthor={Helen Payne},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+
+\title{Aster\_Hastings}
+\author{Helen Payne}
+\date{2024-07-30}
+
+\begin{document}
+\maketitle
+
+\#HASTINGS RANCH \#\#Generation 1 2022
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(tidyverse)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## -- Attaching core tidyverse packages ------------------------ tidyverse 2.0.0 --
+## v dplyr     1.1.4     v readr     2.1.5
+## v forcats   1.0.0     v stringr   1.5.1
+## v ggplot2   3.4.4     v tibble    3.2.1
+## v lubridate 1.9.3     v tidyr     1.3.0
+## v purrr     1.0.2     
+## -- Conflicts ------------------------------------------ tidyverse_conflicts() --
+## x dplyr::filter() masks stats::filter()
+## x dplyr::lag()    masks stats::lag()
+## i Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(readr)}
+\FunctionTok{library}\NormalTok{(dplyr)}
+\FunctionTok{library}\NormalTok{(stringr)}
+\FunctionTok{library}\NormalTok{(here)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## here() starts at /Users/Helen/Desktop/NSF Nemophila
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#read in the data and change the name to \#surv\_to\_fruitpod from surv\_to\_fruitprods}
+\CommentTok{\#HR\_22 \textless{}{-} read\_csv(here::here("data\_sheets", "compiled\_sheets", "HR\_mastersheet\_full\_2022.csv")) \%\textgreater{}\%}
+\CommentTok{\#  rename\_at(vars(55), \textasciitilde{}"surv\_to\_fruitpod")}
+         
+\CommentTok{\#colnames(HR\_22)}
+      
+
+\NormalTok{HR\_22 }\OtherTok{\textless{}{-}} \FunctionTok{read\_csv}\NormalTok{(here}\SpecialCharTok{::}\FunctionTok{here}\NormalTok{(}\StringTok{"data\_sheets"}\NormalTok{, }\StringTok{"compiled\_sheets"}\NormalTok{, }\StringTok{"HR\_mastersheet\_full\_2022.csv"}\NormalTok{)) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{rename\_at}\NormalTok{(}\FunctionTok{vars}\NormalTok{(}\DecValTok{55}\NormalTok{), }\SpecialCharTok{\textasciitilde{}}\StringTok{"surv\_to\_fruitpod"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{mutate}\NormalTok{(}
+    \CommentTok{\# Construct sample\_ID conditionally}
+    \AttributeTok{sample\_ID =} \FunctionTok{str\_c}\NormalTok{(Year, Recipient, Gen, }\FunctionTok{str\_pad}\NormalTok{(Transect, }\AttributeTok{width =} \DecValTok{3}\NormalTok{, }\AttributeTok{pad =} \StringTok{"0"}\NormalTok{), Plant\_ID, }\AttributeTok{sep =} \StringTok{"{-}"}\NormalTok{),}
+    \CommentTok{\# Replace leading underscores in sample\_ID with hyphens}
+    \AttributeTok{sample\_ID =} \FunctionTok{str\_replace}\NormalTok{(sample\_ID, }\StringTok{"\^{}([\^{}\_]*)\_"}\NormalTok{, }\StringTok{"}\SpecialCharTok{\textbackslash{}\textbackslash{}}\StringTok{1{-}"}\NormalTok{)}
+\NormalTok{  ) }\SpecialCharTok{\%\textgreater{}\%}
+\NormalTok{  dplyr}\SpecialCharTok{::}\FunctionTok{select}\NormalTok{(}\StringTok{"Transect"}\NormalTok{, }\StringTok{"Donor"}\NormalTok{, }\StringTok{"Recipient"}\NormalTok{, }\StringTok{"sample\_ID"}\NormalTok{, }\StringTok{"surv\_to\_flower"}\NormalTok{, }\StringTok{"any\_FitP"}\NormalTok{, }\StringTok{"total\_fruits"}\NormalTok{, }\StringTok{"closed\_fruits"}\NormalTok{, }\StringTok{"filled\_seeds"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{any\_FitP =} \FunctionTok{ifelse}\NormalTok{(any\_FitP }\SpecialCharTok{==} \ConstantTok{TRUE}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{0}\NormalTok{))}\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{filter}\NormalTok{(}\SpecialCharTok{!}\NormalTok{(Transect }\SpecialCharTok{\%in\%} \FunctionTok{c}\NormalTok{(}\StringTok{"W1"}\NormalTok{, }\StringTok{"W2"}\NormalTok{)))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Rows: 3624 Columns: 57
+## -- Column specification --------------------------------------------------------
+## Delimiter: ","
+## chr   (7): Block, Transect, Donor, Recipient, Gen, Replicated, Needed Area Redo
+## dbl  (41): Year, Sequence, Cohort, Plant_ID, F_plant_ID, fl_duration, days_g...
+## num   (1): F_multi
+## lgl   (3): F_plant, Rep_FitP, any_FitP
+## date  (5): Germ_Date, Sow_Date, Plant_Date, FFD, LFD
+## 
+## i Use `spec()` to retrieve the full column specification for this data.
+## i Specify the column types or set `show_col_types = FALSE` to quiet this message.
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#make NAs for other life history stages zero}
+\NormalTok{HR\_22}\SpecialCharTok{$}\NormalTok{surv\_to\_flower[}\FunctionTok{is.na}\NormalTok{(HR\_22}\SpecialCharTok{$}\NormalTok{surv\_to\_flower)] }\OtherTok{\textless{}{-}} \DecValTok{0}
+\NormalTok{HR\_22}\SpecialCharTok{$}\NormalTok{total\_fruits[}\FunctionTok{is.na}\NormalTok{(HR\_22}\SpecialCharTok{$}\NormalTok{total\_fruits)]}\OtherTok{\textless{}{-}}\DecValTok{0}
+\NormalTok{HR\_22}\SpecialCharTok{$}\NormalTok{closed\_fruits[}\FunctionTok{is.na}\NormalTok{(HR\_22}\SpecialCharTok{$}\NormalTok{closed\_fruits)]}\OtherTok{\textless{}{-}}\DecValTok{0}
+\NormalTok{HR\_22}\SpecialCharTok{$}\NormalTok{filled\_seeds[}\FunctionTok{is.na}\NormalTok{(HR\_22}\SpecialCharTok{$}\NormalTok{filled\_seeds)]}\OtherTok{\textless{}{-}}\DecValTok{0}
+
+\CommentTok{\# Define the update\_zeros function}
+\DocumentationTok{\#\# Determines survival info}
+\NormalTok{update\_zeros }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(df) \{}
+  \ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \DecValTok{1}\SpecialCharTok{:}\FunctionTok{nrow}\NormalTok{(df)) \{}
+    \ControlFlowTok{if}\NormalTok{ (df}\SpecialCharTok{$}\NormalTok{surv\_to\_flower[i] }\SpecialCharTok{==} \DecValTok{0}\NormalTok{) \{}
+\NormalTok{      df}\SpecialCharTok{$}\NormalTok{total\_fruits[i] }\OtherTok{\textless{}{-}} \DecValTok{0}
+\NormalTok{      df}\SpecialCharTok{$}\NormalTok{closed\_fruits[i] }\OtherTok{\textless{}{-}} \DecValTok{0}
+\NormalTok{      df}\SpecialCharTok{$}\NormalTok{filled\_seeds[i] }\OtherTok{\textless{}{-}} \DecValTok{0}
+\NormalTok{    \}}
+    \ControlFlowTok{if}\NormalTok{ (df}\SpecialCharTok{$}\NormalTok{total\_fruits[i] }\SpecialCharTok{==} \DecValTok{0}\NormalTok{) \{}
+\NormalTok{      df}\SpecialCharTok{$}\NormalTok{closed\_fruits[i] }\OtherTok{\textless{}{-}} \DecValTok{0}
+\NormalTok{      df}\SpecialCharTok{$}\NormalTok{filled\_seeds[i] }\OtherTok{\textless{}{-}} \DecValTok{0}
+\NormalTok{    \}}
+    \ControlFlowTok{if}\NormalTok{ (df}\SpecialCharTok{$}\NormalTok{closed\_fruits[i] }\OtherTok{\textless{}{-}} \DecValTok{0}\NormalTok{) \{}
+\NormalTok{      df}\SpecialCharTok{$}\NormalTok{filled\_seeds[i] }\OtherTok{\textless{}{-}} \DecValTok{0}
+\NormalTok{    \}}
+  \FunctionTok{return}\NormalTok{(df)}
+\NormalTok{  \}\}}
+
+\CommentTok{\# Apply the function to the dataset}
+\NormalTok{HR\_22 }\OtherTok{\textless{}{-}} \FunctionTok{update\_zeros}\NormalTok{(HR\_22)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#check for nonsense data}
+\FunctionTok{subset}\NormalTok{(HR\_22, filled\_seeds }\SpecialCharTok{\textgreater{}} \DecValTok{0} \SpecialCharTok{\&}\NormalTok{ surv\_to\_flower }\SpecialCharTok{==} \DecValTok{0}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 0 x 9
+## # i 9 variables: Transect <chr>, Donor <chr>, Recipient <chr>, sample_ID <chr>,
+## #   surv_to_flower <dbl>, any_FitP <dbl>, total_fruits <dbl>,
+## #   closed_fruits <dbl>, filled_seeds <dbl>
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{subset}\NormalTok{(HR\_22, filled\_seeds }\SpecialCharTok{\textgreater{}} \DecValTok{0} \SpecialCharTok{\&}\NormalTok{ any\_FitP }\SpecialCharTok{==} \DecValTok{0}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 0 x 9
+## # i 9 variables: Transect <chr>, Donor <chr>, Recipient <chr>, sample_ID <chr>,
+## #   surv_to_flower <dbl>, any_FitP <dbl>, total_fruits <dbl>,
+## #   closed_fruits <dbl>, filled_seeds <dbl>
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{subset}\NormalTok{(HR\_22, filled\_seeds }\SpecialCharTok{\textgreater{}} \DecValTok{0} \SpecialCharTok{\&}\NormalTok{ total\_fruits }\SpecialCharTok{==} \DecValTok{0}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 0 x 9
+## # i 9 variables: Transect <chr>, Donor <chr>, Recipient <chr>, sample_ID <chr>,
+## #   surv_to_flower <dbl>, any_FitP <dbl>, total_fruits <dbl>,
+## #   closed_fruits <dbl>, filled_seeds <dbl>
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{subset}\NormalTok{(HR\_22, filled\_seeds }\SpecialCharTok{\textgreater{}} \DecValTok{0} \SpecialCharTok{\&}\NormalTok{ closed\_fruits }\SpecialCharTok{==} \DecValTok{0}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 0 x 9
+## # i 9 variables: Transect <chr>, Donor <chr>, Recipient <chr>, sample_ID <chr>,
+## #   surv_to_flower <dbl>, any_FitP <dbl>, total_fruits <dbl>,
+## #   closed_fruits <dbl>, filled_seeds <dbl>
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#Make  sire and dam factors}
+\NormalTok{HR\_22}\SpecialCharTok{$}\NormalTok{Donor }\OtherTok{\textless{}{-}} \FunctionTok{as.factor}\NormalTok{(HR\_22}\SpecialCharTok{$}\NormalTok{Donor)}
+\NormalTok{HR\_22}\SpecialCharTok{$}\NormalTok{Recipient }\OtherTok{\textless{}{-}} \FunctionTok{as.factor}\NormalTok{(HR\_22}\SpecialCharTok{$}\NormalTok{Recipient)}
+
+\CommentTok{\#number that germinated from table 1}
+\NormalTok{HR\_22 }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{surv\_to\_flower =} \FunctionTok{as.factor}\NormalTok{(surv\_to\_flower)) }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{group\_by}\NormalTok{(surv\_to\_flower) }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{count}\NormalTok{() }\CommentTok{\#I don\textquotesingle{}t think Devin included plants that didn\textquotesingle{}t flower.. we need to fix this}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 2 x 2
+## # Groups:   surv_to_flower [2]
+##   surv_to_flower     n
+##   <fct>          <int>
+## 1 0                439
+## 2 1               2849
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#distinct number of dams}
+\NormalTok{HR\_22 }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{distinct}\NormalTok{(Recipient) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{count}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 1 x 1
+##       n
+##   <int>
+## 1   137
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#distinct \# sires}
+\NormalTok{HR\_22  }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{distinct}\NormalTok{(Donor) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{count}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 1 x 1
+##       n
+##   <int>
+## 1    46
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#number of dams, and number of individuals for each dam}
+\NormalTok{NDS}\OtherTok{\textless{}{-}}\NormalTok{HR\_22 }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{group\_by}\NormalTok{(Recipient, Donor) }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{count}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\#\#\#Set up aster
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(aster)}
+\FunctionTok{library}\NormalTok{(reshape2)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Attaching package: 'reshape2'
+\end{verbatim}
+
+\begin{verbatim}
+## The following object is masked from 'package:tidyr':
+## 
+##     smiths
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#the "vars" are the nodes in the aster graphical model.   }
+\NormalTok{vars}\OtherTok{\textless{}{-}}\FunctionTok{c}\NormalTok{(}\StringTok{"surv\_to\_flower"}\NormalTok{, }\StringTok{"any\_FitP"}\NormalTok{, }\StringTok{"total\_fruits"}\NormalTok{, }\StringTok{"closed\_fruits"}\NormalTok{, }\StringTok{"filled\_seeds"}\NormalTok{)}
+
+\CommentTok{\#convert to a dataframe for reshape to work}
+\NormalTok{HR\_22 }\OtherTok{\textless{}{-}} \FunctionTok{as.data.frame}\NormalTok{(HR\_22)}
+
+\CommentTok{\#Reshape HR to longform. "varying" notes the set of variables that will be converted to longform and named in "timevar" under one column of varb. "Times" says to use vars for the newly created column varb }
+\NormalTok{HR22\_aster }\OtherTok{\textless{}{-}} \FunctionTok{reshape}\NormalTok{(HR\_22 ,}\AttributeTok{varying =} \FunctionTok{list}\NormalTok{(vars), }\AttributeTok{direction =} \StringTok{"long"}\NormalTok{, }\AttributeTok{timevar =} \StringTok{"varb"}\NormalTok{,}\AttributeTok{times =} \FunctionTok{as.factor}\NormalTok{(vars), }\AttributeTok{v.names =} \StringTok{"resp"}\NormalTok{)}
+
+\DocumentationTok{\#\#\#\#\#Check that the reshape worked }
+\CommentTok{\#If it did the number of rows will be the same }
+\FunctionTok{nrow}\NormalTok{(HR22\_aster)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 16440
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{nrow}\NormalTok{(HR\_22)}\SpecialCharTok{*}\FunctionTok{length}\NormalTok{(vars)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 16440
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\DocumentationTok{\#\#\#\#\#Designate fitness variable, "filled\_seeds", which is the final node }
+\CommentTok{\#grep1 is like a search function}
+\NormalTok{fit}\OtherTok{\textless{}{-}}\FunctionTok{grepl}\NormalTok{(}\StringTok{"filled\_seeds"}\NormalTok{, }\FunctionTok{as.character}\NormalTok{(HR22\_aster}\SpecialCharTok{$}\NormalTok{varb))}
+\NormalTok{fit}\OtherTok{\textless{}{-}}\FunctionTok{as.numeric}\NormalTok{(fit)}
+\NormalTok{HR22\_aster}\SpecialCharTok{$}\NormalTok{fit}\OtherTok{\textless{}{-}}\NormalTok{fit}
+
+\DocumentationTok{\#\#\#\#\#Check "filled\_seeds", is designated as the fitness variable }
+\FunctionTok{with}\NormalTok{(HR22\_aster, }\FunctionTok{sort}\NormalTok{(}\FunctionTok{unique}\NormalTok{(}\FunctionTok{as.character}\NormalTok{(varb)[fit}\SpecialCharTok{==}\DecValTok{0}\NormalTok{])))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "any_FitP"       "closed_fruits"  "surv_to_flower" "total_fruits"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{with}\NormalTok{(HR22\_aster, }\FunctionTok{sort}\NormalTok{(}\FunctionTok{unique}\NormalTok{(}\FunctionTok{as.character}\NormalTok{(varb)[fit}\SpecialCharTok{==}\DecValTok{1}\NormalTok{])))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "filled_seeds"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\DocumentationTok{\#\#\#\#\#Add "root" to ML18\_aster files where value is 1 }
+\NormalTok{HR22\_aster }\OtherTok{\textless{}{-}} \FunctionTok{data.frame}\NormalTok{(HR22\_aster, }\AttributeTok{root=}\DecValTok{1}\NormalTok{)}
+
+\DocumentationTok{\#\#\#\#\#Set graphical node and distribution for fitness nodes(preds) }
+\FunctionTok{names}\NormalTok{(HR22\_aster)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "Transect"  "Donor"     "Recipient" "sample_ID" "varb"      "resp"     
+## [7] "id"        "fit"       "root"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#pred is nodes. There are 5 nodes, so five preds.}
+\NormalTok{pred }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{,}\DecValTok{1}\NormalTok{,}\DecValTok{2}\NormalTok{,}\DecValTok{2}\NormalTok{,}\DecValTok{3}\NormalTok{)}
+
+\CommentTok{\#fam assigns a distribution to each node. 1= bernoulli, 2= poission. The subsampling node (node \#2 in pred) is binomial. Bernouli is a specific type of binomial so the assignment for family distribution is the same}
+\NormalTok{fam}\OtherTok{\textless{}{-}}\FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{1}\NormalTok{,}\DecValTok{2}\NormalTok{,}\DecValTok{2}\NormalTok{,}\DecValTok{2}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(MASS)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Attaching package: 'MASS'
+\end{verbatim}
+
+\begin{verbatim}
+## The following object is masked from 'package:dplyr':
+## 
+##     select
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#check distribution of non{-}Bernoulli nodes}
+\CommentTok{\#Evaluate distribution of total pods}
+\CommentTok{\#first subset for those that survived to flowering }
+\NormalTok{HR22\_flwr}\OtherTok{\textless{}{-}}\FunctionTok{subset}\NormalTok{(HR\_22, surv\_to\_flower}\SpecialCharTok{\textgreater{}}\DecValTok{0}\NormalTok{)}
+
+\CommentTok{\#evaluate the distribution of total\_fruits }
+\FunctionTok{hist}\NormalTok{(HR22\_flwr}\SpecialCharTok{$}\NormalTok{filled\_seeds)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Aster_Hastings_files/figure-latex/unnamed-chunk-5-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#get parameters for a negative binomial distribution}
+\NormalTok{HR22.param }\OtherTok{\textless{}{-}} \FunctionTok{fitdistr}\NormalTok{(HR22\_flwr}\SpecialCharTok{$}\NormalTok{filled\_seeds, }\StringTok{"negative binomial"}\NormalTok{) }
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning in densfun(x, parm[1], parm[2], ...): NaNs produced
+
+## Warning in densfun(x, parm[1], parm[2], ...): NaNs produced
+
+## Warning in densfun(x, parm[1], parm[2], ...): NaNs produced
+
+## Warning in densfun(x, parm[1], parm[2], ...): NaNs produced
+
+## Warning in densfun(x, parm[1], parm[2], ...): NaNs produced
+
+## Warning in densfun(x, parm[1], parm[2], ...): NaNs produced
+
+## Warning in densfun(x, parm[1], parm[2], ...): NaNs produced
+
+## Warning in densfun(x, parm[1], parm[2], ...): NaNs produced
+
+## Warning in densfun(x, parm[1], parm[2], ...): NaNs produced
+
+## Warning in densfun(x, parm[1], parm[2], ...): NaNs produced
+
+## Warning in densfun(x, parm[1], parm[2], ...): NaNs produced
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#get a random distribution with the parameters from you data and plot a histogram. Do that for poisson and negative bionoimal and compare against the histogram for total pods to see which fits the best }
+\CommentTok{\#nbinomial??}
+\FunctionTok{hist}\NormalTok{(}\FunctionTok{rnbinom}\NormalTok{(}\DecValTok{2849}\NormalTok{, }\AttributeTok{size =} \FloatTok{0.0413}\NormalTok{, }\AttributeTok{mu=}\FloatTok{2.7732}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Aster_Hastings_files/figure-latex/unnamed-chunk-5-2.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{hist}\NormalTok{(}\FunctionTok{rpois}\NormalTok{(}\DecValTok{2849}\NormalTok{, }\AttributeTok{lambda=}\FloatTok{2.7732}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Aster_Hastings_files/figure-latex/unnamed-chunk-5-3.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#evaluate filled seeds node. Proceed as outlined above }
+\CommentTok{\#poisson is better}
+\NormalTok{HR22\_total\_fruit}\OtherTok{\textless{}{-}}\FunctionTok{subset}\NormalTok{(HR\_22, total\_fruits}\SpecialCharTok{\textgreater{}}\DecValTok{0}\NormalTok{)}
+\FunctionTok{hist}\NormalTok{(HR22\_total\_fruit}\SpecialCharTok{$}\NormalTok{filled\_seeds)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Aster_Hastings_files/figure-latex/unnamed-chunk-5-4.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{HR22.param2 }\OtherTok{\textless{}{-}} \FunctionTok{fitdistr}\NormalTok{(HR22\_total\_fruit}\SpecialCharTok{$}\NormalTok{filled\_seeds, }\StringTok{"negative binomial"}\NormalTok{) }
+
+\FunctionTok{hist}\NormalTok{(}\FunctionTok{rnbinom}\NormalTok{(}\DecValTok{596}\NormalTok{, }\AttributeTok{size =} \FloatTok{0.784}\NormalTok{, }\AttributeTok{mu=}\FloatTok{16.219}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Aster_Hastings_files/figure-latex/unnamed-chunk-5-5.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{hist}\NormalTok{(}\FunctionTok{rpois}\NormalTok{(}\DecValTok{600}\NormalTok{, }\AttributeTok{lambda=}\FloatTok{17.42}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Aster_Hastings_files/figure-latex/unnamed-chunk-5-6.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#evaluate filled seeds node. Proceed as outlined above }
+\CommentTok{\#poisson is better}
+\NormalTok{HR22\_closed\_fruit}\OtherTok{\textless{}{-}}\FunctionTok{subset}\NormalTok{(HR\_22, closed\_fruits}\SpecialCharTok{\textgreater{}}\DecValTok{0}\NormalTok{)}
+\FunctionTok{hist}\NormalTok{(HR22\_closed\_fruit}\SpecialCharTok{$}\NormalTok{filled\_seeds)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Aster_Hastings_files/figure-latex/unnamed-chunk-5-7.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{HR22.param3 }\OtherTok{\textless{}{-}} \FunctionTok{fitdistr}\NormalTok{(HR22\_closed\_fruit}\SpecialCharTok{$}\NormalTok{filled\_seeds, }\StringTok{"negative binomial"}\NormalTok{) }
+
+\FunctionTok{hist}\NormalTok{(}\FunctionTok{rnbinom}\NormalTok{(}\DecValTok{486}\NormalTok{, }\AttributeTok{size =} \FloatTok{0.801}\NormalTok{, }\AttributeTok{mu=}\FloatTok{16.319}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Aster_Hastings_files/figure-latex/unnamed-chunk-5-8.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{hist}\NormalTok{(}\FunctionTok{rpois}\NormalTok{(}\DecValTok{486}\NormalTok{, }\AttributeTok{lambda=}\FloatTok{16.319}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Aster_Hastings_files/figure-latex/unnamed-chunk-5-9.pdf}
+
+\#\#\#Random effects aster model
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\DocumentationTok{\#\#\#\#Testing for Donor and Recipient significance}
+\CommentTok{\#Donor is zero with Recipient}
+\NormalTok{both\_HR22 }\OtherTok{\textless{}{-}} \FunctionTok{reaster}\NormalTok{(resp }\SpecialCharTok{\textasciitilde{}}\NormalTok{ fit }\SpecialCharTok{+}\NormalTok{ varb }\SpecialCharTok{+}\NormalTok{ fit}\SpecialCharTok{:}\NormalTok{Transect, }\AttributeTok{random =} \FunctionTok{list}\NormalTok{(}\AttributeTok{Donor =} \SpecialCharTok{\textasciitilde{}}\DecValTok{0} \SpecialCharTok{+} 
+\NormalTok{    fit}\SpecialCharTok{:}\NormalTok{Donor, }\AttributeTok{Recipient =} \SpecialCharTok{\textasciitilde{}}\DecValTok{0} \SpecialCharTok{+}\NormalTok{ fit}\SpecialCharTok{:}\NormalTok{Recipient), }\AttributeTok{pred =}\NormalTok{ pred, }\AttributeTok{fam =}\NormalTok{ fam, }\AttributeTok{varvar =}\NormalTok{ varb, }
+    \AttributeTok{idvar =}\NormalTok{ id, }\AttributeTok{root =}\NormalTok{ root, }\AttributeTok{data =}\NormalTok{ HR22\_aster)}
+\FunctionTok{summary}\NormalTok{(both\_HR22)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Call:
+## reaster.formula(fixed = resp ~ fit + varb + fit:Transect, random = list(Donor = ~0 + 
+##     fit:Donor, Recipient = ~0 + fit:Recipient), pred = pred, 
+##     fam = fam, varvar = varb, idvar = id, root = root, data = HR22_aster)
+## 
+## 
+## Fixed Effects:
+##                     Estimate Std. Error  z value Pr(>|z|)    
+## (Intercept)        -22.27416    0.21424 -103.970  < 2e-16 ***
+## fit                 22.42368    0.21551  104.052  < 2e-16 ***
+## varbclosed_fruits   24.65444    0.22324  110.437  < 2e-16 ***
+## varbsurv_to_flower  24.63127    0.22242  110.743  < 2e-16 ***
+## varbtotal_fruits    24.55787    0.22358  109.839  < 2e-16 ***
+## fit:Transect2        0.02209    0.01543    1.432 0.152287    
+## fit:Transect3        0.03306    0.01602    2.063 0.039090 *  
+## fit:Transect4       -0.03003    0.01781   -1.686 0.091820 .  
+## fit:Transect5        0.02800    0.01555    1.801 0.071728 .  
+## fit:Transect6        0.01664    0.01571    1.060 0.289364    
+## fit:Transect7        0.05771    0.01459    3.956 7.61e-05 ***
+## fit:Transect8        0.02090    0.01560    1.340 0.180305    
+## fit:Transect9        0.05016    0.01451    3.458 0.000544 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Square Roots of Variance Components (P-values are one-tailed):
+##           Estimate Std. Error z value Pr(>|z|)/2    
+## Donor     0.032109   0.006486   4.950   3.71e-07 ***
+## Recipient 0.033152   0.004957   6.689   1.13e-11 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#Call:}
+\CommentTok{\#reaster.formula(fixed = resp \textasciitilde{} fit + varb + fit:Transect, random = list(Donor = \textasciitilde{}0 + }
+\CommentTok{\#    fit:Donor, Recipient = \textasciitilde{}0 + fit:Recipient), pred = pred, }
+\CommentTok{\#    fam = fam, varvar = varb, idvar = id, root = root, data = HR22\_aster)}
+
+
+\CommentTok{\#Fixed Effects:}
+\CommentTok{\#                    Estimate Std. Error  z value Pr(\textgreater{}|z|)    }
+\CommentTok{\#(Intercept)        {-}22.27416    0.21424 {-}103.970  \textless{} 2e{-}16 ***}
+\CommentTok{\#fit                 22.42368    0.21551  104.052  \textless{} 2e{-}16 ***}
+\CommentTok{\#varbclosed\_fruits   24.65444    0.22324  110.437  \textless{} 2e{-}16 ***}
+\CommentTok{\#varbsurv\_to\_flower  24.63127    0.22242  110.743  \textless{} 2e{-}16 ***}
+\CommentTok{\#varbtotal\_fruits    24.55787    0.22358  109.839  \textless{} 2e{-}16 ***}
+\CommentTok{\#fit:Transect2        0.02209    0.01543    1.432 0.152287    }
+\CommentTok{\#fit:Transect3        0.03306    0.01602    2.063 0.039090 *  }
+\CommentTok{\#fit:Transect4       {-}0.03003    0.01781   {-}1.686 0.091820 .  }
+\CommentTok{\#fit:Transect5        0.02800    0.01555    1.801 0.071728 .  }
+\CommentTok{\#fit:Transect6        0.01664    0.01571    1.060 0.289364    }
+\CommentTok{\#fit:Transect7        0.05771    0.01459    3.956 7.61e{-}05 ***}
+\CommentTok{\#fit:Transect8        0.02090    0.01560    1.340 0.180305    }
+\CommentTok{\#fit:Transect9        0.05016    0.01451    3.458 0.000544 ***}
+\CommentTok{\#{-}{-}{-}}
+\CommentTok{\#Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1}
+
+\CommentTok{\#Square Roots of Variance Components (P{-}values are one{-}tailed):}
+\CommentTok{\#          Estimate Std. Error z value Pr(\textgreater{}|z|)/2    }
+\CommentTok{\#Donor     0.032109   0.006486   4.950   3.71e{-}07 ***}
+\CommentTok{\#Recipient 0.033152   0.004957   6.689   1.13e{-}11 ***}
+\CommentTok{\#{-}{-}{-}}
+\CommentTok{\#Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1}
+
+\NormalTok{both2\_HR22 }\OtherTok{\textless{}{-}} \FunctionTok{reaster}\NormalTok{(resp }\SpecialCharTok{\textasciitilde{}}\NormalTok{ varb }\SpecialCharTok{+}\NormalTok{ fit, }\AttributeTok{random =} \FunctionTok{list}\NormalTok{(}\AttributeTok{Donor =} \SpecialCharTok{\textasciitilde{}}\DecValTok{0} \SpecialCharTok{+} 
+\NormalTok{    fit}\SpecialCharTok{:}\NormalTok{Donor, }\AttributeTok{Recipient =} \SpecialCharTok{\textasciitilde{}}\DecValTok{0} \SpecialCharTok{+}\NormalTok{ fit}\SpecialCharTok{:}\NormalTok{Recipient), }\AttributeTok{pred =}\NormalTok{ pred, }\AttributeTok{fam =}\NormalTok{ fam, }\AttributeTok{varvar =}\NormalTok{ varb, }
+    \AttributeTok{idvar =}\NormalTok{ id, }\AttributeTok{root =}\NormalTok{ root, }\AttributeTok{data =}\NormalTok{ HR22\_aster)}
+\FunctionTok{summary}\NormalTok{(both2\_HR22)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Call:
+## reaster.formula(fixed = resp ~ varb + fit, random = list(Donor = ~0 + 
+##     fit:Donor, Recipient = ~0 + fit:Recipient), pred = pred, 
+##     fam = fam, varvar = varb, idvar = id, root = root, data = HR22_aster)
+## 
+## 
+## Fixed Effects:
+##                    Estimate Std. Error z value Pr(>|z|)    
+## (Intercept)        -22.3261     0.2142  -104.2   <2e-16 ***
+## varbclosed_fruits   24.7064     0.2232   110.7   <2e-16 ***
+## varbfilled_seeds    22.5045     0.2149   104.7   <2e-16 ***
+## varbsurv_to_flower  24.6832     0.2224   111.0   <2e-16 ***
+## varbtotal_fruits    24.6094     0.2236   110.1   <2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Square Roots of Variance Components (P-values are one-tailed):
+##           Estimate Std. Error z value Pr(>|z|)/2    
+## Donor     0.031025   0.006491   4.780   8.77e-07 ***
+## Recipient 0.033883   0.004857   6.976   1.52e-12 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#Call:}
+\CommentTok{\#reaster.formula(fixed = resp \textasciitilde{} varb + fit, random = list(Donor = \textasciitilde{}0 + }
+\CommentTok{\#    fit:Donor, Recipient = \textasciitilde{}0 + fit:Recipient), pred = pred, }
+\CommentTok{\#    fam = fam, varvar = varb, idvar = id, root = root, data = HR22\_aster)}
+
+
+\CommentTok{\#Fixed Effects:}
+\CommentTok{\#                   Estimate Std. Error z value Pr(\textgreater{}|z|)    }
+\CommentTok{\#(Intercept)        {-}22.3261     0.2142  {-}104.2   \textless{}2e{-}16 ***}
+\CommentTok{\#varbclosed\_fruits   24.7064     0.2232   110.7   \textless{}2e{-}16 ***}
+\CommentTok{\#varbfilled\_seeds    22.5045     0.2149   104.7   \textless{}2e{-}16 ***}
+\CommentTok{\#varbsurv\_to\_flower  24.6832     0.2224   111.0   \textless{}2e{-}16 ***}
+\CommentTok{\#varbtotal\_fruits    24.6094     0.2236   110.1   \textless{}2e{-}16 ***}
+\CommentTok{\#{-}{-}{-}}
+\CommentTok{\#Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1}
+
+\CommentTok{\#Square Roots of Variance Components (P{-}values are one{-}tailed):}
+\CommentTok{\#          Estimate Std. Error z value Pr(\textgreater{}|z|)/2    }
+\CommentTok{\#Donor     0.031025   0.006491   4.780   8.77e{-}07 ***}
+\CommentTok{\#Recipient 0.033883   0.004857   6.976   1.52e{-}12 ***}
+\CommentTok{\#{-}{-}{-}}
+\CommentTok{\#Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1}
+
+\FunctionTok{anova}\NormalTok{(both2\_HR22,both\_HR22)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Analysis of Deviance Table
+## 
+## Model 1: resp ~ varb + fit, ~0 + fit:Donor, ~0 + fit:Recipient
+## Model 2: resp ~ fit + varb + fit:Transect, ~0 + fit:Donor, ~0 + fit:Recipient
+##   Mod Df Fix Mod Df Rand Mod Dev Df Fix Df Rand Deviance    P-value
+## 1          5           2   17494                                   
+## 2         13           2   17546      8       0   52.381 1.4205e-08
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#Analysis of Deviance Table}
+
+\CommentTok{\#Model 1: resp \textasciitilde{} varb + fit, \textasciitilde{}0 + fit:Donor, \textasciitilde{}0 + fit:Recipient}
+\CommentTok{\#Model 2: resp \textasciitilde{} fit + varb + fit:Transect, \textasciitilde{}0 + fit:Donor, \textasciitilde{}0 + fit:Recipient}
+\CommentTok{\#  Mod Df Fix Mod Df Rand Mod Dev Df Fix Df Rand Deviance    P{-}value}
+\CommentTok{\#1          5           2   17494                                   }
+\CommentTok{\#2         13           2   17546      8       0   52.381 1.4205e{-}08}
+
+\CommentTok{\#Check for the effect of Donor alone. Significant. }
+\NormalTok{Donor\_HR22}\OtherTok{\textless{}{-}} \FunctionTok{reaster}\NormalTok{(resp }\SpecialCharTok{\textasciitilde{}}\NormalTok{ fit }\SpecialCharTok{+}\NormalTok{ varb }\SpecialCharTok{+}\NormalTok{ fit}\SpecialCharTok{:}\NormalTok{Transect, }\AttributeTok{random =} \FunctionTok{list}\NormalTok{(}\AttributeTok{Donor =} \SpecialCharTok{\textasciitilde{}}\DecValTok{0} \SpecialCharTok{+} 
+\NormalTok{    fit}\SpecialCharTok{:}\NormalTok{Donor), }\AttributeTok{pred =}\NormalTok{ pred, }\AttributeTok{fam =}\NormalTok{ fam, }\AttributeTok{varvar =}\NormalTok{ varb, }
+    \AttributeTok{idvar =}\NormalTok{ id, }\AttributeTok{root =}\NormalTok{ root, }\AttributeTok{data =}\NormalTok{ HR22\_aster)}
+\FunctionTok{summary}\NormalTok{(Donor\_HR22)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Call:
+## reaster.formula(fixed = resp ~ fit + varb + fit:Transect, random = list(Donor = ~0 + 
+##     fit:Donor), pred = pred, fam = fam, varvar = varb, idvar = id, 
+##     root = root, data = HR22_aster)
+## 
+## 
+## Fixed Effects:
+##                     Estimate Std. Error  z value Pr(>|z|)    
+## (Intercept)        -22.32207    0.21405 -104.283  < 2e-16 ***
+## fit                 22.47521    0.21523  104.426  < 2e-16 ***
+## varbclosed_fruits   24.70234    0.22307  110.740  < 2e-16 ***
+## varbsurv_to_flower  24.67917    0.22224  111.048  < 2e-16 ***
+## varbtotal_fruits    24.60527    0.22342  110.132  < 2e-16 ***
+## fit:Transect2        0.02483    0.01447    1.716  0.08613 .  
+## fit:Transect3        0.03449    0.01519    2.270  0.02323 *  
+## fit:Transect4       -0.02796    0.01738   -1.609  0.10764    
+## fit:Transect5        0.02859    0.01477    1.935  0.05294 .  
+## fit:Transect6        0.01876    0.01495    1.254  0.20969    
+## fit:Transect7        0.05873    0.01369    4.290 1.79e-05 ***
+## fit:Transect8        0.01977    0.01498    1.320  0.18689    
+## fit:Transect9        0.05307    0.01380    3.845  0.00012 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Square Roots of Variance Components (P-values are one-tailed):
+##       Estimate Std. Error z value Pr(>|z|)/2    
+## Donor 0.038347   0.005331   7.193   3.16e-13 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#Fixed Effects:}
+\CommentTok{\#                    Estimate Std. Error  z value Pr(\textgreater{}|z|)    }
+\CommentTok{\#(Intercept)        {-}22.32207    0.21405 {-}104.283  \textless{} 2e{-}16 ***}
+\CommentTok{\#fit                 22.47521    0.21523  104.426  \textless{} 2e{-}16 ***}
+\CommentTok{\#varbclosed\_fruits   24.70234    0.22307  110.740  \textless{} 2e{-}16 ***}
+\CommentTok{\#varbsurv\_to\_flower  24.67917    0.22224  111.048  \textless{} 2e{-}16 ***}
+\CommentTok{\#varbtotal\_fruits    24.60527    0.22342  110.132  \textless{} 2e{-}16 ***}
+\CommentTok{\#fit:Transect2        0.02483    0.01447    1.716  0.08613 .  }
+\CommentTok{\#fit:Transect3        0.03449    0.01519    2.270  0.02323 *  }
+\CommentTok{\#fit:Transect4       {-}0.02796    0.01738   {-}1.609  0.10764    }
+\CommentTok{\#fit:Transect5        0.02859    0.01477    1.935  0.05294 .  }
+\CommentTok{\#fit:Transect6        0.01876    0.01495    1.254  0.20969    }
+\CommentTok{\#fit:Transect7        0.05873    0.01369    4.290 1.79e{-}05 ***}
+\CommentTok{\#fit:Transect8        0.01977    0.01498    1.320  0.18689    }
+\CommentTok{\#fit:Transect9        0.05307    0.01380    3.845  0.00012 ***}
+\CommentTok{\#{-}{-}{-}}
+\CommentTok{\#Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1}
+
+\CommentTok{\#Square Roots of Variance Components (P{-}values are one{-}tailed):}
+\CommentTok{\#      Estimate Std. Error z value Pr(\textgreater{}|z|)/2    }
+\CommentTok{\#Donor 0.038347   0.005331   7.193   3.16e{-}13 ***}
+\CommentTok{\#{-}{-}{-}}
+\CommentTok{\#Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1}
+
+\CommentTok{\#Check for the effect of Recipient alone. Significant. }
+\NormalTok{Recipient\_HR22}\OtherTok{\textless{}{-}} \FunctionTok{reaster}\NormalTok{(resp }\SpecialCharTok{\textasciitilde{}}\NormalTok{ varb }\SpecialCharTok{+}\NormalTok{ fit, }\AttributeTok{random =} \FunctionTok{list}\NormalTok{(}\AttributeTok{Recipient =} \SpecialCharTok{\textasciitilde{}}\DecValTok{0} \SpecialCharTok{+} 
+\NormalTok{    fit}\SpecialCharTok{:}\NormalTok{Recipient), }\AttributeTok{pred =}\NormalTok{ pred, }\AttributeTok{fam =}\NormalTok{ fam, }\AttributeTok{varvar =}\NormalTok{ varb, }
+    \AttributeTok{idvar =}\NormalTok{ id, }\AttributeTok{root =}\NormalTok{ root, }\AttributeTok{data =}\NormalTok{ HR22\_aster)}
+
+\FunctionTok{summary}\NormalTok{(Recipient\_HR22)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Call:
+## reaster.formula(fixed = resp ~ varb + fit, random = list(Recipient = ~0 + 
+##     fit:Recipient), pred = pred, fam = fam, varvar = varb, idvar = id, 
+##     root = root, data = HR22_aster)
+## 
+## 
+## Fixed Effects:
+##                    Estimate Std. Error z value Pr(>|z|)    
+## (Intercept)        -22.3364     0.2142  -104.3   <2e-16 ***
+## varbclosed_fruits   24.7167     0.2232   110.7   <2e-16 ***
+## varbfilled_seeds    22.5165     0.2149   104.8   <2e-16 ***
+## varbsurv_to_flower  24.6935     0.2224   111.0   <2e-16 ***
+## varbtotal_fruits    24.6197     0.2236   110.1   <2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Square Roots of Variance Components (P-values are one-tailed):
+##           Estimate Std. Error z value Pr(>|z|)/2    
+## Recipient 0.044690   0.004261   10.49     <2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#Call:}
+\CommentTok{\#reaster.formula(fixed = resp \textasciitilde{} varb + fit, random = list(Recipient = \textasciitilde{}0 + }
+\CommentTok{\#    fit:Recipient), pred = pred, fam = fam, varvar = varb, idvar = id, }
+\CommentTok{\#    root = root, data = HR22\_aster)}
+
+\CommentTok{\#Fixed Effects:}
+\CommentTok{\#                   Estimate Std. Error z value Pr(\textgreater{}|z|)    }
+\CommentTok{\#(Intercept)        {-}22.3364     0.2142  {-}104.3   \textless{}2e{-}16 ***}
+\CommentTok{\#varbclosed\_fruits   24.7167     0.2232   110.7   \textless{}2e{-}16 ***}
+\CommentTok{\#varbfilled\_seeds    22.5165     0.2149   104.8   \textless{}2e{-}16 ***}
+\CommentTok{\#varbsurv\_to\_flower  24.6935     0.2224   111.0   \textless{}2e{-}16 ***}
+\CommentTok{\#varbtotal\_fruits    24.6197     0.2236   110.1   \textless{}2e{-}16 ***}
+\CommentTok{\#{-}{-}{-}}
+\CommentTok{\#Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1}
+
+\CommentTok{\#Square Roots of Variance Components (P{-}values are one{-}tailed):}
+\CommentTok{\#          Estimate Std. Error z value Pr(\textgreater{}|z|)/2    }
+\CommentTok{\#Recipient 0.044690   0.004261   10.49     \textless{}2e{-}16 ***}
+\CommentTok{\#{-}{-}{-}}
+\CommentTok{\#Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1}
+
+\DocumentationTok{\#\#\#\#Combine Sire and Dam into one random effect, \textasciigrave{}Parental\textasciigrave{}. The estimates are of similar magnitude }
+\NormalTok{modmat.Donor }\OtherTok{\textless{}{-}} \FunctionTok{model.matrix}\NormalTok{(}\SpecialCharTok{\textasciitilde{}} \DecValTok{0} \SpecialCharTok{+}\NormalTok{ fit}\SpecialCharTok{:}\NormalTok{Donor, HR22\_aster)}
+\NormalTok{modmat.Recipient }\OtherTok{\textless{}{-}} \FunctionTok{model.matrix}\NormalTok{(}\SpecialCharTok{\textasciitilde{}} \DecValTok{0} \SpecialCharTok{+}\NormalTok{ fit}\SpecialCharTok{:}\NormalTok{Recipient, HR22\_aster)}
+\NormalTok{modmat.donorrecipient }\OtherTok{\textless{}{-}} \FunctionTok{cbind}\NormalTok{(modmat.Donor,modmat.Recipient)}
+
+\NormalTok{rout\_HR22 }\OtherTok{\textless{}{-}} \FunctionTok{reaster}\NormalTok{(resp }\SpecialCharTok{\textasciitilde{}}\NormalTok{ fit }\SpecialCharTok{+}\NormalTok{ varb, }\FunctionTok{list}\NormalTok{(}\AttributeTok{Parental =} \SpecialCharTok{\textasciitilde{}} \DecValTok{0} \SpecialCharTok{+}\NormalTok{ modmat.donorrecipient),pred, fam, varb, id, root, }\AttributeTok{data =}\NormalTok{ HR22\_aster)}
+\NormalTok{sout\_HR22 }\OtherTok{\textless{}{-}}\FunctionTok{summary}\NormalTok{(rout\_HR22)}
+\NormalTok{sout\_HR22}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Call:
+## reaster.formula(fixed = resp ~ fit + varb, random = list(Parental = ~0 + 
+##     modmat.donorrecipient), pred = pred, fam = fam, varvar = varb, 
+##     idvar = id, root = root, data = HR22_aster)
+## 
+## 
+## Fixed Effects:
+##                    Estimate Std. Error z value Pr(>|z|)    
+## (Intercept)        -22.3258     0.2142  -104.2   <2e-16 ***
+## fit                 22.5041     0.2149   104.7   <2e-16 ***
+## varbclosed_fruits   24.7061     0.2232   110.7   <2e-16 ***
+## varbsurv_to_flower  24.6829     0.2224   111.0   <2e-16 ***
+## varbtotal_fruits    24.6091     0.2236   110.1   <2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Square Roots of Variance Components (P-values are one-tailed):
+##          Estimate Std. Error z value Pr(>|z|)/2    
+## Parental 0.032798   0.003304   9.927     <2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{save}\NormalTok{(rout\_HR22, }\AttributeTok{file =} \StringTok{"rout\_HR22.rdata"}\NormalTok{)}
+
+\CommentTok{\#Call:}
+\CommentTok{\#reaster.formula(fixed = resp \textasciitilde{} fit + varb, random = list(Parental = \textasciitilde{}0 + }
+\CommentTok{\#    modmat.DonorRecipient), pred = pred, fam = fam, varvar = varb, }
+\CommentTok{\#    idvar = id, root = root, data = HR22\_aster)}
+
+\CommentTok{\#Fixed Effects:}
+\CommentTok{\#                   Estimate Std. Error z value Pr(\textgreater{}|z|)    }
+\CommentTok{\#(Intercept)        {-}22.3258     0.2142  {-}104.2   \textless{}2e{-}16 ***}
+\CommentTok{\#fit                 22.5041     0.2149   104.7   \textless{}2e{-}16 ***}
+\CommentTok{\#varbclosed\_fruits   24.7061     0.2232   110.7   \textless{}2e{-}16 ***}
+\CommentTok{\#varbsurv\_to\_flower  24.6829     0.2224   111.0   \textless{}2e{-}16 ***}
+\CommentTok{\#varbtotal\_fruits    24.6091     0.2236   110.1   \textless{}2e{-}16 ***}
+\CommentTok{\#{-}{-}{-}}
+\CommentTok{\#Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1}
+
+\CommentTok{\#Square Roots of Variance Components (P{-}values are one{-}tailed):}
+\CommentTok{\#         Estimate Std. Error z value Pr(\textgreater{}|z|)/2    }
+\CommentTok{\#Parental 0.032798   0.003304   9.927     \textless{}2e{-}16 ***}
+\CommentTok{\#{-}{-}{-}}
+\CommentTok{\#Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1}
+
+\CommentTok{\#model comparison for significance of Transect. Significant.}
+\NormalTok{rout\_HR22\_2 }\OtherTok{\textless{}{-}} \FunctionTok{reaster}\NormalTok{(resp }\SpecialCharTok{\textasciitilde{}}\NormalTok{ fit }\SpecialCharTok{+}\NormalTok{ varb }\SpecialCharTok{+}\NormalTok{ fit}\SpecialCharTok{:}\NormalTok{Transect, }\FunctionTok{list}\NormalTok{(}\AttributeTok{Parental =} \SpecialCharTok{\textasciitilde{}} \DecValTok{0} \SpecialCharTok{+}\NormalTok{ modmat.donorrecipient),}
+\NormalTok{    pred, fam, varb, id, root, }\AttributeTok{data =}\NormalTok{ HR22\_aster)}
+\NormalTok{sout\_HR22\_2 }\OtherTok{\textless{}{-}}\FunctionTok{summary}\NormalTok{(rout\_HR22\_2)}
+\NormalTok{sout\_HR22\_2}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Call:
+## reaster.formula(fixed = resp ~ fit + varb + fit:Transect, random = list(Parental = ~0 + 
+##     modmat.donorrecipient), pred = pred, fam = fam, varvar = varb, 
+##     idvar = id, root = root, data = HR22_aster)
+## 
+## 
+## Fixed Effects:
+##                     Estimate Std. Error  z value Pr(>|z|)    
+## (Intercept)        -22.27405    0.21423 -103.971  < 2e-16 ***
+## fit                 22.42354    0.21550  104.052  < 2e-16 ***
+## varbclosed_fruits   24.65433    0.22324  110.438  < 2e-16 ***
+## varbsurv_to_flower  24.63115    0.22242  110.744  < 2e-16 ***
+## varbtotal_fruits    24.55775    0.22358  109.840  < 2e-16 ***
+## fit:Transect2        0.02202    0.01541    1.429 0.153068    
+## fit:Transect3        0.03311    0.01601    2.068 0.038601 *  
+## fit:Transect4       -0.03004    0.01781   -1.687 0.091667 .  
+## fit:Transect5        0.02800    0.01554    1.802 0.071565 .  
+## fit:Transect6        0.01661    0.01570    1.058 0.289988    
+## fit:Transect7        0.05771    0.01458    3.958 7.55e-05 ***
+## fit:Transect8        0.02088    0.01559    1.339 0.180645    
+## fit:Transect9        0.05015    0.01450    3.459 0.000543 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Square Roots of Variance Components (P-values are one-tailed):
+##          Estimate Std. Error z value Pr(>|z|)/2    
+## Parental 0.032744   0.003349   9.778     <2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#Call:}
+\CommentTok{\#reaster.formula(fixed = resp \textasciitilde{} fit + varb + fit:Transect, random = list(Parental = \textasciitilde{}0 + }
+\CommentTok{\#    modmat.DonorRecipient), pred = pred, fam = fam, varvar = varb, }
+\CommentTok{\#    idvar = id, root = root, data = HR22\_aster)}
+
+
+\CommentTok{\#Fixed Effects:}
+\CommentTok{\#                    Estimate Std. Error  z value Pr(\textgreater{}|z|)    }
+\CommentTok{\#(Intercept)        {-}22.27405    0.21423 {-}103.971  \textless{} 2e{-}16 ***}
+\CommentTok{\#fit                 22.42354    0.21550  104.052  \textless{} 2e{-}16 ***}
+\CommentTok{\#varbclosed\_fruits   24.65433    0.22324  110.438  \textless{} 2e{-}16 ***}
+\CommentTok{\#varbsurv\_to\_flower  24.63115    0.22242  110.744  \textless{} 2e{-}16 ***}
+\CommentTok{\#varbtotal\_fruits    24.55775    0.22358  109.840  \textless{} 2e{-}16 ***}
+\CommentTok{\#fit:Transect2        0.02202    0.01541    1.429 0.153068    }
+\CommentTok{\#fit:Transect3        0.03311    0.01601    2.068 0.038601 *  }
+\CommentTok{\#fit:Transect4       {-}0.03004    0.01781   {-}1.687 0.091667 .  }
+\CommentTok{\#fit:Transect5        0.02800    0.01554    1.802 0.071565 .  }
+\CommentTok{\#fit:Transect6        0.01661    0.01570    1.058 0.289988    }
+\CommentTok{\#fit:Transect7        0.05771    0.01458    3.958 7.55e{-}05 ***}
+\CommentTok{\#fit:Transect8        0.02088    0.01559    1.339 0.180645    }
+\CommentTok{\#fit:Transect9        0.05015    0.01450    3.459 0.000543 ***}
+\CommentTok{\#{-}{-}{-}}
+\CommentTok{\#Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1}
+
+\CommentTok{\#Square Roots of Variance Components (P{-}values are one{-}tailed):}
+\CommentTok{\#         Estimate Std. Error z value Pr(\textgreater{}|z|)/2    }
+\CommentTok{\#Parental 0.032744   0.003349   9.778     \textless{}2e{-}16 ***}
+\CommentTok{\#{-}{-}{-}}
+\CommentTok{\#Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1}
+
+\FunctionTok{anova}\NormalTok{(rout\_HR22, rout\_HR22\_2)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Analysis of Deviance Table
+## 
+## Model 1: resp ~ fit + varb, ~0 + modmat.donorrecipient
+## Model 2: resp ~ fit + varb + fit:Transect, ~0 + modmat.donorrecipient
+##   Mod Df Fix Mod Df Rand Mod Dev Df Fix Df Rand Deviance    P-value
+## 1          5           1   17494                                   
+## 2         13           1   17546      8       0   52.441 1.3832e-08
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\DocumentationTok{\#\#\#\#Now look at parameter estimates to be sure we have the model intended.}
+\NormalTok{sout\_HR22\_2 }\OtherTok{\textless{}{-}}\FunctionTok{summary}\NormalTok{(rout\_HR22\_2)}
+\NormalTok{sout\_HR22\_2}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Call:
+## reaster.formula(fixed = resp ~ fit + varb + fit:Transect, random = list(Parental = ~0 + 
+##     modmat.donorrecipient), pred = pred, fam = fam, varvar = varb, 
+##     idvar = id, root = root, data = HR22_aster)
+## 
+## 
+## Fixed Effects:
+##                     Estimate Std. Error  z value Pr(>|z|)    
+## (Intercept)        -22.27405    0.21423 -103.971  < 2e-16 ***
+## fit                 22.42354    0.21550  104.052  < 2e-16 ***
+## varbclosed_fruits   24.65433    0.22324  110.438  < 2e-16 ***
+## varbsurv_to_flower  24.63115    0.22242  110.744  < 2e-16 ***
+## varbtotal_fruits    24.55775    0.22358  109.840  < 2e-16 ***
+## fit:Transect2        0.02202    0.01541    1.429 0.153068    
+## fit:Transect3        0.03311    0.01601    2.068 0.038601 *  
+## fit:Transect4       -0.03004    0.01781   -1.687 0.091667 .  
+## fit:Transect5        0.02800    0.01554    1.802 0.071565 .  
+## fit:Transect6        0.01661    0.01570    1.058 0.289988    
+## fit:Transect7        0.05771    0.01458    3.958 7.55e-05 ***
+## fit:Transect8        0.02088    0.01559    1.339 0.180645    
+## fit:Transect9        0.05015    0.01450    3.459 0.000543 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Square Roots of Variance Components (P-values are one-tailed):
+##          Estimate Std. Error z value Pr(>|z|)/2    
+## Parental 0.032744   0.003349   9.778     <2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+\end{verbatim}
+
+\#\#\#Mapping function
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#following Geyer et al. 2022}
+\FunctionTok{library}\NormalTok{(numDeriv)}
+\NormalTok{fishinv}\OtherTok{\textless{}{-}}\FunctionTok{solve}\NormalTok{(sout\_HR22\_2}\SpecialCharTok{$}\NormalTok{fisher)}
+\NormalTok{map.factory }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(rout, is.subsamp) \{}
+  \FunctionTok{stopifnot}\NormalTok{(}\FunctionTok{inherits}\NormalTok{(rout, }\StringTok{"reaster"}\NormalTok{))}
+  \FunctionTok{stopifnot}\NormalTok{(}\FunctionTok{is.logical}\NormalTok{(is.subsamp))}
+\NormalTok{  aout }\OtherTok{\textless{}{-}}\NormalTok{ rout}\SpecialCharTok{$}\NormalTok{obj}
+  \FunctionTok{stopifnot}\NormalTok{(}\FunctionTok{inherits}\NormalTok{(aout, }\StringTok{"aster"}\NormalTok{))}
+\NormalTok{  nnode }\OtherTok{\textless{}{-}} \FunctionTok{ncol}\NormalTok{(aout}\SpecialCharTok{$}\NormalTok{x)}
+  \ControlFlowTok{if}\NormalTok{ (nnode }\SpecialCharTok{!=} \FunctionTok{length}\NormalTok{(is.subsamp))}
+    \FunctionTok{stop}\NormalTok{(}\StringTok{"length(is.subsamp) not the number of nodes in the aster graph"}\NormalTok{)}
+\NormalTok{  alpha }\OtherTok{\textless{}{-}}\NormalTok{ rout}\SpecialCharTok{$}\NormalTok{alpha}
+\NormalTok{  ifit }\OtherTok{\textless{}{-}} \FunctionTok{which}\NormalTok{(}\FunctionTok{names}\NormalTok{(alpha) }\SpecialCharTok{==} \StringTok{"fit"}\NormalTok{)}
+  \ControlFlowTok{if}\NormalTok{ (}\FunctionTok{length}\NormalTok{(ifit) }\SpecialCharTok{!=} \DecValTok{1}\NormalTok{)}
+    \FunctionTok{stop}\NormalTok{(}\StringTok{"no fixed effect named fit"}\NormalTok{)}
+\NormalTok{  modmat }\OtherTok{\textless{}{-}}\NormalTok{ rout}\SpecialCharTok{$}\NormalTok{obj}\SpecialCharTok{$}\NormalTok{modmat[}\DecValTok{1}\NormalTok{, , , drop }\OtherTok{=} \ConstantTok{FALSE}\NormalTok{]}
+  \CommentTok{\# set root = 1}
+\NormalTok{  root }\OtherTok{\textless{}{-}} \FunctionTok{array}\NormalTok{(}\DecValTok{1}\NormalTok{, }\AttributeTok{dim =} \FunctionTok{dim}\NormalTok{(modmat)[}\DecValTok{1}\SpecialCharTok{:}\DecValTok{2}\NormalTok{])}
+\NormalTok{  x }\OtherTok{\textless{}{-}}\NormalTok{ aout}\SpecialCharTok{$}\NormalTok{x[}\DecValTok{1}\NormalTok{, }\FunctionTok{c}\NormalTok{(}\DecValTok{1}\SpecialCharTok{:}\DecValTok{5}\NormalTok{)] }\CommentTok{\# added, 5 is the number of nodes }
+  \CommentTok{\# return map function}
+  \ControlFlowTok{function}\NormalTok{ (b) \{}
+    \FunctionTok{stopifnot}\NormalTok{(}\FunctionTok{is.numeric}\NormalTok{(b))}
+    \FunctionTok{stopifnot}\NormalTok{(}\FunctionTok{is.finite}\NormalTok{(b))}
+    \FunctionTok{stopifnot}\NormalTok{(}\FunctionTok{length}\NormalTok{(b) }\SpecialCharTok{==} \DecValTok{1}\NormalTok{)}
+\NormalTok{    alpha[ifit] }\OtherTok{\textless{}{-}}\NormalTok{ alpha[ifit] }\SpecialCharTok{+}\NormalTok{ b}
+\NormalTok{    xi }\OtherTok{\textless{}{-}} \FunctionTok{predict}\NormalTok{(}
+\NormalTok{      aout,}
+      \AttributeTok{x =}\NormalTok{ x, }\CommentTok{\# added}
+      \AttributeTok{newcoef =}\NormalTok{ alpha,}
+      \AttributeTok{modmat =}\NormalTok{ modmat,}
+      \AttributeTok{root =}\NormalTok{ root,}
+      \AttributeTok{model.type =} \StringTok{"conditional"}\NormalTok{,}
+      \AttributeTok{is.always.parameter =} \ConstantTok{TRUE}\NormalTok{)}
+  
+\NormalTok{    xi }\OtherTok{\textless{}{-}} \FunctionTok{matrix}\NormalTok{(xi, }\AttributeTok{ncol =}\NormalTok{ nnode)}
+    \CommentTok{\# always use drop = FALSE unless you are sure you don\textquotesingle{}t want that}
+    \CommentTok{\# here if we omit drop = FALSE and there is only one non{-}subsampling}
+    \CommentTok{\# node, the code will break (apply will give an error)}
+\NormalTok{    xi }\OtherTok{\textless{}{-}}\NormalTok{ xi[,}\SpecialCharTok{!}\NormalTok{is.subsamp, drop }\OtherTok{=} \ConstantTok{FALSE}\NormalTok{]}
+\NormalTok{    mu }\OtherTok{\textless{}{-}} \FunctionTok{apply}\NormalTok{(xi, }\DecValTok{1}\NormalTok{, prod) }\CommentTok{\#every individual}
+    \CommentTok{\# mu is unconditional mean values for model without subsampling}
+    \CommentTok{\# in this application all components mu are the same because no}
+    \CommentTok{\# covariates except varb, so just return only one}
+\NormalTok{    mu[}\DecValTok{1}\NormalTok{] }
+\NormalTok{  \}}
+\NormalTok{\}}
+
+\NormalTok{map }\OtherTok{\textless{}{-}} \FunctionTok{map.factory}\NormalTok{(rout\_HR22\_2, vars }\SpecialCharTok{==} \StringTok{"any\_FitP"}\NormalTok{)}
+
+\CommentTok{\#MEAN FITNESS}
+\NormalTok{mf}\OtherTok{\textless{}{-}}\FunctionTok{map}\NormalTok{(}\DecValTok{0}\NormalTok{)}
+\NormalTok{mf}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 124.1588
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#124.1588}
+
+\CommentTok{\#ADDITIVE GENETIC VARIANCE FOR FITNESS}
+\NormalTok{vaw }\OtherTok{\textless{}{-}}\NormalTok{ rout\_HR22\_2}\SpecialCharTok{$}\NormalTok{sigma[}\StringTok{"Parental"}\NormalTok{]}\SpecialCharTok{\^{}}\DecValTok{2} \SpecialCharTok{*} \FunctionTok{grad}\NormalTok{(map, }\DecValTok{0}\NormalTok{)}\SpecialCharTok{\^{}}\DecValTok{2}
+\CommentTok{\# get rid of name}
+\NormalTok{vaw }\OtherTok{\textless{}{-}} \FunctionTok{as.numeric}\NormalTok{(vaw)}
+\NormalTok{vaw }\OtherTok{\textless{}{-}}\NormalTok{ vaw }\SpecialCharTok{*} \DecValTok{4}
+\NormalTok{vaw}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 381.0984
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#381.0984}
+
+\DocumentationTok{\#\#\#\#FFTNS}
+\NormalTok{fftns }\OtherTok{\textless{}{-}}\NormalTok{ vaw }\SpecialCharTok{/}\NormalTok{ mf}
+\NormalTok{fftns}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 3.069442
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#3.069442}
+
+\CommentTok{\#prediction of progeny generation mean fitness}
+\NormalTok{mf}\SpecialCharTok{+}\NormalTok{fftns}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 127.2283
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#127.2283}
+
+\CommentTok{\# get SE}
+\NormalTok{map.factory.too }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(rout, is.subsamp) \{}
+  \FunctionTok{stopifnot}\NormalTok{(}\FunctionTok{inherits}\NormalTok{(rout, }\StringTok{"reaster"}\NormalTok{))}
+  \FunctionTok{stopifnot}\NormalTok{(}\FunctionTok{is.logical}\NormalTok{(is.subsamp))}
+\NormalTok{  aout }\OtherTok{\textless{}{-}}\NormalTok{ rout}\SpecialCharTok{$}\NormalTok{obj}
+  \FunctionTok{stopifnot}\NormalTok{(}\FunctionTok{inherits}\NormalTok{(aout, }\StringTok{"aster"}\NormalTok{))}
+\NormalTok{  nnode }\OtherTok{\textless{}{-}} \FunctionTok{ncol}\NormalTok{(aout}\SpecialCharTok{$}\NormalTok{x)}
+  \ControlFlowTok{if}\NormalTok{ (nnode }\SpecialCharTok{!=} \FunctionTok{length}\NormalTok{(is.subsamp))}
+    \FunctionTok{stop}\NormalTok{(}\StringTok{"length(is.subsamp) not the number of nodes in the aster graph"}\NormalTok{)}
+\NormalTok{  alpha }\OtherTok{\textless{}{-}}\NormalTok{ rout}\SpecialCharTok{$}\NormalTok{alpha}
+\NormalTok{  ifit }\OtherTok{\textless{}{-}} \FunctionTok{which}\NormalTok{(}\FunctionTok{names}\NormalTok{(alpha) }\SpecialCharTok{==} \StringTok{"fit"}\NormalTok{)}
+  \ControlFlowTok{if}\NormalTok{ (}\FunctionTok{length}\NormalTok{(ifit) }\SpecialCharTok{!=} \DecValTok{1}\NormalTok{)}
+    \FunctionTok{stop}\NormalTok{(}\StringTok{"no fixed effect named fit"}\NormalTok{)}
+  \CommentTok{\# modmat for one individual. Taking the first row of modmat{-} there is one row for each individual}
+\NormalTok{  modmat }\OtherTok{\textless{}{-}}\NormalTok{ rout}\SpecialCharTok{$}\NormalTok{obj}\SpecialCharTok{$}\NormalTok{modmat[}\DecValTok{1}\NormalTok{, , , drop }\OtherTok{=} \ConstantTok{FALSE}\NormalTok{] }\CommentTok{\#this only takes the first row }
+  \CommentTok{\# set root = 1}
+\NormalTok{  root }\OtherTok{\textless{}{-}} \FunctionTok{array}\NormalTok{(}\DecValTok{1}\NormalTok{, }\AttributeTok{dim =} \FunctionTok{dim}\NormalTok{(modmat)[}\DecValTok{1}\SpecialCharTok{:}\DecValTok{2}\NormalTok{])}
+\NormalTok{  x }\OtherTok{\textless{}{-}}\NormalTok{ aout}\SpecialCharTok{$}\NormalTok{x[}\DecValTok{1}\NormalTok{, }\FunctionTok{c}\NormalTok{(}\DecValTok{1}\SpecialCharTok{:}\DecValTok{5}\NormalTok{)] }\CommentTok{\# added, second number is number of nodes }
+  \CommentTok{\# return map function}
+  \ControlFlowTok{function}\NormalTok{ (balpha) \{}
+    \FunctionTok{stopifnot}\NormalTok{(}\FunctionTok{is.numeric}\NormalTok{(balpha))}
+    \FunctionTok{stopifnot}\NormalTok{(}\FunctionTok{is.finite}\NormalTok{(balpha))}
+    \FunctionTok{stopifnot}\NormalTok{(}\FunctionTok{length}\NormalTok{(balpha) }\SpecialCharTok{==} \DecValTok{1} \SpecialCharTok{+} \FunctionTok{length}\NormalTok{(alpha))}
+\NormalTok{    b }\OtherTok{\textless{}{-}}\NormalTok{ balpha[}\DecValTok{1}\NormalTok{]}
+\NormalTok{    alpha }\OtherTok{\textless{}{-}}\NormalTok{ balpha[}\SpecialCharTok{{-}}\DecValTok{1}\NormalTok{]}
+\NormalTok{    alpha[ifit] }\OtherTok{\textless{}{-}}\NormalTok{ alpha[ifit] }\SpecialCharTok{+}\NormalTok{ b}
+\NormalTok{    xi }\OtherTok{\textless{}{-}} \FunctionTok{predict}\NormalTok{(}
+\NormalTok{      aout,}
+      \AttributeTok{x =}\NormalTok{ x, }\CommentTok{\# added}
+      \AttributeTok{newcoef =}\NormalTok{ alpha,}
+      \AttributeTok{modmat =}\NormalTok{ modmat,}
+      \AttributeTok{root =}\NormalTok{ root,}
+      \AttributeTok{model.type =} \StringTok{"conditional"}\NormalTok{,}
+      \AttributeTok{is.always.parameter =} \ConstantTok{TRUE}
+\NormalTok{    )}
+\NormalTok{    xi }\OtherTok{\textless{}{-}} \FunctionTok{matrix}\NormalTok{(xi, }\AttributeTok{ncol =}\NormalTok{ nnode)}
+\NormalTok{    xi }\OtherTok{\textless{}{-}}\NormalTok{ xi[,}\SpecialCharTok{!}\NormalTok{is.subsamp, drop }\OtherTok{=} \ConstantTok{FALSE}\NormalTok{]}
+\NormalTok{    mu }\OtherTok{\textless{}{-}} \FunctionTok{apply}\NormalTok{(xi, }\DecValTok{1}\NormalTok{, prod)}
+    \CommentTok{\# mu is unconditional mean values for model without subsampling}
+\NormalTok{    mu[}\DecValTok{1}\NormalTok{]}
+\NormalTok{  \}}
+\NormalTok{\}}
+
+\NormalTok{map.too }\OtherTok{\textless{}{-}} \FunctionTok{map.factory.too}\NormalTok{(rout\_HR22\_2, vars }\SpecialCharTok{==} \StringTok{"any\_FitP"}\NormalTok{)}
+
+\CommentTok{\#centering sire on zero}
+\NormalTok{balpha.hat }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, rout\_HR22\_2}\SpecialCharTok{$}\NormalTok{alpha)}
+
+\FunctionTok{map.too}\NormalTok{(balpha.hat)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 124.1588
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#124.1588}
+
+\FunctionTok{all.equal}\NormalTok{(}\FunctionTok{map}\NormalTok{(}\DecValTok{0}\NormalTok{), }\FunctionTok{map.too}\NormalTok{(balpha.hat))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] TRUE
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#first and second derivatives}
+\NormalTok{g}\OtherTok{\textless{}{-}}\FunctionTok{grad}\NormalTok{(map.too, balpha.hat)}
+
+\CommentTok{\#calculates the nxn matrix}
+\NormalTok{h }\OtherTok{\textless{}{-}} \FunctionTok{hessian}\NormalTok{(map.too, balpha.hat)}
+
+\CommentTok{\#these are partial derivatives}
+\NormalTok{dmu.db }\OtherTok{\textless{}{-}}\NormalTok{ g[}\DecValTok{1}\NormalTok{]}
+\NormalTok{dmu.dalpha }\OtherTok{\textless{}{-}}\NormalTok{ g[}\SpecialCharTok{{-}}\DecValTok{1}\NormalTok{]}
+\NormalTok{d2mu.db.dalpha }\OtherTok{\textless{}{-}}\NormalTok{ h[}\DecValTok{1}\NormalTok{, }\SpecialCharTok{{-}}\DecValTok{1}\NormalTok{]}
+
+\CommentTok{\# give names to the estimators in our formulas}
+\NormalTok{mu.hat }\OtherTok{\textless{}{-}} \FunctionTok{map.too}\NormalTok{(balpha.hat)}
+\NormalTok{nu.hat }\OtherTok{\textless{}{-}}\NormalTok{ rout\_HR22\_2}\SpecialCharTok{$}\NormalTok{nu[}\StringTok{"Parental"}\NormalTok{]}
+
+\CommentTok{\#FFTNS SE}
+\CommentTok{\#calculations for the gradient vector of the FFTNS prediction with respect to the parameters of the models (fixed effects and variance components) }
+\CommentTok{\#zero removed}
+\NormalTok{dfftns }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\SpecialCharTok{{-}} \DecValTok{4} \SpecialCharTok{*}\NormalTok{ nu.hat }\SpecialCharTok{*}\NormalTok{ dmu.dalpha }\SpecialCharTok{*}\NormalTok{ dmu.db}\SpecialCharTok{\^{}}\DecValTok{2} \SpecialCharTok{/}\NormalTok{ mu.hat}\SpecialCharTok{\^{}}\DecValTok{2} \SpecialCharTok{+}
+\DecValTok{8} \SpecialCharTok{*}\NormalTok{ nu.hat }\SpecialCharTok{*}\NormalTok{ d2mu.db.dalpha }\SpecialCharTok{/}\NormalTok{ mu.hat, }\DecValTok{4} \SpecialCharTok{*}\NormalTok{ dmu.db}\SpecialCharTok{\^{}}\DecValTok{2} \SpecialCharTok{/}\NormalTok{ mu.hat)}
+
+\CommentTok{\#And apply the delta method.}
+\NormalTok{fftns.se }\OtherTok{\textless{}{-}} \FunctionTok{t}\NormalTok{(dfftns) }\SpecialCharTok{\%*\%}\NormalTok{ fishinv }\SpecialCharTok{\%*\%}\NormalTok{ dfftns}
+\NormalTok{fftns.se }\OtherTok{\textless{}{-}} \FunctionTok{sqrt}\NormalTok{(}\FunctionTok{as.vector}\NormalTok{(fftns.se))}
+\NormalTok{fftns.se}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 23.32391
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#23.32391}
+
+\CommentTok{\#ADDITIVE GENETIC VARIANCE SE }
+\CommentTok{\#calculate the gradient vector VA(W) with respect to the parameters of the model using these formulae}
+\NormalTok{dvaw }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\DecValTok{8} \SpecialCharTok{*}\NormalTok{ nu.hat }\SpecialCharTok{*}\NormalTok{ d2mu.db.dalpha, }\DecValTok{4} \SpecialCharTok{*}\NormalTok{ dmu.db}\SpecialCharTok{\^{}}\DecValTok{2}\NormalTok{)}
+
+\CommentTok{\#And then apply the delta method to get standard errors for this estimator}
+\NormalTok{vaw.se }\OtherTok{\textless{}{-}} \FunctionTok{t}\NormalTok{(dvaw) }\SpecialCharTok{\%*\%}\NormalTok{ fishinv }\SpecialCharTok{\%*\%}\NormalTok{ dvaw}
+\NormalTok{vaw.se }\OtherTok{\textless{}{-}} \FunctionTok{sqrt}\NormalTok{(}\FunctionTok{as.vector}\NormalTok{(vaw.se))}
+\NormalTok{vaw.se}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 2902.975
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#2902.975}
+
+\CommentTok{\#MEAN FITNESS SE}
+\NormalTok{dmf }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(dmu.dalpha, }\DecValTok{0}\NormalTok{)}
+\NormalTok{mf.se }\OtherTok{\textless{}{-}} \FunctionTok{t}\NormalTok{(dmf) }\SpecialCharTok{\%*\%}\NormalTok{ fishinv }\SpecialCharTok{\%*\%}\NormalTok{ dmf}
+\NormalTok{mf.se }\OtherTok{\textless{}{-}} \FunctionTok{sqrt}\NormalTok{(}\FunctionTok{as.vector}\NormalTok{(mf.se))}
+\NormalTok{mf.se}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 4.805239
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#4.805239}
+\end{Highlighting}
+\end{Shaded}
+
+\#\#\#breeding values
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#extract breeding values}
+\NormalTok{bhat }\OtherTok{\textless{}{-}}\NormalTok{ rout\_HR22\_2}\SpecialCharTok{$}\NormalTok{b }
+\NormalTok{bhat.Donor}\OtherTok{\textless{}{-}}\NormalTok{ bhat[}\FunctionTok{grep}\NormalTok{(}\StringTok{"Donor"}\NormalTok{, }\FunctionTok{names}\NormalTok{(bhat))]}
+
+\CommentTok{\#check this is the correct number of sires (46)}
+\FunctionTok{length}\NormalTok{(bhat.Donor)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 46
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#convert canonical values to mean value parameter values using mapping function. "total\_pods\_collected" is the subsampling node }
+\NormalTok{map }\OtherTok{\textless{}{-}} \FunctionTok{map.factory}\NormalTok{(rout\_HR22\_2, vars }\SpecialCharTok{==} \StringTok{"any\_FitP"}\NormalTok{)}
+\NormalTok{vectorized.map }\OtherTok{\textless{}{-}} \FunctionTok{Vectorize}\NormalTok{(map)}
+\FunctionTok{curve}\NormalTok{(vectorized.map, }\AttributeTok{from =} \SpecialCharTok{{-}}\DecValTok{1} \SpecialCharTok{/} \DecValTok{2}\NormalTok{, }\AttributeTok{to =} \DecValTok{1}\SpecialCharTok{/}\DecValTok{2}\NormalTok{, }\AttributeTok{xlab=}\StringTok{"b"}\NormalTok{, }\AttributeTok{ylab=}\FunctionTok{expression}\NormalTok{(}\FunctionTok{mu}\NormalTok{(b)))}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Aster_Hastings_files/figure-latex/unnamed-chunk-8-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#breeding values for sire groups on the mean value parameter scale }
+\NormalTok{bhat.Donor.mu }\OtherTok{\textless{}{-}} \FunctionTok{vectorized.map}\NormalTok{(bhat.Donor)}
+\NormalTok{bhat.Donor.mu}\OtherTok{\textless{}{-}}\FunctionTok{as.data.frame}\NormalTok{(bhat.Donor.mu)}
+\FunctionTok{write.csv}\NormalTok{(bhat.Donor.mu, }\StringTok{"bhat.Donor.mu.csv"}\NormalTok{)}
+
+\CommentTok{\#plot the distribution of breeding values}
+\CommentTok{\# Extract the numeric column from bhat.Donor.mu}
+\NormalTok{numeric\_values }\OtherTok{\textless{}{-}}\NormalTok{ bhat.Donor.mu[[}\StringTok{"bhat.Donor.mu"}\NormalTok{]]  }\CommentTok{\# Column name is the same as the data frame name}
+
+\CommentTok{\# Calculate and plot the density}
+\NormalTok{prob\_den }\OtherTok{\textless{}{-}} \FunctionTok{density}\NormalTok{(numeric\_values)}
+\FunctionTok{plot}\NormalTok{(prob\_den)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Aster_Hastings_files/figure-latex/unnamed-chunk-8-2.pdf}
+
+\#HASTINGS RANCH \#\#Generation 1 2023
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(tidyverse)}
+
+\CommentTok{\#load year 2 (2023) life history data for HR site}
+\NormalTok{HR\_23 }\OtherTok{\textless{}{-}} \FunctionTok{read\_csv}\NormalTok{(here}\SpecialCharTok{::}\FunctionTok{here}\NormalTok{(}\StringTok{"data\_sheets"}\NormalTok{, }\StringTok{"compiled\_sheets"}\NormalTok{, }\StringTok{"HR\_mastersheet\_full\_2023.csv"}\NormalTok{)) }\SpecialCharTok{\%\textgreater{}\%}
+\NormalTok{  dplyr}\SpecialCharTok{::}\FunctionTok{select}\NormalTok{(}\StringTok{"Transect"}\NormalTok{, }\StringTok{"Gen"}\NormalTok{, }\StringTok{"Donor"}\NormalTok{, }\StringTok{"Recipient"}\NormalTok{, }\StringTok{"sample\_ID"}\NormalTok{, }\StringTok{"surv\_to\_flower"}\NormalTok{, }\StringTok{"F\_plant"}\NormalTok{, }\StringTok{"total\_fruits"}\NormalTok{, }\StringTok{"closed\_fruits"}\NormalTok{, }\StringTok{"filled\_seeds"}\NormalTok{, }\StringTok{"msm\_all"}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{F\_plant =} \FunctionTok{ifelse}\NormalTok{(F\_plant }\SpecialCharTok{==} \ConstantTok{TRUE}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{0}\NormalTok{)) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{surv\_to\_flower =} \FunctionTok{ifelse}\NormalTok{(total\_fruits }\SpecialCharTok{\textgreater{}} \DecValTok{0} \SpecialCharTok{\&}\NormalTok{ surv\_to\_flower }\SpecialCharTok{==} \DecValTok{0}\NormalTok{, }\DecValTok{1}\NormalTok{, surv\_to\_flower)) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{F\_plant =} \FunctionTok{ifelse}\NormalTok{(surv\_to\_flower }\SpecialCharTok{==} \DecValTok{0}\NormalTok{, }\DecValTok{0}\NormalTok{, F\_plant))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Rows: 4060 Columns: 51
+## -- Column specification --------------------------------------------------------
+## Delimiter: ","
+## chr   (6): Gen, Donor, Recipient, sample_ID_SEG, sample_ID, SegPos
+## dbl  (35): Year, Transect, Sequence, Plant_ID, days_sow2flower, days_plant2f...
+## lgl   (1): F_plant
+## date  (9): Sow_Date, Plant_Date, FFD, LFD, F_Num_01, F_Num_02, F_Num_03, pho...
+## 
+## i Use `spec()` to retrieve the full column specification for this data.
+## i Specify the column types or set `show_col_types = FALSE` to quiet this message.
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\DocumentationTok{\#\#\#\#make NAs for other life history stages zero}
+\NormalTok{HR\_23[}\FunctionTok{is.na}\NormalTok{(HR\_23}\SpecialCharTok{$}\NormalTok{surv\_to\_flower),]}\SpecialCharTok{$}\NormalTok{surv\_to\_flower }\OtherTok{\textless{}{-}} \DecValTok{0}
+\NormalTok{HR\_23[}\FunctionTok{is.na}\NormalTok{(HR\_23}\SpecialCharTok{$}\NormalTok{total\_fruits),]}\SpecialCharTok{$}\NormalTok{total\_fruits }\OtherTok{\textless{}{-}} \DecValTok{0}
+\NormalTok{HR\_23[}\FunctionTok{is.na}\NormalTok{(HR\_23}\SpecialCharTok{$}\NormalTok{closed\_fruits),]}\SpecialCharTok{$}\NormalTok{closed\_fruits }\OtherTok{\textless{}{-}} \DecValTok{0}
+\NormalTok{HR\_23[}\FunctionTok{is.na}\NormalTok{(HR\_23}\SpecialCharTok{$}\NormalTok{filled\_seeds),]}\SpecialCharTok{$}\NormalTok{filled\_seeds }\OtherTok{\textless{}{-}} \DecValTok{0}
+\NormalTok{HR\_23[}\FunctionTok{is.na}\NormalTok{(HR\_23}\SpecialCharTok{$}\NormalTok{F\_plant),]}\SpecialCharTok{$}\NormalTok{F\_plant }\OtherTok{\textless{}{-}} \DecValTok{0}
+
+\DocumentationTok{\#\#\#\#check for nonsense data}
+\FunctionTok{subset}\NormalTok{(HR\_23, filled\_seeds }\SpecialCharTok{\textgreater{}} \DecValTok{0} \SpecialCharTok{\&}\NormalTok{ surv\_to\_flower  }\SpecialCharTok{==} \DecValTok{0}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 0 x 11
+## # i 11 variables: Transect <dbl>, Gen <chr>, Donor <chr>, Recipient <chr>,
+## #   sample_ID <chr>, surv_to_flower <dbl>, F_plant <dbl>, total_fruits <dbl>,
+## #   closed_fruits <dbl>, filled_seeds <dbl>, msm_all <dbl>
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{subset}\NormalTok{(HR\_23, filled\_seeds }\SpecialCharTok{\textgreater{}} \DecValTok{0} \SpecialCharTok{\&}\NormalTok{ total\_fruits }\SpecialCharTok{==} \DecValTok{0}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 0 x 11
+## # i 11 variables: Transect <dbl>, Gen <chr>, Donor <chr>, Recipient <chr>,
+## #   sample_ID <chr>, surv_to_flower <dbl>, F_plant <dbl>, total_fruits <dbl>,
+## #   closed_fruits <dbl>, filled_seeds <dbl>, msm_all <dbl>
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{subset}\NormalTok{(HR\_23, filled\_seeds }\SpecialCharTok{\textgreater{}} \DecValTok{0} \SpecialCharTok{\&}\NormalTok{ closed\_fruits }\SpecialCharTok{==}\DecValTok{0}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 0 x 11
+## # i 11 variables: Transect <dbl>, Gen <chr>, Donor <chr>, Recipient <chr>,
+## #   sample_ID <chr>, surv_to_flower <dbl>, F_plant <dbl>, total_fruits <dbl>,
+## #   closed_fruits <dbl>, filled_seeds <dbl>, msm_all <dbl>
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{subset}\NormalTok{(HR\_23, filled\_seeds }\SpecialCharTok{\textgreater{}} \DecValTok{0} \SpecialCharTok{\&}\NormalTok{ filled\_seeds }\SpecialCharTok{==}\DecValTok{0}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 0 x 11
+## # i 11 variables: Transect <dbl>, Gen <chr>, Donor <chr>, Recipient <chr>,
+## #   sample_ID <chr>, surv_to_flower <dbl>, F_plant <dbl>, total_fruits <dbl>,
+## #   closed_fruits <dbl>, filled_seeds <dbl>, msm_all <dbl>
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{subset}\NormalTok{(HR\_23, closed\_fruits }\SpecialCharTok{\textgreater{}}\NormalTok{ total\_fruits)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 0 x 11
+## # i 11 variables: Transect <dbl>, Gen <chr>, Donor <chr>, Recipient <chr>,
+## #   sample_ID <chr>, surv_to_flower <dbl>, F_plant <dbl>, total_fruits <dbl>,
+## #   closed_fruits <dbl>, filled_seeds <dbl>, msm_all <dbl>
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{subset}\NormalTok{(HR\_23, total\_fruits }\SpecialCharTok{\textgreater{}} \DecValTok{0} \SpecialCharTok{\&}\NormalTok{ surv\_to\_flower  }\SpecialCharTok{==} \DecValTok{0}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 0 x 11
+## # i 11 variables: Transect <dbl>, Gen <chr>, Donor <chr>, Recipient <chr>,
+## #   sample_ID <chr>, surv_to_flower <dbl>, F_plant <dbl>, total_fruits <dbl>,
+## #   closed_fruits <dbl>, filled_seeds <dbl>, msm_all <dbl>
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#make factors}
+\NormalTok{HR\_23}\SpecialCharTok{$}\NormalTok{Donor }\OtherTok{\textless{}{-}} \FunctionTok{as.factor}\NormalTok{(HR\_23}\SpecialCharTok{$}\NormalTok{Donor)}
+\NormalTok{HR\_23}\SpecialCharTok{$}\NormalTok{Recipient }\OtherTok{\textless{}{-}} \FunctionTok{as.factor}\NormalTok{(HR\_23}\SpecialCharTok{$}\NormalTok{Recipient)}
+\NormalTok{HR\_23}\SpecialCharTok{$}\NormalTok{Gen}\OtherTok{\textless{}{-}}\FunctionTok{as.factor}\NormalTok{(HR\_23}\SpecialCharTok{$}\NormalTok{Gen)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Enforce logical constraints in your data}
+
+\CommentTok{\# Condition 1: If surv\_to\_flower is 0, then total\_fruits, closed\_fruits, and filled\_seeds should be 0}
+\NormalTok{HR\_23}\SpecialCharTok{$}\NormalTok{surv\_to\_flower[HR\_23}\SpecialCharTok{$}\NormalTok{surv\_to\_flower }\SpecialCharTok{==} \DecValTok{0}\NormalTok{] }\OtherTok{\textless{}{-}} \DecValTok{0}
+\NormalTok{HR\_23}\SpecialCharTok{$}\NormalTok{total\_fruits[HR\_23}\SpecialCharTok{$}\NormalTok{surv\_to\_flower }\SpecialCharTok{==} \DecValTok{0}\NormalTok{] }\OtherTok{\textless{}{-}} \DecValTok{0}
+\NormalTok{HR\_23}\SpecialCharTok{$}\NormalTok{closed\_fruits[HR\_23}\SpecialCharTok{$}\NormalTok{surv\_to\_flower }\SpecialCharTok{==} \DecValTok{0}\NormalTok{] }\OtherTok{\textless{}{-}} \DecValTok{0}
+\NormalTok{HR\_23}\SpecialCharTok{$}\NormalTok{filled\_seeds[HR\_23}\SpecialCharTok{$}\NormalTok{surv\_to\_flower }\SpecialCharTok{==} \DecValTok{0}\NormalTok{] }\OtherTok{\textless{}{-}} \DecValTok{0}
+
+\CommentTok{\# Condition 2: If total\_fruits is 0, then closed\_fruits and filled\_seeds should be 0}
+\NormalTok{HR\_23}\SpecialCharTok{$}\NormalTok{closed\_fruits[HR\_23}\SpecialCharTok{$}\NormalTok{total\_fruits }\SpecialCharTok{==} \DecValTok{0}\NormalTok{] }\OtherTok{\textless{}{-}} \DecValTok{0}
+\NormalTok{HR\_23}\SpecialCharTok{$}\NormalTok{filled\_seeds[HR\_23}\SpecialCharTok{$}\NormalTok{total\_fruits }\SpecialCharTok{==} \DecValTok{0}\NormalTok{] }\OtherTok{\textless{}{-}} \DecValTok{0}
+
+\CommentTok{\# Condition 3: closed\_fruits should be less than or equal to total\_fruits}
+\NormalTok{HR\_23}\SpecialCharTok{$}\NormalTok{closed\_fruits }\OtherTok{\textless{}{-}} \FunctionTok{pmin}\NormalTok{(HR\_23}\SpecialCharTok{$}\NormalTok{closed\_fruits, HR\_23}\SpecialCharTok{$}\NormalTok{total\_fruits)}
+
+\CommentTok{\# Condition 4: If closed\_fruits is 0, then filled\_seeds should be 0}
+\NormalTok{HR\_23}\SpecialCharTok{$}\NormalTok{filled\_seeds[HR\_23}\SpecialCharTok{$}\NormalTok{closed\_fruits }\SpecialCharTok{==} \DecValTok{0}\NormalTok{] }\OtherTok{\textless{}{-}} \DecValTok{0}
+\end{Highlighting}
+\end{Shaded}
+
+\#\#\#\#Germination in parental vs progeny
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(tidyverse)}
+\CommentTok{\#data for table 1}
+\CommentTok{\#counts the number of Recipients in parental and progeny generation}
+\NormalTok{HR\_23 }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{group\_by}\NormalTok{(Gen) }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{distinct}\NormalTok{(Recipient) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{arrange}\NormalTok{(Gen, Recipient) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{count}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 2 x 2
+## # Groups:   Gen [2]
+##   Gen       n
+##   <fct> <int>
+## 1 G1      137
+## 2 G2      136
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#counts the number of Donors in each group. For progeny number of sires is grand{-}Donors as they were open pollinated in the field }
+\NormalTok{HR\_23 }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{group\_by}\NormalTok{(Gen) }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{distinct}\NormalTok{(Donor) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{count}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 2 x 2
+## # Groups:   Gen [2]
+##   Gen       n
+##   <fct> <int>
+## 1 G1       46
+## 2 G2       46
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{HR\_23 }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{group\_by}\NormalTok{(Gen, Recipient, Donor) }\SpecialCharTok{\%\textgreater{}\%} 
+  \FunctionTok{count}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 273 x 4
+## # Groups:   Gen, Recipient, Donor [273]
+##    Gen   Recipient Donor      n
+##    <fct> <fct>     <fct>  <int>
+##  1 G1    HR_001    HR_171    15
+##  2 G1    HR_004    HR_135    15
+##  3 G1    HR_005    HR_164    15
+##  4 G1    HR_006    HR_057    15
+##  5 G1    HR_007    HR_149    15
+##  6 G1    HR_009    HR_155    15
+##  7 G1    HR_010    HR_200    15
+##  8 G1    HR_011    HR_059    15
+##  9 G1    HR_012    HR_008    15
+## 10 G1    HR_014    HR_088    15
+## # i 263 more rows
+\end{verbatim}
+
+\#\#\#\#Seed weight
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#regress fitness on seed weight}
+\CommentTok{\#Only the first planting position contained the weighed seed hence slice by 1 to get the planting position with .1}
+\FunctionTok{library}\NormalTok{(dplyr)}
+\FunctionTok{library}\NormalTok{(ggplot2)}
+
+\NormalTok{seedWgt\_HR }\OtherTok{\textless{}{-}}\NormalTok{ HR\_23 }\SpecialCharTok{\%\textgreater{}\%}
+\NormalTok{  dplyr}\SpecialCharTok{::}\FunctionTok{select}\NormalTok{(sample\_ID, Recipient, Gen, surv\_to\_flower, msm\_all, filled\_seeds) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{filter}\NormalTok{(}\SpecialCharTok{!}\FunctionTok{is.na}\NormalTok{(msm\_all)) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{group\_by}\NormalTok{(Recipient) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{slice}\NormalTok{(}\DecValTok{1}\NormalTok{)}
+
+\CommentTok{\# t{-}test of seed weight between generations}
+\FunctionTok{t.test}\NormalTok{(}\FunctionTok{subset}\NormalTok{(seedWgt\_HR, Gen }\SpecialCharTok{==} \StringTok{"G1"}\NormalTok{)}\SpecialCharTok{$}\NormalTok{msm\_all, }\FunctionTok{subset}\NormalTok{(seedWgt\_HR, Gen }\SpecialCharTok{==} \StringTok{"G2"}\NormalTok{)}\SpecialCharTok{$}\NormalTok{msm\_all)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+##  Welch Two Sample t-test
+## 
+## data:  subset(seedWgt_HR, Gen == "G1")$msm_all and subset(seedWgt_HR, Gen == "G2")$msm_all
+## t = -0.84581, df = 92.892, p-value = 0.3998
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  -0.9958563  0.4009323
+## sample estimates:
+## mean of x mean of y 
+##  2.403800  2.701262
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#   Welch Two Sample t{-}test}
+
+\CommentTok{\#data:  subset(seedWgt\_HR, Gen == "G1")$msm\_all and subset(seedWgt\_HR, Gen == "G2")$msm\_all}
+\CommentTok{\#t = {-}0.84581, df = 92.892, p{-}value = 0.3998}
+\CommentTok{\#alternative hypothesis: true difference in means is not equal to 0}
+\CommentTok{\#95 percent confidence interval:}
+\CommentTok{\# {-}0.9958563  0.4009323}
+\CommentTok{\#sample estimates:}
+\CommentTok{\#mean of x mean of y }
+\CommentTok{\# 2.403800  2.701262 }
+
+\CommentTok{\#average seed weight of progeny and parental}
+\NormalTok{seedWgt\_HR}\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{group\_by}\NormalTok{(Gen) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{summarise}\NormalTok{(}\AttributeTok{Average=}\FunctionTok{mean}\NormalTok{(msm\_all))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 2 x 2
+##   Gen   Average
+##   <fct>   <dbl>
+## 1 G1       2.40
+## 2 G2       2.70
+\end{verbatim}
+
+\#\#\#\#check distributions
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{HR23\_aster\_a}\OtherTok{\textless{}{-}}\FunctionTok{subset}\NormalTok{(HR\_23, Gen}\SpecialCharTok{==}\StringTok{"G1"}\NormalTok{)}
+
+\FunctionTok{library}\NormalTok{(MASS)}
+
+\CommentTok{\#total\_fruits}
+\CommentTok{\#negative binomial is better}
+\NormalTok{HRyr2\_flwr}\OtherTok{\textless{}{-}}\FunctionTok{subset}\NormalTok{(HR\_23, surv\_to\_flower}\SpecialCharTok{\textgreater{}}\DecValTok{0}\NormalTok{)}
+\FunctionTok{hist}\NormalTok{(HRyr2\_flwr}\SpecialCharTok{$}\NormalTok{total\_fruits)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Aster_Hastings_files/figure-latex/unnamed-chunk-13-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{HR2.param }\OtherTok{\textless{}{-}} \FunctionTok{fitdistr}\NormalTok{(HRyr2\_flwr}\SpecialCharTok{$}\NormalTok{total\_fruits, }\StringTok{"negative binomial"}\NormalTok{) }
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning in densfun(x, parm[1], parm[2], ...): NaNs produced
+
+## Warning in densfun(x, parm[1], parm[2], ...): NaNs produced
+
+## Warning in densfun(x, parm[1], parm[2], ...): NaNs produced
+
+## Warning in densfun(x, parm[1], parm[2], ...): NaNs produced
+
+## Warning in densfun(x, parm[1], parm[2], ...): NaNs produced
+
+## Warning in densfun(x, parm[1], parm[2], ...): NaNs produced
+
+## Warning in densfun(x, parm[1], parm[2], ...): NaNs produced
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{hist}\NormalTok{(}\FunctionTok{rnbinom}\NormalTok{(}\DecValTok{2589}\NormalTok{, }\AttributeTok{size =}\FloatTok{0.133}\NormalTok{, }\AttributeTok{mu=}\FloatTok{1.254}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Aster_Hastings_files/figure-latex/unnamed-chunk-13-2.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{hist}\NormalTok{(}\FunctionTok{rpois}\NormalTok{(}\DecValTok{2589}\NormalTok{, }\AttributeTok{lambda=}\FloatTok{1.254}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Aster_Hastings_files/figure-latex/unnamed-chunk-13-3.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#closed\_fruits}
+\CommentTok{\#negative binomial is better}
+\NormalTok{HR2\_fruits}\OtherTok{\textless{}{-}}\FunctionTok{subset}\NormalTok{(HR23\_aster\_a, total\_fruits}\SpecialCharTok{\textgreater{}}\DecValTok{0}\NormalTok{)}
+\FunctionTok{hist}\NormalTok{(HR2\_fruits}\SpecialCharTok{$}\NormalTok{closed\_fruits)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Aster_Hastings_files/figure-latex/unnamed-chunk-13-4.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{HR2.param2 }\OtherTok{\textless{}{-}} \FunctionTok{fitdistr}\NormalTok{(HR2\_fruits}\SpecialCharTok{$}\NormalTok{closed\_fruits, }\StringTok{"negative binomial"}\NormalTok{) }
+\FunctionTok{hist}\NormalTok{(}\FunctionTok{rnbinom}\NormalTok{(}\DecValTok{337}\NormalTok{, }\AttributeTok{size =} \FloatTok{1.22}\NormalTok{, }\AttributeTok{mu=}\FloatTok{3.83}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Aster_Hastings_files/figure-latex/unnamed-chunk-13-5.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{hist}\NormalTok{(}\FunctionTok{rpois}\NormalTok{(}\DecValTok{337}\NormalTok{, }\AttributeTok{lambda=}\FloatTok{3.83}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Aster_Hastings_files/figure-latex/unnamed-chunk-13-6.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#filled\_seeds}
+\CommentTok{\#negative binomial is better}
+\NormalTok{HRyr2\_cl\_fruits}\OtherTok{\textless{}{-}}\FunctionTok{subset}\NormalTok{(HR23\_aster\_a, closed\_fruits}\SpecialCharTok{\textgreater{}}\DecValTok{0}\NormalTok{)}
+\FunctionTok{hist}\NormalTok{(HRyr2\_cl\_fruits}\SpecialCharTok{$}\NormalTok{filled\_seeds)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Aster_Hastings_files/figure-latex/unnamed-chunk-13-7.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{HR2.param3 }\OtherTok{\textless{}{-}} \FunctionTok{fitdistr}\NormalTok{(HRyr2\_cl\_fruits}\SpecialCharTok{$}\NormalTok{filled\_seeds, }\StringTok{"negative binomial"}\NormalTok{) }
+\FunctionTok{hist}\NormalTok{(}\FunctionTok{rnbinom}\NormalTok{(}\DecValTok{295}\NormalTok{, }\AttributeTok{size =} \FloatTok{0.668}\NormalTok{, }\AttributeTok{mu=}\FloatTok{9.898}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Aster_Hastings_files/figure-latex/unnamed-chunk-13-8.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{hist}\NormalTok{(}\FunctionTok{rpois}\NormalTok{(}\DecValTok{295}\NormalTok{, }\AttributeTok{lambda=}\FloatTok{9.898}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Aster_Hastings_files/figure-latex/unnamed-chunk-13-9.pdf}
+
+\#\#\#Set up aster
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#subset the data to only Gen 1}
+\NormalTok{HR23\_aster\_a}\OtherTok{\textless{}{-}}\FunctionTok{subset}\NormalTok{(HR\_23, Gen}\SpecialCharTok{==}\StringTok{"G1"}\NormalTok{)}
+\CommentTok{\#using base r, because for some reason I had an issue with the select function}
+\NormalTok{HR23\_aster\_a }\OtherTok{\textless{}{-}}\NormalTok{ HR23\_aster\_a[, }\SpecialCharTok{!}\FunctionTok{names}\NormalTok{(HR23\_aster\_a) }\SpecialCharTok{\%in\%} \StringTok{"msm\_all"}\NormalTok{]}
+
+\CommentTok{\#set the nodes for the aster graphical model as "vars". "Pods\_collected" is the sub sampled node }
+\NormalTok{vars}\OtherTok{\textless{}{-}}\FunctionTok{c}\NormalTok{(}\StringTok{"surv\_to\_flower"}\NormalTok{, }\StringTok{"F\_plant"}\NormalTok{, }\StringTok{"total\_fruits"}\NormalTok{, }\StringTok{"closed\_fruits"}\NormalTok{, }\StringTok{"filled\_seeds"}\NormalTok{)}
+
+\NormalTok{HR23\_aster\_a }\OtherTok{\textless{}{-}} \FunctionTok{as.data.frame}\NormalTok{(HR23\_aster\_a)}
+
+\CommentTok{\#reshape HR23\_aster\_a to longform}
+\NormalTok{HR23\_aster }\OtherTok{\textless{}{-}} \FunctionTok{reshape}\NormalTok{(HR23\_aster\_a,}\AttributeTok{varying =} \FunctionTok{list}\NormalTok{(vars), }\AttributeTok{direction =} \StringTok{"long"}\NormalTok{, }\AttributeTok{timevar =} \StringTok{"varb"}\NormalTok{,}\AttributeTok{times =} \FunctionTok{as.factor}\NormalTok{(vars), }\AttributeTok{v.names =} \StringTok{"resp"}\NormalTok{)}
+
+\CommentTok{\#Check that the reshape worked }
+\FunctionTok{nrow}\NormalTok{(HR23\_aster)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 10275
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{nrow}\NormalTok{(HR23\_aster\_a)}\SpecialCharTok{*}\FunctionTok{length}\NormalTok{(vars)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 10275
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#designate fitness variable as terminal node, "filled\_seeds"}
+\NormalTok{fit}\OtherTok{\textless{}{-}}\FunctionTok{grepl}\NormalTok{(}\StringTok{"filled\_seeds"}\NormalTok{, }\FunctionTok{as.character}\NormalTok{(HR23\_aster}\SpecialCharTok{$}\NormalTok{varb))}
+\NormalTok{fit}\OtherTok{\textless{}{-}}\FunctionTok{as.numeric}\NormalTok{(fit)}
+\NormalTok{HR23\_aster}\SpecialCharTok{$}\NormalTok{fit}\OtherTok{\textless{}{-}}\NormalTok{fit}
+
+\CommentTok{\#check that "filled\_seeds" is designated as the fitness variable}
+\FunctionTok{with}\NormalTok{(HR23\_aster, }\FunctionTok{sort}\NormalTok{(}\FunctionTok{unique}\NormalTok{(}\FunctionTok{as.character}\NormalTok{(varb)[fit}\SpecialCharTok{==}\DecValTok{0}\NormalTok{])))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "closed_fruits"  "F_plant"        "surv_to_flower" "total_fruits"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{with}\NormalTok{(HR23\_aster, }\FunctionTok{sort}\NormalTok{(}\FunctionTok{unique}\NormalTok{(}\FunctionTok{as.character}\NormalTok{(varb)[fit}\SpecialCharTok{==}\DecValTok{1}\NormalTok{])))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "filled_seeds"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#Add a variable "root" to HR23\_aster where value is 1}
+\NormalTok{HR23\_aster }\OtherTok{\textless{}{-}} \FunctionTok{data.frame}\NormalTok{(HR23\_aster, }\AttributeTok{root=}\DecValTok{1}\NormalTok{)}
+
+\CommentTok{\#give each node a number}
+\NormalTok{pred }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{,}\DecValTok{1}\NormalTok{,}\DecValTok{2}\NormalTok{,}\DecValTok{2}\NormalTok{,}\DecValTok{3}\NormalTok{)}
+
+\CommentTok{\#designate each node with a distribution. 1= Bernoulli, 2= poisson. sub sampling node (pods\_collected) is binomial(Bernoulli is a type of binomial distribution so the family assignment is the same)}
+\NormalTok{fam}\OtherTok{\textless{}{-}}\FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{1}\NormalTok{,}\DecValTok{2}\NormalTok{,}\DecValTok{2}\NormalTok{,}\DecValTok{2}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\#\#\#Random effects aster model
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\DocumentationTok{\#\#\#\#Fit random effects model. sire estimate is zero with dam  }
+\NormalTok{both\_HR23}\OtherTok{\textless{}{-}} \FunctionTok{reaster}\NormalTok{(resp }\SpecialCharTok{\textasciitilde{}}\NormalTok{ varb }\SpecialCharTok{+}\NormalTok{ fit }\SpecialCharTok{+}\NormalTok{ fit}\SpecialCharTok{:}\NormalTok{Transect, }\AttributeTok{random =} \FunctionTok{list}\NormalTok{(}\AttributeTok{Donor =} \SpecialCharTok{\textasciitilde{}}\DecValTok{0} \SpecialCharTok{+} 
+\NormalTok{    fit}\SpecialCharTok{:}\NormalTok{Donor, }\AttributeTok{Recipient =} \SpecialCharTok{\textasciitilde{}}\DecValTok{0} \SpecialCharTok{+}\NormalTok{ fit}\SpecialCharTok{:}\NormalTok{Recipient), }\AttributeTok{pred =}\NormalTok{ pred, }\AttributeTok{fam =}\NormalTok{ fam, }\AttributeTok{varvar =}\NormalTok{ varb, }
+    \AttributeTok{idvar =}\NormalTok{ id, }\AttributeTok{root =}\NormalTok{ root, }\AttributeTok{data =}\NormalTok{ HR23\_aster)}
+\FunctionTok{summary}\NormalTok{(both\_HR23)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Call:
+## reaster.formula(fixed = resp ~ varb + fit + fit:Transect, random = list(Donor = ~0 + 
+##     fit:Donor, Recipient = ~0 + fit:Recipient), pred = pred, 
+##     fam = fam, varvar = varb, idvar = id, root = root, data = HR23_aster)
+## 
+## 
+## Fixed Effects:
+##                      Estimate Std. Error z value Pr(>|z|)    
+## (Intercept)         1.2039728  0.0278423  43.243  < 2e-16 ***
+## varbF_plant        -7.7822788  0.1735385 -44.845  < 2e-16 ***
+## varbfilled_seeds   -0.7367891  0.0375308 -19.632  < 2e-16 ***
+## varbsurv_to_flower -0.3907776  0.0564086  -6.928 4.28e-12 ***
+## varbtotal_fruits   -0.3363888  0.0477060  -7.051 1.77e-12 ***
+## fit:Transect       -0.0001091  0.0027380  -0.040    0.968    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Square Roots of Variance Components (P-values are one-tailed):
+##           Estimate Std. Error z value Pr(>|z|)/2    
+## Donor      0.02007    0.03220   0.623      0.267    
+## Recipient  0.08323    0.01147   7.255   2.02e-13 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#Call:}
+\CommentTok{\#reaster.formula(fixed = resp \textasciitilde{} varb + fit + fit:Transect, random = list(Donor = \textasciitilde{}0 + }
+\CommentTok{\#    fit:Donor, Recipient = \textasciitilde{}0 + fit:Recipient), pred = pred, }
+\CommentTok{\#    fam = fam, varvar = varb, idvar = id, root = root, data = HR23\_aster)}
+
+\CommentTok{\#Fixed Effects:}
+\CommentTok{\#                     Estimate Std. Error z value Pr(\textgreater{}|z|)    }
+\CommentTok{\#(Intercept)         1.2039728  0.0278423  43.243  \textless{} 2e{-}16 ***}
+\CommentTok{\#varbF\_plant        {-}7.7822788  0.1735385 {-}44.845  \textless{} 2e{-}16 ***}
+\CommentTok{\#varbfilled\_seeds   {-}0.7367891  0.0375308 {-}19.632  \textless{} 2e{-}16 ***}
+\CommentTok{\#varbsurv\_to\_flower {-}0.3907776  0.0564086  {-}6.928 4.28e{-}12 ***}
+\CommentTok{\#varbtotal\_fruits   {-}0.3363888  0.0477060  {-}7.051 1.77e{-}12 ***}
+\CommentTok{\#fit:Transect       {-}0.0001091  0.0027380  {-}0.040    0.968    }
+\CommentTok{\#{-}{-}{-}}
+\CommentTok{\#Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1}
+
+\CommentTok{\#Square Roots of Variance Components (P{-}values are one{-}tailed):}
+\CommentTok{\#          Estimate Std. Error z value Pr(\textgreater{}|z|)/2    }
+\CommentTok{\#Donor      0.02007    0.03220   0.623      0.267    }
+\CommentTok{\#Recipient  0.08323    0.01147   7.255   2.02e{-}13 ***}
+\CommentTok{\#{-}{-}{-}}
+\CommentTok{\#Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1}
+
+\CommentTok{\#Check for the effect of sire alone. Significant. }
+\NormalTok{donor\_HR23}\OtherTok{\textless{}{-}} \FunctionTok{reaster}\NormalTok{(resp }\SpecialCharTok{\textasciitilde{}}\NormalTok{ fit }\SpecialCharTok{+}\NormalTok{ varb }\SpecialCharTok{+}\NormalTok{ fit}\SpecialCharTok{:}\NormalTok{Transect, }\AttributeTok{random =} \FunctionTok{list}\NormalTok{(}\AttributeTok{Donor =} \SpecialCharTok{\textasciitilde{}}\DecValTok{0} \SpecialCharTok{+} 
+\NormalTok{    fit}\SpecialCharTok{:}\NormalTok{Donor), }\AttributeTok{pred =}\NormalTok{ pred, }\AttributeTok{fam =}\NormalTok{ fam, }\AttributeTok{varvar =}\NormalTok{ varb, }
+    \AttributeTok{idvar =}\NormalTok{ id, }\AttributeTok{root =}\NormalTok{ root, }\AttributeTok{data =}\NormalTok{ HR23\_aster)}
+\FunctionTok{summary}\NormalTok{(donor\_HR23)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Call:
+## reaster.formula(fixed = resp ~ fit + varb + fit:Transect, random = list(Donor = ~0 + 
+##     fit:Donor), pred = pred, fam = fam, varvar = varb, idvar = id, 
+##     root = root, data = HR23_aster)
+## 
+## 
+## Fixed Effects:
+##                     Estimate Std. Error z value Pr(>|z|)    
+## (Intercept)         1.203973   0.027842  43.243  < 2e-16 ***
+## fit                -0.730126   0.037312 -19.568  < 2e-16 ***
+## varbF_plant        -7.857325   0.173471 -45.295  < 2e-16 ***
+## varbsurv_to_flower -0.390778   0.056409  -6.928 4.28e-12 ***
+## varbtotal_fruits   -0.340847   0.047742  -7.139 9.38e-13 ***
+## fit:Transect        0.002455   0.002505   0.980    0.327    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Square Roots of Variance Components (P-values are one-tailed):
+##       Estimate Std. Error z value Pr(>|z|)/2    
+## Donor 0.058235   0.009977   5.837   2.66e-09 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#Call:}
+\CommentTok{\#reaster.formula(fixed = resp \textasciitilde{} fit + varb + fit:Transect, random = list(Donor = \textasciitilde{}0 + }
+\CommentTok{\#    fit:Donor), pred = pred, fam = fam, varvar = varb, idvar = id, }
+\CommentTok{\#    root = root, data = HR23\_aster)}
+
+
+\CommentTok{\#Fixed Effects:}
+\CommentTok{\#                    Estimate Std. Error z value Pr(\textgreater{}|z|)    }
+\CommentTok{\#(Intercept)         1.203973   0.027842  43.243  \textless{} 2e{-}16 ***}
+\CommentTok{\#fit                {-}0.730126   0.037312 {-}19.568  \textless{} 2e{-}16 ***}
+\CommentTok{\#varbF\_plant        {-}7.857325   0.173471 {-}45.295  \textless{} 2e{-}16 ***}
+\CommentTok{\#varbsurv\_to\_flower {-}0.390778   0.056409  {-}6.928 4.28e{-}12 ***}
+\CommentTok{\#varbtotal\_fruits   {-}0.340847   0.047742  {-}7.139 9.38e{-}13 ***}
+\CommentTok{\#fit:Transect        0.002455   0.002505   0.980    0.327    }
+\CommentTok{\#{-}{-}{-}}
+\CommentTok{\#Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1}
+
+\CommentTok{\#Square Roots of Variance Components (P{-}values are one{-}tailed):}
+\CommentTok{\#      Estimate Std. Error z value Pr(\textgreater{}|z|)/2    }
+\CommentTok{\#Donor 0.058235   0.009977   5.837   2.66e{-}09 ***}
+\CommentTok{\#{-}{-}{-}}
+\CommentTok{\#Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1}
+
+\CommentTok{\#check for the effect of dam alone. significant  }
+\NormalTok{recipient\_HR23}\OtherTok{\textless{}{-}} \FunctionTok{reaster}\NormalTok{(resp }\SpecialCharTok{\textasciitilde{}}\NormalTok{ fit }\SpecialCharTok{+}\NormalTok{ varb }\SpecialCharTok{+}\NormalTok{ fit}\SpecialCharTok{:}\NormalTok{Transect, }\AttributeTok{random =} \FunctionTok{list}\NormalTok{(}\AttributeTok{Recipient =} \SpecialCharTok{\textasciitilde{}}\DecValTok{0} \SpecialCharTok{+} 
+\NormalTok{    fit}\SpecialCharTok{:}\NormalTok{Recipient), }\AttributeTok{pred =}\NormalTok{ pred, }\AttributeTok{fam =}\NormalTok{ fam, }\AttributeTok{varvar =}\NormalTok{ varb, }\CommentTok{\#in model dam\_ML19 shouldn\textquotesingle{}t this say "fit:Dam"}
+    \AttributeTok{idvar =}\NormalTok{ id, }\AttributeTok{root =}\NormalTok{ root, }\AttributeTok{data =}\NormalTok{ HR23\_aster)}
+\FunctionTok{summary}\NormalTok{(recipient\_HR23)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Call:
+## reaster.formula(fixed = resp ~ fit + varb + fit:Transect, random = list(Recipient = ~0 + 
+##     fit:Recipient), pred = pred, fam = fam, varvar = varb, idvar = id, 
+##     root = root, data = HR23_aster)
+## 
+## 
+## Fixed Effects:
+##                      Estimate Std. Error z value Pr(>|z|)    
+## (Intercept)         1.2039728  0.0278423  43.243  < 2e-16 ***
+## fit                -0.7365407  0.0374391 -19.673  < 2e-16 ***
+## varbF_plant        -7.7825016  0.1735386 -44.846  < 2e-16 ***
+## varbsurv_to_flower -0.3907776  0.0564086  -6.928 4.28e-12 ***
+## varbtotal_fruits   -0.3363929  0.0477061  -7.051 1.77e-12 ***
+## fit:Transect       -0.0001326  0.0027371  -0.048    0.961    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Square Roots of Variance Components (P-values are one-tailed):
+##           Estimate Std. Error z value Pr(>|z|)/2    
+## Recipient 0.085533   0.009046   9.455     <2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#Call:}
+\CommentTok{\#reaster.formula(fixed = resp \textasciitilde{} fit + varb + fit:Transect, random = list(Recipient = \textasciitilde{}0 + }
+\CommentTok{\#    fit:Recipient), pred = pred, fam = fam, varvar = varb, idvar = id, }
+\CommentTok{\#    root = root, data = HR23\_aster)}
+
+\CommentTok{\#Fixed Effects:}
+\CommentTok{\#                     Estimate Std. Error z value Pr(\textgreater{}|z|)    }
+\CommentTok{\#(Intercept)         1.2039728  0.0278423  43.243  \textless{} 2e{-}16 ***}
+\CommentTok{\#fit                {-}0.7365407  0.0374391 {-}19.673  \textless{} 2e{-}16 ***}
+\CommentTok{\#varbF\_plant        {-}7.7825016  0.1735386 {-}44.846  \textless{} 2e{-}16 ***}
+\CommentTok{\#varbsurv\_to\_flower {-}0.3907776  0.0564086  {-}6.928 4.28e{-}12 ***}
+\CommentTok{\#varbtotal\_fruits   {-}0.3363929  0.0477061  {-}7.051 1.77e{-}12 ***}
+\CommentTok{\#fit:Transect       {-}0.0001326  0.0027371  {-}0.048    0.961    }
+\CommentTok{\#{-}{-}{-}}
+\CommentTok{\#Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1}
+
+\CommentTok{\#Square Roots of Variance Components (P{-}values are one{-}tailed):}
+\CommentTok{\#          Estimate Std. Error z value Pr(\textgreater{}|z|)/2    }
+\CommentTok{\#Recipient 0.085533   0.009046   9.455     \textless{}2e{-}16 ***}
+\CommentTok{\#{-}{-}{-}}
+\CommentTok{\#Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1}
+
+\DocumentationTok{\#\#\#\#Combine Sire and Dam into one random effect, \textasciigrave{}Parental\textasciigrave{}. The estimates are of similar magnitude }
+\NormalTok{modmat.Donor }\OtherTok{\textless{}{-}} \FunctionTok{model.matrix}\NormalTok{(}\SpecialCharTok{\textasciitilde{}} \DecValTok{0} \SpecialCharTok{+}\NormalTok{ fit}\SpecialCharTok{:}\NormalTok{Donor, HR23\_aster)}
+\NormalTok{modmat.Recipient }\OtherTok{\textless{}{-}} \FunctionTok{model.matrix}\NormalTok{(}\SpecialCharTok{\textasciitilde{}} \DecValTok{0} \SpecialCharTok{+}\NormalTok{ fit}\SpecialCharTok{:}\NormalTok{Recipient, HR23\_aster)}
+\NormalTok{modmat.donorrecipient }\OtherTok{\textless{}{-}} \FunctionTok{cbind}\NormalTok{(modmat.Donor,modmat.Recipient)}
+
+
+\NormalTok{rout\_HR23 }\OtherTok{\textless{}{-}} \FunctionTok{reaster}\NormalTok{(resp }\SpecialCharTok{\textasciitilde{}}\NormalTok{ fit }\SpecialCharTok{+}\NormalTok{ varb, }\FunctionTok{list}\NormalTok{(}\AttributeTok{Parental =} \SpecialCharTok{\textasciitilde{}} \DecValTok{0} \SpecialCharTok{+}\NormalTok{ modmat.donorrecipient),pred, fam, varb, id, root, }\AttributeTok{data =}\NormalTok{ HR23\_aster)}
+\NormalTok{sout\_HR23 }\OtherTok{\textless{}{-}}\FunctionTok{summary}\NormalTok{(rout\_HR23)}
+\NormalTok{sout\_HR23}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Call:
+## reaster.formula(fixed = resp ~ fit + varb, random = list(Parental = ~0 + 
+##     modmat.donorrecipient), pred = pred, fam = fam, varvar = varb, 
+##     idvar = id, root = root, data = HR23_aster)
+## 
+## 
+## Fixed Effects:
+##                    Estimate Std. Error z value Pr(>|z|)    
+## (Intercept)         1.20397    0.02784  43.243  < 2e-16 ***
+## fit                -0.73740    0.03593 -20.523  < 2e-16 ***
+## varbF_plant        -7.78538    0.17357 -44.854  < 2e-16 ***
+## varbsurv_to_flower -0.39078    0.05641  -6.928 4.28e-12 ***
+## varbtotal_fruits   -0.33672    0.04771  -7.058 1.69e-12 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Square Roots of Variance Components (P-values are one-tailed):
+##          Estimate Std. Error z value Pr(>|z|)/2    
+## Parental 0.064232   0.007329   8.764     <2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#Call:}
+\CommentTok{\#reaster.formula(fixed = resp \textasciitilde{} fit + varb, random = list(Parental = \textasciitilde{}0 + }
+\CommentTok{\#    modmat.donorrecipient), pred = pred, fam = fam, varvar = varb, }
+\CommentTok{\#    idvar = id, root = root, data = HR23\_aster)}
+
+\CommentTok{\#Fixed Effects:}
+\CommentTok{\#                   Estimate Std. Error z value Pr(\textgreater{}|z|)    }
+\CommentTok{\#(Intercept)         1.20397    0.02784  43.243  \textless{} 2e{-}16 ***}
+\CommentTok{\#fit                {-}0.73740    0.03593 {-}20.523  \textless{} 2e{-}16 ***}
+\CommentTok{\#varbF\_plant        {-}7.78538    0.17357 {-}44.854  \textless{} 2e{-}16 ***}
+\CommentTok{\#varbsurv\_to\_flower {-}0.39078    0.05641  {-}6.928 4.28e{-}12 ***}
+\CommentTok{\#varbtotal\_fruits   {-}0.33672    0.04771  {-}7.058 1.69e{-}12 ***}
+\CommentTok{\#{-}{-}{-}}
+\CommentTok{\#Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1}
+
+\CommentTok{\#Square Roots of Variance Components (P{-}values are one{-}tailed):}
+\CommentTok{\#         Estimate Std. Error z value Pr(\textgreater{}|z|)/2    }
+\CommentTok{\#Parental 0.064232   0.007329   8.764     \textless{}2e{-}16 ***}
+\CommentTok{\#{-}{-}{-}}
+\CommentTok{\#Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1}
+
+
+\FunctionTok{save}\NormalTok{(rout\_HR23, }\AttributeTok{file =} \StringTok{"rout\_HR23.rdata"}\NormalTok{)}
+
+\CommentTok{\#model comparison for significance of yloc. Significant.}
+\NormalTok{rout\_HR23\_2 }\OtherTok{\textless{}{-}} \FunctionTok{reaster}\NormalTok{(resp }\SpecialCharTok{\textasciitilde{}}\NormalTok{ fit }\SpecialCharTok{+}\NormalTok{ varb }\SpecialCharTok{+}\NormalTok{ fit}\SpecialCharTok{:}\NormalTok{Transect, }\FunctionTok{list}\NormalTok{(}\AttributeTok{Parental =} \SpecialCharTok{\textasciitilde{}} \DecValTok{0} \SpecialCharTok{+}\NormalTok{ modmat.donorrecipient),}
+\NormalTok{    pred, fam, varb, id, root, }\AttributeTok{data =}\NormalTok{ HR23\_aster)}
+\NormalTok{sout\_HR23\_2 }\OtherTok{\textless{}{-}}\FunctionTok{summary}\NormalTok{(rout\_HR23\_2)}
+\NormalTok{sout\_HR23\_2}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Call:
+## reaster.formula(fixed = resp ~ fit + varb + fit:Transect, random = list(Parental = ~0 + 
+##     modmat.donorrecipient), pred = pred, fam = fam, varvar = varb, 
+##     idvar = id, root = root, data = HR23_aster)
+## 
+## 
+## Fixed Effects:
+##                     Estimate Std. Error z value Pr(>|z|)    
+## (Intercept)         1.203973   0.027842  43.243  < 2e-16 ***
+## fit                -0.738708   0.038332 -19.271  < 2e-16 ***
+## varbF_plant        -7.785506   0.173573 -44.854  < 2e-16 ***
+## varbsurv_to_flower -0.390778   0.056409  -6.928 4.28e-12 ***
+## varbtotal_fruits   -0.336723   0.047709  -7.058 1.69e-12 ***
+## fit:Transect        0.000267   0.002717   0.098    0.922    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Square Roots of Variance Components (P-values are one-tailed):
+##          Estimate Std. Error z value Pr(>|z|)/2    
+## Parental 0.064141   0.007374   8.698     <2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#Call:}
+\CommentTok{\#reaster.formula(fixed = resp \textasciitilde{} fit + varb + fit:Transect, random = list(Parental = \textasciitilde{}0 + }
+\CommentTok{\#    modmat.donorrecipient), pred = pred, fam = fam, varvar = varb, }
+\CommentTok{\#    idvar = id, root = root, data = HR23\_aster)}
+
+
+\CommentTok{\#Fixed Effects:}
+\CommentTok{\#                    Estimate Std. Error z value Pr(\textgreater{}|z|)    }
+\CommentTok{\#(Intercept)         1.203973   0.027842  43.243  \textless{} 2e{-}16 ***}
+\CommentTok{\#fit                {-}0.738708   0.038332 {-}19.271  \textless{} 2e{-}16 ***}
+\CommentTok{\#varbF\_plant        {-}7.785506   0.173573 {-}44.854  \textless{} 2e{-}16 ***}
+\CommentTok{\#varbsurv\_to\_flower {-}0.390778   0.056409  {-}6.928 4.28e{-}12 ***}
+\CommentTok{\#varbtotal\_fruits   {-}0.336723   0.047709  {-}7.058 1.69e{-}12 ***}
+\CommentTok{\#fit:Transect        0.000267   0.002717   0.098    0.922    }
+\CommentTok{\#{-}{-}{-}}
+\CommentTok{\#Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1}
+
+\CommentTok{\#Square Roots of Variance Components (P{-}values are one{-}tailed):}
+\CommentTok{\#         Estimate Std. Error z value Pr(\textgreater{}|z|)/2    }
+\CommentTok{\#Parental 0.064141   0.007374   8.698     \textless{}2e{-}16 ***}
+\CommentTok{\#{-}{-}{-}}
+\CommentTok{\#Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1}
+
+\FunctionTok{anova}\NormalTok{(rout\_HR23, rout\_HR23\_2)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Analysis of Deviance Table
+## 
+## Model 1: resp ~ fit + varb, ~0 + modmat.donorrecipient
+## Model 2: resp ~ fit + varb + fit:Transect, ~0 + modmat.donorrecipient
+##   Mod Df Fix Mod Df Rand Mod Dev Df Fix Df Rand    Deviance P-value
+## 1          5           1 -4759.1                                   
+## 2          6           1 -4759.1      1       0 -0.00019887       1
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#Analysis of Deviance Table}
+
+\CommentTok{\#Model 1: resp \textasciitilde{} fit + varb, \textasciitilde{}0 + modmat.donorrecipient}
+\CommentTok{\#Model 2: resp \textasciitilde{} fit + varb + fit:Transect, \textasciitilde{}0 + modmat.donorrecipient}
+\CommentTok{\#  Mod Df Fix Mod Df Rand Mod Dev Df Fix Df Rand    Deviance P{-}value}
+\CommentTok{\#1          5           1 {-}4759.1                                   }
+\CommentTok{\#2          6           1 {-}4759.1      1       0 {-}0.00019887       1}
+\end{Highlighting}
+\end{Shaded}
+
+\#\#\#Mapping function
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#following Geyer et al. 2022}
+
+\FunctionTok{library}\NormalTok{(numDeriv)}
+\NormalTok{fishinv}\OtherTok{\textless{}{-}}\FunctionTok{solve}\NormalTok{(sout\_HR23}\SpecialCharTok{$}\NormalTok{fisher)}
+\NormalTok{map.factory }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(rout, is.subsamp) \{}
+  \FunctionTok{stopifnot}\NormalTok{(}\FunctionTok{inherits}\NormalTok{(rout, }\StringTok{"reaster"}\NormalTok{))}
+  \FunctionTok{stopifnot}\NormalTok{(}\FunctionTok{is.logical}\NormalTok{(is.subsamp))}
+\NormalTok{  aout }\OtherTok{\textless{}{-}}\NormalTok{ rout}\SpecialCharTok{$}\NormalTok{obj}
+  \FunctionTok{stopifnot}\NormalTok{(}\FunctionTok{inherits}\NormalTok{(aout, }\StringTok{"aster"}\NormalTok{))}
+\NormalTok{  nnode }\OtherTok{\textless{}{-}} \FunctionTok{ncol}\NormalTok{(aout}\SpecialCharTok{$}\NormalTok{x)}
+  \ControlFlowTok{if}\NormalTok{ (nnode }\SpecialCharTok{!=} \FunctionTok{length}\NormalTok{(is.subsamp))}
+    \FunctionTok{stop}\NormalTok{(}\StringTok{"length(is.subsamp) not the number of nodes in the aster graph"}\NormalTok{)}
+\NormalTok{  alpha }\OtherTok{\textless{}{-}}\NormalTok{ rout}\SpecialCharTok{$}\NormalTok{alpha}
+\NormalTok{  ifit }\OtherTok{\textless{}{-}} \FunctionTok{which}\NormalTok{(}\FunctionTok{names}\NormalTok{(alpha) }\SpecialCharTok{==} \StringTok{"fit"}\NormalTok{)}
+  \ControlFlowTok{if}\NormalTok{ (}\FunctionTok{length}\NormalTok{(ifit) }\SpecialCharTok{!=} \DecValTok{1}\NormalTok{)}
+    \FunctionTok{stop}\NormalTok{(}\StringTok{"no fixed effect named fit"}\NormalTok{)}
+\NormalTok{  modmat }\OtherTok{\textless{}{-}}\NormalTok{ rout}\SpecialCharTok{$}\NormalTok{obj}\SpecialCharTok{$}\NormalTok{modmat[}\DecValTok{1}\NormalTok{, , , drop }\OtherTok{=} \ConstantTok{FALSE}\NormalTok{]}
+  \CommentTok{\# set root = 1}
+\NormalTok{  root }\OtherTok{\textless{}{-}} \FunctionTok{array}\NormalTok{(}\DecValTok{1}\NormalTok{, }\AttributeTok{dim =} \FunctionTok{dim}\NormalTok{(modmat)[}\DecValTok{1}\SpecialCharTok{:}\DecValTok{2}\NormalTok{])}
+\NormalTok{  x }\OtherTok{\textless{}{-}}\NormalTok{ aout}\SpecialCharTok{$}\NormalTok{x[}\DecValTok{1}\NormalTok{, }\FunctionTok{c}\NormalTok{(}\DecValTok{1}\SpecialCharTok{:}\DecValTok{5}\NormalTok{)] }\CommentTok{\# added, 5 is the number of nodes }
+  \CommentTok{\# return map function}
+  \ControlFlowTok{function}\NormalTok{ (b) \{}
+    \FunctionTok{stopifnot}\NormalTok{(}\FunctionTok{is.numeric}\NormalTok{(b))}
+    \FunctionTok{stopifnot}\NormalTok{(}\FunctionTok{is.finite}\NormalTok{(b))}
+    \FunctionTok{stopifnot}\NormalTok{(}\FunctionTok{length}\NormalTok{(b) }\SpecialCharTok{==} \DecValTok{1}\NormalTok{)}
+\NormalTok{    alpha[ifit] }\OtherTok{\textless{}{-}}\NormalTok{ alpha[ifit] }\SpecialCharTok{+}\NormalTok{ b}
+\NormalTok{    xi }\OtherTok{\textless{}{-}} \FunctionTok{predict}\NormalTok{(}
+\NormalTok{      aout,}
+      \AttributeTok{x =}\NormalTok{ x, }\CommentTok{\# added}
+      \AttributeTok{newcoef =}\NormalTok{ alpha,}
+      \AttributeTok{modmat =}\NormalTok{ modmat,}
+      \AttributeTok{root =}\NormalTok{ root,}
+      \AttributeTok{model.type =} \StringTok{"conditional"}\NormalTok{,}
+      \AttributeTok{is.always.parameter =} \ConstantTok{TRUE}\NormalTok{)}
+  
+\NormalTok{    xi }\OtherTok{\textless{}{-}} \FunctionTok{matrix}\NormalTok{(xi, }\AttributeTok{ncol =}\NormalTok{ nnode)}
+    \CommentTok{\# always use drop = FALSE unless you are sure you don\textquotesingle{}t want that}
+    \CommentTok{\# here if we omit drop = FALSE and there is only one non{-}subsampling}
+    \CommentTok{\# node, the code will break (apply will give an error)}
+\NormalTok{    xi }\OtherTok{\textless{}{-}}\NormalTok{ xi[,}\SpecialCharTok{!}\NormalTok{is.subsamp, drop }\OtherTok{=} \ConstantTok{FALSE}\NormalTok{]}
+\NormalTok{    mu }\OtherTok{\textless{}{-}} \FunctionTok{apply}\NormalTok{(xi, }\DecValTok{1}\NormalTok{, prod) }\CommentTok{\#every individual}
+    \CommentTok{\# mu is unconditional mean values for model without subsampling}
+    \CommentTok{\# in this application all components mu are the same because no}
+    \CommentTok{\# covariates except varb, so just return only one}
+\NormalTok{    mu[}\DecValTok{1}\NormalTok{] }
+\NormalTok{  \}}
+\NormalTok{\}}
+
+\NormalTok{map }\OtherTok{\textless{}{-}} \FunctionTok{map.factory}\NormalTok{(rout\_HR23, vars }\SpecialCharTok{==} \StringTok{"F\_plant"}\NormalTok{)}
+
+\CommentTok{\#MEAN FITNESS}
+\NormalTok{mf}\OtherTok{\textless{}{-}}\FunctionTok{map}\NormalTok{(}\DecValTok{0}\NormalTok{)}
+\NormalTok{mf}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 14.00745
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# 14.00745}
+
+\CommentTok{\#VA(W)}
+\NormalTok{vaw }\OtherTok{\textless{}{-}}\NormalTok{ rout\_HR23}\SpecialCharTok{$}\NormalTok{sigma[}\StringTok{"Parental"}\NormalTok{]}\SpecialCharTok{\^{}}\DecValTok{2} \SpecialCharTok{*} \FunctionTok{grad}\NormalTok{(map, }\DecValTok{0}\NormalTok{)}\SpecialCharTok{\^{}}\DecValTok{2}
+\CommentTok{\# get rid of name}
+\NormalTok{vaw }\OtherTok{\textless{}{-}} \FunctionTok{as.numeric}\NormalTok{(vaw)}
+\NormalTok{vaw }\OtherTok{\textless{}{-}}\NormalTok{ vaw }\SpecialCharTok{*} \DecValTok{4}
+\NormalTok{vaw}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 36.32008
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#36.32008}
+
+\DocumentationTok{\#\#\#\#FFTNS}
+\NormalTok{fftns }\OtherTok{\textless{}{-}}\NormalTok{ vaw }\SpecialCharTok{/}\NormalTok{ mf}
+\NormalTok{fftns}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 2.592912
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#2.592912}
+
+\CommentTok{\# get SE}
+\NormalTok{map.factory.too }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(rout, is.subsamp) \{}
+  \FunctionTok{stopifnot}\NormalTok{(}\FunctionTok{inherits}\NormalTok{(rout, }\StringTok{"reaster"}\NormalTok{))}
+  \FunctionTok{stopifnot}\NormalTok{(}\FunctionTok{is.logical}\NormalTok{(is.subsamp))}
+\NormalTok{  aout }\OtherTok{\textless{}{-}}\NormalTok{ rout}\SpecialCharTok{$}\NormalTok{obj}
+  \FunctionTok{stopifnot}\NormalTok{(}\FunctionTok{inherits}\NormalTok{(aout, }\StringTok{"aster"}\NormalTok{))}
+\NormalTok{  nnode }\OtherTok{\textless{}{-}} \FunctionTok{ncol}\NormalTok{(aout}\SpecialCharTok{$}\NormalTok{x)}
+  \ControlFlowTok{if}\NormalTok{ (nnode }\SpecialCharTok{!=} \FunctionTok{length}\NormalTok{(is.subsamp))}
+    \FunctionTok{stop}\NormalTok{(}\StringTok{"length(is.subsamp) not the number of nodes in the aster graph"}\NormalTok{)}
+\NormalTok{  alpha }\OtherTok{\textless{}{-}}\NormalTok{ rout}\SpecialCharTok{$}\NormalTok{alpha}
+\NormalTok{  ifit }\OtherTok{\textless{}{-}} \FunctionTok{which}\NormalTok{(}\FunctionTok{names}\NormalTok{(alpha) }\SpecialCharTok{==} \StringTok{"fit"}\NormalTok{)}
+  \ControlFlowTok{if}\NormalTok{ (}\FunctionTok{length}\NormalTok{(ifit) }\SpecialCharTok{!=} \DecValTok{1}\NormalTok{)}
+    \FunctionTok{stop}\NormalTok{(}\StringTok{"no fixed effect named fit"}\NormalTok{)}
+  \CommentTok{\# modmat for one individual. Taking the first row of modmat{-} there is one row for each individual}
+\NormalTok{  modmat }\OtherTok{\textless{}{-}}\NormalTok{ rout}\SpecialCharTok{$}\NormalTok{obj}\SpecialCharTok{$}\NormalTok{modmat[}\DecValTok{1}\NormalTok{, , , drop }\OtherTok{=} \ConstantTok{FALSE}\NormalTok{] }\CommentTok{\#this only takes the first row }
+  \CommentTok{\# set root = 1}
+\NormalTok{  root }\OtherTok{\textless{}{-}} \FunctionTok{array}\NormalTok{(}\DecValTok{1}\NormalTok{, }\AttributeTok{dim =} \FunctionTok{dim}\NormalTok{(modmat)[}\DecValTok{1}\SpecialCharTok{:}\DecValTok{2}\NormalTok{])}
+\NormalTok{  x }\OtherTok{\textless{}{-}}\NormalTok{ aout}\SpecialCharTok{$}\NormalTok{x[}\DecValTok{1}\NormalTok{, }\FunctionTok{c}\NormalTok{(}\DecValTok{1}\SpecialCharTok{:}\DecValTok{5}\NormalTok{)] }\CommentTok{\# added, second number is number of nodes }
+  \CommentTok{\# return map function}
+  \ControlFlowTok{function}\NormalTok{ (balpha) \{}
+    \FunctionTok{stopifnot}\NormalTok{(}\FunctionTok{is.numeric}\NormalTok{(balpha))}
+    \FunctionTok{stopifnot}\NormalTok{(}\FunctionTok{is.finite}\NormalTok{(balpha))}
+    \FunctionTok{stopifnot}\NormalTok{(}\FunctionTok{length}\NormalTok{(balpha) }\SpecialCharTok{==} \DecValTok{1} \SpecialCharTok{+} \FunctionTok{length}\NormalTok{(alpha))}
+\NormalTok{    b }\OtherTok{\textless{}{-}}\NormalTok{ balpha[}\DecValTok{1}\NormalTok{]}
+\NormalTok{    alpha }\OtherTok{\textless{}{-}}\NormalTok{ balpha[}\SpecialCharTok{{-}}\DecValTok{1}\NormalTok{]}
+\NormalTok{    alpha[ifit] }\OtherTok{\textless{}{-}}\NormalTok{ alpha[ifit] }\SpecialCharTok{+}\NormalTok{ b}
+\NormalTok{    xi }\OtherTok{\textless{}{-}} \FunctionTok{predict}\NormalTok{(}
+\NormalTok{      aout,}
+      \AttributeTok{x =}\NormalTok{ x, }\CommentTok{\# added}
+      \AttributeTok{newcoef =}\NormalTok{ alpha,}
+      \AttributeTok{modmat =}\NormalTok{ modmat,}
+      \AttributeTok{root =}\NormalTok{ root,}
+      \AttributeTok{model.type =} \StringTok{"conditional"}\NormalTok{,}
+      \AttributeTok{is.always.parameter =} \ConstantTok{TRUE}
+\NormalTok{    )}
+\NormalTok{    xi }\OtherTok{\textless{}{-}} \FunctionTok{matrix}\NormalTok{(xi, }\AttributeTok{ncol =}\NormalTok{ nnode)}
+\NormalTok{    xi }\OtherTok{\textless{}{-}}\NormalTok{ xi[,}\SpecialCharTok{!}\NormalTok{is.subsamp, drop }\OtherTok{=} \ConstantTok{FALSE}\NormalTok{]}
+\NormalTok{    mu }\OtherTok{\textless{}{-}} \FunctionTok{apply}\NormalTok{(xi, }\DecValTok{1}\NormalTok{, prod)}
+    \CommentTok{\# mu is unconditional mean values for model without subsampling}
+    \CommentTok{\# Here Yloc was set to zero so there in only one value in the Xi matrix }
+\NormalTok{    mu[}\DecValTok{1}\NormalTok{]}
+\NormalTok{  \}}
+\NormalTok{\}}
+
+\NormalTok{map.too }\OtherTok{\textless{}{-}} \FunctionTok{map.factory.too}\NormalTok{(rout\_HR23, vars }\SpecialCharTok{==} \StringTok{"F\_plant"}\NormalTok{)}
+
+\CommentTok{\#centering sire on zero}
+\NormalTok{balpha.hat }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, rout\_HR23}\SpecialCharTok{$}\NormalTok{alpha)}
+
+\FunctionTok{map.too}\NormalTok{(balpha.hat)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 14.00745
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#14.00745}
+
+\FunctionTok{all.equal}\NormalTok{(}\FunctionTok{map}\NormalTok{(}\DecValTok{0}\NormalTok{), }\FunctionTok{map.too}\NormalTok{(balpha.hat))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] TRUE
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#first and second derivatives}
+\NormalTok{g}\OtherTok{\textless{}{-}}\FunctionTok{grad}\NormalTok{(map.too, balpha.hat)}
+
+\CommentTok{\#calculates the nxn matrix}
+\NormalTok{h }\OtherTok{\textless{}{-}} \FunctionTok{hessian}\NormalTok{(map.too, balpha.hat)}
+
+\CommentTok{\#these are partial derivatives}
+\NormalTok{dmu.db }\OtherTok{\textless{}{-}}\NormalTok{ g[}\DecValTok{1}\NormalTok{]}
+\NormalTok{dmu.dalpha }\OtherTok{\textless{}{-}}\NormalTok{ g[}\SpecialCharTok{{-}}\DecValTok{1}\NormalTok{]}
+\NormalTok{d2mu.db.dalpha }\OtherTok{\textless{}{-}}\NormalTok{ h[}\DecValTok{1}\NormalTok{, }\SpecialCharTok{{-}}\DecValTok{1}\NormalTok{]}
+
+\CommentTok{\# give names to the estimators in our formulas}
+\NormalTok{mu.hat }\OtherTok{\textless{}{-}} \FunctionTok{map.too}\NormalTok{(balpha.hat)}
+\NormalTok{nu.hat }\OtherTok{\textless{}{-}}\NormalTok{ rout\_HR23}\SpecialCharTok{$}\NormalTok{nu[}\StringTok{"Parental"}\NormalTok{]}
+
+\CommentTok{\#FFTNS SE}
+\CommentTok{\#calculations for the gradient vector of the FFTNS prediction with respect to the parameters of the models (fixed effects and variance components) }
+\CommentTok{\#zero removed}
+\NormalTok{dfftns }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\SpecialCharTok{{-}} \DecValTok{4} \SpecialCharTok{*}\NormalTok{ nu.hat }\SpecialCharTok{*}\NormalTok{ dmu.dalpha }\SpecialCharTok{*}\NormalTok{ dmu.db}\SpecialCharTok{\^{}}\DecValTok{2} \SpecialCharTok{/}\NormalTok{ mu.hat}\SpecialCharTok{\^{}}\DecValTok{2} \SpecialCharTok{+}
+\DecValTok{8} \SpecialCharTok{*}\NormalTok{ nu.hat }\SpecialCharTok{*}\NormalTok{ d2mu.db.dalpha }\SpecialCharTok{/}\NormalTok{ mu.hat, }\DecValTok{4} \SpecialCharTok{*}\NormalTok{ dmu.db}\SpecialCharTok{\^{}}\DecValTok{2} \SpecialCharTok{/}\NormalTok{ mu.hat)}
+
+\CommentTok{\#And apply the delta method.}
+\NormalTok{fftns.se }\OtherTok{\textless{}{-}} \FunctionTok{t}\NormalTok{(dfftns) }\SpecialCharTok{\%*\%}\NormalTok{ fishinv }\SpecialCharTok{\%*\%}\NormalTok{ dfftns}
+\NormalTok{fftns.se }\OtherTok{\textless{}{-}} \FunctionTok{sqrt}\NormalTok{(}\FunctionTok{as.vector}\NormalTok{(fftns.se))}
+\NormalTok{fftns.se}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0.6453412
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#0.6453412}
+
+\CommentTok{\#ADDITIVE GENETIC VARIANCE SE }
+\CommentTok{\#calculate the gradient vector VA(W) with respect to the parameters of the model using these formulae}
+\NormalTok{dvaw }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\DecValTok{8} \SpecialCharTok{*}\NormalTok{ nu.hat }\SpecialCharTok{*}\NormalTok{ d2mu.db.dalpha, }\DecValTok{4} \SpecialCharTok{*}\NormalTok{ dmu.db}\SpecialCharTok{\^{}}\DecValTok{2}\NormalTok{)}
+
+\CommentTok{\#And then apply the delta method to get standard errors for this estimator}
+\NormalTok{vaw.se }\OtherTok{\textless{}{-}} \FunctionTok{t}\NormalTok{(dvaw) }\SpecialCharTok{\%*\%}\NormalTok{ fishinv }\SpecialCharTok{\%*\%}\NormalTok{ dvaw}
+\NormalTok{vaw.se }\OtherTok{\textless{}{-}} \FunctionTok{sqrt}\NormalTok{(}\FunctionTok{as.vector}\NormalTok{(vaw.se))}
+\NormalTok{vaw.se}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 8.253644
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#8.253644}
+
+\CommentTok{\#MEAN FITNESS SE}
+\NormalTok{dmf }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(dmu.dalpha, }\DecValTok{0}\NormalTok{)}
+\NormalTok{mf.se }\OtherTok{\textless{}{-}} \FunctionTok{t}\NormalTok{(dmf) }\SpecialCharTok{\%*\%}\NormalTok{ fishinv }\SpecialCharTok{\%*\%}\NormalTok{ dmf}
+\NormalTok{mf.se }\OtherTok{\textless{}{-}} \FunctionTok{sqrt}\NormalTok{(}\FunctionTok{as.vector}\NormalTok{(mf.se))}
+\NormalTok{mf.se}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0.8501245
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#0.8501245}
+\end{Highlighting}
+\end{Shaded}
+
+\#\#\#breeding values
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{bhat }\OtherTok{\textless{}{-}}\NormalTok{ rout\_HR23}\SpecialCharTok{$}\NormalTok{b }
+\NormalTok{bhat.donor}\OtherTok{\textless{}{-}}\NormalTok{ bhat[}\FunctionTok{grep}\NormalTok{(}\StringTok{"Donor"}\NormalTok{, }\FunctionTok{names}\NormalTok{(bhat))]}
+
+\CommentTok{\#check this is the correct number of sires (47)}
+\FunctionTok{length}\NormalTok{(bhat.donor)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 46
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#convert canonical values to mean value parameter values using mapping function}
+\NormalTok{map }\OtherTok{\textless{}{-}} \FunctionTok{map.factory}\NormalTok{(rout\_HR23, vars }\SpecialCharTok{==} \StringTok{"F\_plant"}\NormalTok{)}
+\NormalTok{vectorized.map }\OtherTok{\textless{}{-}} \FunctionTok{Vectorize}\NormalTok{(map)}
+
+\CommentTok{\#breeding values for sire groups on the mean value parameter scale }
+\NormalTok{bhat.donor.mu }\OtherTok{\textless{}{-}} \FunctionTok{vectorized.map}\NormalTok{(bhat.donor)}
+\NormalTok{bhat.donor.mu}\OtherTok{\textless{}{-}}\FunctionTok{as.data.frame}\NormalTok{(bhat.donor.mu)}
+\FunctionTok{write.csv}\NormalTok{(bhat.donor.mu, }\StringTok{"bhat.donor.mu.csv"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\#HASTINGS RANCH \#\#Generation 2 2023
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#subset the dataframe for the progeny generation}
+\NormalTok{HR23\_aster\_b}\OtherTok{\textless{}{-}}\FunctionTok{subset}\NormalTok{(HR\_23, Gen}\SpecialCharTok{==}\StringTok{"G2"}\NormalTok{)}
+\NormalTok{HR23\_aster\_b}\OtherTok{\textless{}{-}}\FunctionTok{droplevels}\NormalTok{(HR23\_aster\_b)}
+\FunctionTok{levels}\NormalTok{(HR23\_aster\_b}\SpecialCharTok{$}\NormalTok{Gen)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "G2"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#total\_fruits}
+\CommentTok{\#negative binomial is better}
+\NormalTok{HRyr2\_flwr\_b}\OtherTok{\textless{}{-}}\FunctionTok{subset}\NormalTok{(HR23\_aster\_b, surv\_to\_flower}\SpecialCharTok{\textgreater{}}\DecValTok{0}\NormalTok{)}
+\FunctionTok{hist}\NormalTok{(HRyr2\_flwr\_b}\SpecialCharTok{$}\NormalTok{total\_fruits)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Aster_Hastings_files/figure-latex/unnamed-chunk-19-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{HR2b.prog.param }\OtherTok{\textless{}{-}} \FunctionTok{fitdistr}\NormalTok{(HRyr2\_flwr\_b}\SpecialCharTok{$}\NormalTok{total\_fruits, }\StringTok{"negative binomial"}\NormalTok{) }
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning in densfun(x, parm[1], parm[2], ...): NaNs produced
+
+## Warning in densfun(x, parm[1], parm[2], ...): NaNs produced
+
+## Warning in densfun(x, parm[1], parm[2], ...): NaNs produced
+
+## Warning in densfun(x, parm[1], parm[2], ...): NaNs produced
+
+## Warning in densfun(x, parm[1], parm[2], ...): NaNs produced
+
+## Warning in densfun(x, parm[1], parm[2], ...): NaNs produced
+
+## Warning in densfun(x, parm[1], parm[2], ...): NaNs produced
+
+## Warning in densfun(x, parm[1], parm[2], ...): NaNs produced
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{hist}\NormalTok{(}\FunctionTok{rnbinom}\NormalTok{(}\DecValTok{1318}\NormalTok{, }\AttributeTok{size =}\FloatTok{0.139}\NormalTok{, }\AttributeTok{mu=}\FloatTok{1.127}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Aster_Hastings_files/figure-latex/unnamed-chunk-19-2.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{hist}\NormalTok{(}\FunctionTok{rpois}\NormalTok{(}\DecValTok{1318}\NormalTok{, }\AttributeTok{lambda=}\FloatTok{1.127}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Aster_Hastings_files/figure-latex/unnamed-chunk-19-3.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{alpha.HRyr2}\OtherTok{\textless{}{-}}\FunctionTok{round}\NormalTok{(HR2b.prog.param}\SpecialCharTok{$}\NormalTok{estimate[}\DecValTok{1}\NormalTok{],}\DecValTok{2}\NormalTok{)}
+
+\CommentTok{\#closed\_fruits}
+\CommentTok{\#negative binomial is better}
+\NormalTok{HR2\_fruits\_b}\OtherTok{\textless{}{-}}\FunctionTok{subset}\NormalTok{(HR23\_aster\_b, total\_fruits}\SpecialCharTok{\textgreater{}}\DecValTok{0}\NormalTok{)}
+\FunctionTok{hist}\NormalTok{(HR2\_fruits\_b}\SpecialCharTok{$}\NormalTok{closed\_fruits)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Aster_Hastings_files/figure-latex/unnamed-chunk-19-4.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{HR2b.prog.param2 }\OtherTok{\textless{}{-}} \FunctionTok{fitdistr}\NormalTok{(HR2\_fruits\_b}\SpecialCharTok{$}\NormalTok{closed\_fruits, }\StringTok{"negative binomial"}\NormalTok{) }
+\FunctionTok{hist}\NormalTok{(}\FunctionTok{rnbinom}\NormalTok{(}\DecValTok{337}\NormalTok{, }\AttributeTok{size =} \FloatTok{1.22}\NormalTok{, }\AttributeTok{mu=}\FloatTok{3.83}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Aster_Hastings_files/figure-latex/unnamed-chunk-19-5.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{hist}\NormalTok{(}\FunctionTok{rpois}\NormalTok{(}\DecValTok{337}\NormalTok{, }\AttributeTok{lambda=}\FloatTok{3.83}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Aster_Hastings_files/figure-latex/unnamed-chunk-19-6.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{alpha.HRyr2}\FloatTok{.2}\OtherTok{\textless{}{-}}\FunctionTok{round}\NormalTok{(HR2b.prog.param2}\SpecialCharTok{$}\NormalTok{estimate[}\DecValTok{1}\NormalTok{],}\DecValTok{2}\NormalTok{)}
+
+\CommentTok{\#filled\_seeds}
+\CommentTok{\#negative binomial is better}
+\NormalTok{HRyr2\_cl\_fruits\_b}\OtherTok{\textless{}{-}}\FunctionTok{subset}\NormalTok{(HR23\_aster\_b, closed\_fruits}\SpecialCharTok{\textgreater{}}\DecValTok{0}\NormalTok{)}
+\FunctionTok{hist}\NormalTok{(HRyr2\_cl\_fruits\_b}\SpecialCharTok{$}\NormalTok{filled\_seeds)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Aster_Hastings_files/figure-latex/unnamed-chunk-19-7.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{HR2b.prog.param3 }\OtherTok{\textless{}{-}} \FunctionTok{fitdistr}\NormalTok{(HRyr2\_cl\_fruits\_b}\SpecialCharTok{$}\NormalTok{filled\_seeds, }\StringTok{"negative binomial"}\NormalTok{) }
+\FunctionTok{hist}\NormalTok{(}\FunctionTok{rnbinom}\NormalTok{(}\DecValTok{289}\NormalTok{, }\AttributeTok{size =} \FloatTok{0.884}\NormalTok{, }\AttributeTok{mu=}\FloatTok{8.1}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Aster_Hastings_files/figure-latex/unnamed-chunk-19-8.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{hist}\NormalTok{(}\FunctionTok{rpois}\NormalTok{(}\DecValTok{289}\NormalTok{, }\AttributeTok{lambda=}\FloatTok{8.1}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Aster_Hastings_files/figure-latex/unnamed-chunk-19-9.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{alpha.HRyr2}\FloatTok{.3}\OtherTok{\textless{}{-}}\FunctionTok{round}\NormalTok{(HR2b.prog.param3}\SpecialCharTok{$}\NormalTok{estimate[}\DecValTok{1}\NormalTok{],}\DecValTok{2}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\#\#\#Set up aster
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#establish nodes as vars. "pods\_collected" is the subsampled node}
+\NormalTok{vars}\OtherTok{\textless{}{-}}\FunctionTok{c}\NormalTok{(}\StringTok{"surv\_to\_flower"}\NormalTok{, }\StringTok{"F\_plant"}\NormalTok{, }\StringTok{"total\_fruits"}\NormalTok{, }\StringTok{"closed\_fruits"}\NormalTok{, }\StringTok{"filled\_seeds"}\NormalTok{)}
+
+\NormalTok{HR23\_aster\_b }\OtherTok{\textless{}{-}} \FunctionTok{as.data.frame}\NormalTok{(HR23\_aster\_b)}
+
+\CommentTok{\#reshape ML19\_aster\_b to long form}
+\NormalTok{HR23\_aster\_g2 }\OtherTok{\textless{}{-}} \FunctionTok{reshape}\NormalTok{(HR23\_aster\_b,}\AttributeTok{varying =} \FunctionTok{list}\NormalTok{(vars), }\AttributeTok{direction =} \StringTok{"long"}\NormalTok{, }\AttributeTok{timevar =} \StringTok{"varb"}\NormalTok{,}\AttributeTok{times =} \FunctionTok{as.factor}\NormalTok{(vars), }\AttributeTok{v.names =} \StringTok{"resp"}\NormalTok{)}
+
+\CommentTok{\#Check that the reshape worked }
+\FunctionTok{nrow}\NormalTok{(HR23\_aster\_g2)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 10025
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{nrow}\NormalTok{(HR23\_aster\_b)}\SpecialCharTok{*}\FunctionTok{length}\NormalTok{(vars)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 10025
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#designate fitness node, "filled\_seeds"}
+\NormalTok{fit}\OtherTok{\textless{}{-}}\FunctionTok{grepl}\NormalTok{(}\StringTok{"filled\_seeds"}\NormalTok{, }\FunctionTok{as.character}\NormalTok{(HR23\_aster\_g2}\SpecialCharTok{$}\NormalTok{varb))}
+\NormalTok{fit}\OtherTok{\textless{}{-}}\FunctionTok{as.numeric}\NormalTok{(fit)}
+\NormalTok{HR23\_aster\_g2}\SpecialCharTok{$}\NormalTok{fit}\OtherTok{\textless{}{-}}\NormalTok{fit}
+
+\CommentTok{\#check "Total\_seeds" is designated as the fitness variable }
+\FunctionTok{with}\NormalTok{(HR23\_aster\_g2, }\FunctionTok{sort}\NormalTok{(}\FunctionTok{unique}\NormalTok{(}\FunctionTok{as.character}\NormalTok{(varb)[fit}\SpecialCharTok{==}\DecValTok{0}\NormalTok{])))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "closed_fruits"  "F_plant"        "surv_to_flower" "total_fruits"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{with}\NormalTok{(HR23\_aster\_g2, }\FunctionTok{sort}\NormalTok{(}\FunctionTok{unique}\NormalTok{(}\FunctionTok{as.character}\NormalTok{(varb)[fit}\SpecialCharTok{==}\DecValTok{1}\NormalTok{])))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "filled_seeds"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#Add a variable "root" to ML19\_aster files where value is 1}
+\NormalTok{HR23\_aster\_g2 }\OtherTok{\textless{}{-}} \FunctionTok{data.frame}\NormalTok{(HR23\_aster\_g2, }\AttributeTok{root=}\DecValTok{1}\NormalTok{)}
+
+\CommentTok{\#give each node a number}
+\NormalTok{pred }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{,}\DecValTok{1}\NormalTok{,}\DecValTok{2}\NormalTok{,}\DecValTok{2}\NormalTok{,}\DecValTok{3}\NormalTok{)}
+
+\CommentTok{\#designate each node with a distribution. 1= Bernoulli, 2= poisson, subsampling node (pods\_collected) is binomial which is the same family as Bernoulli}
+\NormalTok{fam}\OtherTok{\textless{}{-}}\FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{1}\NormalTok{,}\DecValTok{2}\NormalTok{,}\DecValTok{2}\NormalTok{,}\DecValTok{2}\NormalTok{)}
+
+\CommentTok{\#show graphical model}
+\NormalTok{foo }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\StringTok{"root"}\NormalTok{, vars)}
+\NormalTok{pvars }\OtherTok{\textless{}{-}}\NormalTok{ foo[pred }\SpecialCharTok{+}\DecValTok{1}\NormalTok{]}
+\NormalTok{bar }\OtherTok{\textless{}{-}}\FunctionTok{data.frame}\NormalTok{(pvars, vars, }\FunctionTok{sapply}\NormalTok{(}\FunctionTok{fam.default}\NormalTok{(), as.character)[fam])}
+\FunctionTok{colnames}\NormalTok{(bar) }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\StringTok{"pred"}\NormalTok{, }\StringTok{"succ"}\NormalTok{, }\StringTok{"fam"}\NormalTok{)}
+\FunctionTok{print}\NormalTok{(bar, }\AttributeTok{right =} \ConstantTok{FALSE}\NormalTok{, }\AttributeTok{row.names =} \ConstantTok{FALSE}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##  pred           succ           fam      
+##  root           surv_to_flower bernoulli
+##  surv_to_flower F_plant        bernoulli
+##  F_plant        total_fruits   poisson  
+##  F_plant        closed_fruits  poisson  
+##  total_fruits   filled_seeds   poisson
+\end{verbatim}
+
+\#\#\#fixed effect aster model
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{HR23\_g2 }\OtherTok{\textless{}{-}} \FunctionTok{aster}\NormalTok{(resp }\SpecialCharTok{\textasciitilde{}}\NormalTok{ fit }\SpecialCharTok{+}\NormalTok{ varb }\SpecialCharTok{+}\NormalTok{ fit}\SpecialCharTok{:}\NormalTok{Transect, pred, fam, varb, id, root, }\AttributeTok{data =}\NormalTok{ HR23\_aster\_g2) }
+
+\FunctionTok{summary}\NormalTok{(HR23\_g2, }\AttributeTok{info.tol =} \FloatTok{1e{-}9}\NormalTok{, }\AttributeTok{se.fit=}\ConstantTok{TRUE}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Call:
+## aster.formula(formula = resp ~ fit + varb + fit:Transect, pred = pred, 
+##     fam = fam, varvar = varb, idvar = id, root = root, data = HR23_aster_g2)
+## 
+##                     Estimate Std. Error z value Pr(>|z|)    
+## (Intercept)         0.997423   0.031114  32.057  < 2e-16 ***
+## fit                -0.515306   0.039611 -13.009  < 2e-16 ***
+## varbF_plant        -6.502225   0.165081 -39.388  < 2e-16 ***
+## varbsurv_to_flower  0.006073   0.059084   0.103   0.9181    
+## varbtotal_fruits   -0.213220   0.051988  -4.101 4.11e-05 ***
+## fit:Transect       -0.005702   0.002957  -1.929   0.0538 .  
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Original predictor variables dropped (aliased)
+##      varbfilled_seeds
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#Call:}
+\CommentTok{\#aster.formula(formula = resp \textasciitilde{} fit + varb + fit:Transect, pred = pred, }
+\CommentTok{\#    fam = fam, varvar = varb, idvar = id, root = root, data = HR23\_aster\_g2)}
+
+\CommentTok{\#                    Estimate Std. Error z value Pr(\textgreater{}|z|)    }
+\CommentTok{\#(Intercept)         0.997423   0.031114  32.057  \textless{} 2e{-}16 ***}
+\CommentTok{\#fit                {-}0.515306   0.039611 {-}13.009  \textless{} 2e{-}16 ***}
+\CommentTok{\#varbF\_plant        {-}6.502225   0.165081 {-}39.388  \textless{} 2e{-}16 ***}
+\CommentTok{\#varbsurv\_to\_flower  0.006073   0.059084   0.103   0.9181    }
+\CommentTok{\#varbtotal\_fruits   {-}0.213220   0.051988  {-}4.101 4.11e{-}05 ***}
+\CommentTok{\#fit:Transect       {-}0.005702   0.002957  {-}1.929   0.0538 .  }
+\CommentTok{\#{-}{-}{-}}
+\CommentTok{\#Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1}
+
+\CommentTok{\#Original predictor variables dropped (aliased)}
+\CommentTok{\#     varbfilled\_seeds }
+
+\NormalTok{HR\_23\_hyp }\OtherTok{\textless{}{-}} \FunctionTok{subset}\NormalTok{(HR23\_aster\_g2, id }\SpecialCharTok{==} \DecValTok{1}\NormalTok{)}
+\CommentTok{\# set Transect to 0}
+\NormalTok{HR\_23\_hyp}\SpecialCharTok{$}\NormalTok{Transect }\OtherTok{\textless{}{-}} \DecValTok{0}
+\CommentTok{\# set resp to 1}
+\NormalTok{HR\_23\_hyp}\SpecialCharTok{$}\NormalTok{resp }\OtherTok{\textless{}{-}} \DecValTok{1}
+
+\CommentTok{\# predict conditional fitness estimates for this hypothetical individual}
+\NormalTok{HR\_23\_hyp.p }\OtherTok{\textless{}{-}} \FunctionTok{predict}\NormalTok{(HR23\_g2, }\AttributeTok{varvar =}\NormalTok{ varb, }\AttributeTok{idvar =}\NormalTok{ id, }\AttributeTok{root =}\NormalTok{ root,}
+  \AttributeTok{newdata =}\NormalTok{ HR\_23\_hyp, }\AttributeTok{model.type =} \StringTok{"conditional"}\NormalTok{)}
+
+\CommentTok{\# take the product of these conditional estimates, EXCEPT for the sub sampling node (4th node)}
+\NormalTok{mu.fit}\OtherTok{\textless{}{-}}\FunctionTok{prod}\NormalTok{(HR\_23\_hyp.p[}\SpecialCharTok{{-}}\DecValTok{4}\NormalTok{])}
+\NormalTok{mu.fit}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 1.441642
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#1.441642}
+\end{Highlighting}
+\end{Shaded}
+
+\#\#\#\#mean fitness with negative binomial distributions
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#change the terminal node to negative binomial in the aster set up }
+\NormalTok{pred }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{,}\DecValTok{1}\NormalTok{,}\DecValTok{2}\NormalTok{,}\DecValTok{2}\NormalTok{,}\DecValTok{3}\NormalTok{)}
+
+\CommentTok{\#designate each node with a distribution}
+\NormalTok{fam}\OtherTok{\textless{}{-}}\FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{1}\NormalTok{,}\DecValTok{2}\NormalTok{,}\DecValTok{2}\NormalTok{,}\DecValTok{3}\NormalTok{)}
+
+\CommentTok{\#fam\textless{}{-}c(1,1,2,1,2)}
+\NormalTok{famlist }\OtherTok{\textless{}{-}} \FunctionTok{list}\NormalTok{(}\FunctionTok{fam.bernoulli}\NormalTok{(),}\FunctionTok{fam.negative.binomial}\NormalTok{(}\AttributeTok{size =}\NormalTok{ alpha.HRyr2),}\FunctionTok{fam.negative.binomial}\NormalTok{(}\AttributeTok{size =}\NormalTok{ alpha.HRyr2}\FloatTok{.2}\NormalTok{), }\FunctionTok{fam.negative.binomial}\NormalTok{(}\AttributeTok{size =}\NormalTok{ alpha.HRyr2}\FloatTok{.3}\NormalTok{))}
+\FunctionTok{sapply}\NormalTok{(famlist, as.character)[fam] }
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "bernoulli"                      "bernoulli"                     
+## [3] "negative.binomial(size = 0.14)" "negative.binomial(size = 0.14)"
+## [5] "negative.binomial(size = 1.67)"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{famlist}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [[1]]
+## [1] "bernoulli"
+## 
+## [[2]]
+## [1] "negative.binomial(size = 0.14)"
+## 
+## [[3]]
+## [1] "negative.binomial(size = 1.67)"
+## 
+## [[4]]
+## [1] "negative.binomial(size = 0.88)"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{HR23\_g2\_b }\OtherTok{\textless{}{-}} \FunctionTok{aster}\NormalTok{(resp }\SpecialCharTok{\textasciitilde{}}\NormalTok{ fit }\SpecialCharTok{+}\NormalTok{ varb }\SpecialCharTok{+}\NormalTok{ fit}\SpecialCharTok{:}\NormalTok{(Transect), pred, fam, }\AttributeTok{famlist=}\NormalTok{famlist, varb, id, root, }\AttributeTok{data =}\NormalTok{ HR23\_aster\_g2) }
+\FunctionTok{summary}\NormalTok{(HR23\_g2\_b, }\AttributeTok{se.fit=}\NormalTok{T, }\AttributeTok{info.tol=}\FloatTok{1e{-}9}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Call:
+## aster.formula(formula = resp ~ fit + varb + fit:(Transect), pred = pred, 
+##     fam = fam, varvar = varb, idvar = id, root = root, data = HR23_aster_g2, 
+##     famlist = famlist)
+## 
+##                      Estimate Std. Error z value Pr(>|z|)    
+## (Intercept)         0.9496529  0.0068944 137.744   <2e-16 ***
+## fit                -0.6681700  0.0170870 -39.104   <2e-16 ***
+## varbF_plant        -2.6130216  0.0685649 -38.110   <2e-16 ***
+## varbsurv_to_flower  0.0538432  0.0506988   1.062    0.288    
+## varbtotal_fruits   -0.3290493  0.0248385 -13.248   <2e-16 ***
+## fit:Transect       -0.0008227  0.0011227  -0.733    0.464    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Original predictor variables dropped (aliased)
+##      varbfilled_seeds
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#Call:}
+\CommentTok{\#aster.formula(formula = resp \textasciitilde{} fit + varb + fit:(Transect), pred = pred, }
+\CommentTok{\#    fam = fam, varvar = varb, idvar = id, root = root, data = HR23\_aster\_g2, }
+\CommentTok{\#    famlist = famlist)}
+
+\CommentTok{\#                     Estimate Std. Error z value Pr(\textgreater{}|z|)    }
+\CommentTok{\#(Intercept)         0.9496529  0.0068944 137.744   \textless{}2e{-}16 ***}
+\CommentTok{\#fit                {-}0.6681700  0.0170870 {-}39.104   \textless{}2e{-}16 ***}
+\CommentTok{\#varbF\_plant        {-}2.6130216  0.0685649 {-}38.110   \textless{}2e{-}16 ***}
+\CommentTok{\#varbsurv\_to\_flower  0.0538432  0.0506988   1.062    0.288    }
+\CommentTok{\#varbtotal\_fruits   {-}0.3290493  0.0248385 {-}13.248   \textless{}2e{-}16 ***}
+\CommentTok{\#fit:Transect       {-}0.0008227  0.0011227  {-}0.733    0.464    }
+\CommentTok{\#{-}{-}{-}}
+\CommentTok{\#Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1}
+
+\CommentTok{\#Original predictor variables dropped (aliased)}
+\CommentTok{\#     varbfilled\_seeds }
+
+\NormalTok{HR\_23\_hyp }\OtherTok{\textless{}{-}} \FunctionTok{subset}\NormalTok{(HR23\_aster\_g2, id }\SpecialCharTok{==} \DecValTok{1}\NormalTok{)}
+\CommentTok{\# set Transect to 0}
+\NormalTok{HR\_23\_hyp}\SpecialCharTok{$}\NormalTok{Transect }\OtherTok{\textless{}{-}} \DecValTok{0}
+\CommentTok{\# set resp to 1}
+\NormalTok{HR\_23\_hyp}\SpecialCharTok{$}\NormalTok{resp }\OtherTok{\textless{}{-}} \DecValTok{1}
+
+\CommentTok{\# predict conditional fitness estimates for this hypothetical individual}
+\NormalTok{HR\_23\_hyp.p }\OtherTok{\textless{}{-}} \FunctionTok{predict}\NormalTok{(HR23\_g2\_b, }\AttributeTok{varvar =}\NormalTok{ varb, }\AttributeTok{famlist=}\NormalTok{famlist,}\AttributeTok{idvar =}\NormalTok{ id, }\AttributeTok{root =}\NormalTok{ root,}
+  \AttributeTok{newdata =}\NormalTok{ HR\_23\_hyp, }\AttributeTok{model.type =} \StringTok{"conditional"}\NormalTok{)}
+
+\CommentTok{\# take the product of these conditional estimates, EXCEPT for the subsampling node (4th node)}
+\NormalTok{mu.fit}\OtherTok{\textless{}{-}}\FunctionTok{prod}\NormalTok{(HR\_23\_hyp.p[}\SpecialCharTok{{-}}\DecValTok{4}\NormalTok{])}
+\NormalTok{mu.fit}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 1.460256
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#the estimate is not that different from the model with a poisson node }
+\CommentTok{\#1.460256}
+\end{Highlighting}
+\end{Shaded}
+
+\#\#\#estimate mean fitness and se
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\DocumentationTok{\#\#This is using code from the switch{-}too{-}MR technical report }
+\CommentTok{\#use poisson nodes }
+\CommentTok{\#use the estimates from the hypothetical data frame where you set yloc to zero}
+
+\CommentTok{\#conditional}
+\NormalTok{nnode }\OtherTok{\textless{}{-}} \FunctionTok{length}\NormalTok{(vars)}
+\NormalTok{nind }\OtherTok{\textless{}{-}} \FunctionTok{length}\NormalTok{(}\FunctionTok{unique}\NormalTok{(HR\_23\_hyp}\SpecialCharTok{$}\NormalTok{id))}
+\NormalTok{nnode }\SpecialCharTok{*}\NormalTok{ nind }\SpecialCharTok{==} \FunctionTok{nrow}\NormalTok{(HR\_23\_hyp)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] TRUE
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{pout.cond }\OtherTok{\textless{}{-}} \FunctionTok{predict}\NormalTok{(HR23\_g2\_b, }\AttributeTok{newdata =}\NormalTok{ HR\_23\_hyp, }\AttributeTok{varvar =}\NormalTok{ varb, }\AttributeTok{idvar =}\NormalTok{ id, }\AttributeTok{root =}\NormalTok{ root, }\AttributeTok{model.type =} \StringTok{"conditional"}\NormalTok{, }\AttributeTok{is.always.parameter =} \ConstantTok{TRUE}\NormalTok{, }\AttributeTok{gradient=} \ConstantTok{TRUE}\NormalTok{)}
+\NormalTok{xi}\OtherTok{\textless{}{-}}\NormalTok{pout.cond}\SpecialCharTok{$}\NormalTok{fit}
+
+\FunctionTok{class}\NormalTok{(xi)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "numeric"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{length}\NormalTok{(xi)}\SpecialCharTok{==}\NormalTok{nind}\SpecialCharTok{*}\NormalTok{nnode}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] TRUE
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{xi }\OtherTok{\textless{}{-}} \FunctionTok{matrix}\NormalTok{(xi, }\AttributeTok{nrow =}\NormalTok{ nind)}
+\FunctionTok{colnames}\NormalTok{(xi) }\OtherTok{\textless{}{-}}\NormalTok{ vars}
+\NormalTok{xi}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##      surv_to_flower   F_plant total_fruits closed_fruits filled_seeds
+## [1,]      0.6591307 0.2946588     4.733528      2.711286     1.588375
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#unconditional}
+\NormalTok{pout.unco}\OtherTok{\textless{}{-}}\FunctionTok{predict}\NormalTok{(HR23\_g2\_b, }\AttributeTok{newdata =}\NormalTok{ HR\_23\_hyp, }\AttributeTok{varvar =}\NormalTok{ varb, }\AttributeTok{idvar =}\NormalTok{ id, }\AttributeTok{root =}\NormalTok{ root, }\AttributeTok{gradient=}\ConstantTok{TRUE}\NormalTok{)}
+\NormalTok{mu}\OtherTok{\textless{}{-}}\NormalTok{pout.unco}\SpecialCharTok{$}\NormalTok{fit}
+\NormalTok{mu }\OtherTok{\textless{}{-}} \FunctionTok{matrix}\NormalTok{(mu, }\AttributeTok{nrow =}\NormalTok{ nind)}
+\FunctionTok{colnames}\NormalTok{(mu) }\OtherTok{\textless{}{-}}\NormalTok{ vars}
+\NormalTok{mu}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##      surv_to_flower   F_plant total_fruits closed_fruits filled_seeds
+## [1,]      0.6591307 0.1942186    0.9193393     0.5265823     1.460256
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{is.seeds}\OtherTok{\textless{}{-}}\FunctionTok{grep}\NormalTok{(}\StringTok{"filled\_seeds"}\NormalTok{, vars)}
+\NormalTok{is.closed.fruits}\OtherTok{\textless{}{-}}\FunctionTok{grep}\NormalTok{(}\StringTok{"closed\_fruits"}\NormalTok{, vars)}
+\NormalTok{is.fruits}\OtherTok{\textless{}{-}}\FunctionTok{grep}\NormalTok{(}\StringTok{"total\_fruits"}\NormalTok{, vars)}
+
+\NormalTok{is.seeds}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 5
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{is.closed.fruits}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 4
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{is.fruits}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 3
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#unconditional estimate of total fruits }
+\NormalTok{mu.fruits}\OtherTok{\textless{}{-}}\NormalTok{mu[, is.fruits]}
+
+\CommentTok{\#conditional estimate of closed fruits }
+\NormalTok{xi.closed.fruits}\OtherTok{\textless{}{-}}\NormalTok{xi[, is.closed.fruits]}
+
+\CommentTok{\#conditional estimate of total seeds }
+\NormalTok{xi.seeds }\OtherTok{\textless{}{-}}\NormalTok{ xi[ , is.seeds]}
+
+\NormalTok{mu.seeds }\OtherTok{\textless{}{-}}\NormalTok{ mu.fruits }\SpecialCharTok{*}\NormalTok{ xi.closed.fruits }\SpecialCharTok{*}\NormalTok{ xi.seeds}
+\NormalTok{mu.seeds}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## total_fruits 
+##     3.959171
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Total\_fruits }
+\CommentTok{\#   3.959171}
+
+\CommentTok{\#make a  function}
+\NormalTok{foo }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(x) \{}
+\CommentTok{\# x is xi and mu strung out as one vector}
+\NormalTok{xi }\OtherTok{\textless{}{-}}\NormalTok{ x[}\DecValTok{1}\SpecialCharTok{:}\FunctionTok{length}\NormalTok{(xi)]}
+\NormalTok{mu }\OtherTok{\textless{}{-}}\NormalTok{ x[}\SpecialCharTok{{-}}\NormalTok{ (}\DecValTok{1}\SpecialCharTok{:}\FunctionTok{length}\NormalTok{(xi))]}
+\NormalTok{xi }\OtherTok{\textless{}{-}} \FunctionTok{matrix}\NormalTok{(xi, }\AttributeTok{nrow =}\NormalTok{ nind)}
+\NormalTok{mu }\OtherTok{\textless{}{-}} \FunctionTok{matrix}\NormalTok{(mu, }\AttributeTok{nrow =}\NormalTok{ nind)}
+\NormalTok{mu.fruits }\OtherTok{\textless{}{-}}\NormalTok{ mu[ , is.fruits]}
+\NormalTok{xi.closed.fruits }\OtherTok{\textless{}{-}}\NormalTok{ xi[ , is.closed.fruits]}
+\NormalTok{xi.seeds }\OtherTok{\textless{}{-}}\NormalTok{ xi[ , is.seeds]}
+\NormalTok{mu.seeds }\OtherTok{\textless{}{-}}\NormalTok{ mu.fruits }\SpecialCharTok{*}\NormalTok{ xi.seeds}
+\NormalTok{\}}
+
+\CommentTok{\#vector of conditional and unconditional estimates for each node }
+\NormalTok{ximu }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(xi, mu)}
+\FunctionTok{all.equal}\NormalTok{(}\FunctionTok{foo}\NormalTok{(ximu), mu.seeds)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "names for current but not for target"
+## [2] "Mean relative difference: 1.711286"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{foo}\NormalTok{(ximu)}
+\NormalTok{mu.seeds}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## total_fruits 
+##     3.959171
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(numDeriv)}
+\CommentTok{\# R package numDeriv figures out the Jacobian matrix for this transformation.}
+\CommentTok{\#We also need the Jacobian matrix for the transformation from the “coefficients” vector to the vector ximu}
+
+\NormalTok{jac.foo }\OtherTok{\textless{}{-}} \FunctionTok{jacobian}\NormalTok{(foo, ximu)}
+\NormalTok{jac.ximu }\OtherTok{\textless{}{-}} \FunctionTok{rbind}\NormalTok{(pout.cond}\SpecialCharTok{$}\NormalTok{gradient, pout.unco}\SpecialCharTok{$}\NormalTok{gradient)}
+\NormalTok{jac.total }\OtherTok{\textless{}{-}}\NormalTok{ jac.foo }\SpecialCharTok{\%*\%}\NormalTok{ jac.ximu}
+\CommentTok{\#Now the delta method says the variance{-}covariance matrix of all the fitnesses (the vector estimate mu.fit) is JI−1JT, where J is the overall Jacobian matrix jar.total and I is Fisher information for the “coefficients” vector}
+\CommentTok{\#there are six coefficients from the model}
+\NormalTok{V }\OtherTok{\textless{}{-}}\NormalTok{ jac.total }\SpecialCharTok{\%*\%} \FunctionTok{solve}\NormalTok{(HR23\_g2\_b}\SpecialCharTok{$}\NormalTok{fisher) }\SpecialCharTok{\%*\%} \FunctionTok{t}\NormalTok{(jac.total)}
+\CommentTok{\#and the standard errors are square roots of the variances (the diagonal elements of V)}
+\NormalTok{se }\OtherTok{\textless{}{-}} \FunctionTok{sqrt}\NormalTok{(}\FunctionTok{diag}\NormalTok{(V))}
+\NormalTok{bar.pois }\OtherTok{\textless{}{-}} \FunctionTok{cbind}\NormalTok{(mu.fit, se)}
+\FunctionTok{colnames}\NormalTok{(bar.pois) }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\StringTok{"Estimate"}\NormalTok{, }\StringTok{"SE"}\NormalTok{)}
+\NormalTok{bar.pois}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##      Estimate        SE
+## [1,] 1.460256 0.5332056
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Estimate SE}
+\CommentTok{\# 1.460256 0.5332056}
+\end{Highlighting}
+\end{Shaded}
+
+
+\end{document}
