@@ -1,0 +1,647 @@
+---
+title: "BO_22_Vs_23"
+author: "Helen Payne"
+date: "2024-07-16"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+---
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r}
+# Load libraries
+library(tidyverse)
+library(lme4)
+library(car)
+```
+
+
+```{r}
+#read in the data
+BO_22_23_fit <- read_csv(here::here("data_sheets", "compiled_sheets", "BO_22_23_fit.csv"))
+
+# Create a new column "Genotype" by merging "Donor" and "Recipient" with a hyphen in between
+BO_22_23_fit$Genotype <- paste(BO_22_23_fit$Donor, BO_22_23_fit$Recipient, sep = "-")
+
+BO_22_23_full <- read_csv(here::here("data_sheets", "compiled_sheets", "BO_22_23_full.csv"))
+
+```
+```{r}
+
+# Calculate the mean surv_to_flower for each group in AC_22_23_full and add it as a new column
+BO_22_23_full <- BO_22_23_full %>%
+  group_by(Year, Gen, Transect, Sequence, Donor, Recipient, SegPos) %>%
+  mutate(prop_surv_to_flower = mean(surv_to_flower, na.rm = TRUE)) %>%
+  ungroup()  # Remove grouping
+
+BO_prop_sample <- BO_22_23_full %>%
+  select(c(Year, Gen, Transect, Sequence, Donor, Recipient, SegPos, prop_surv_to_flower))  %>%
+    distinct()
+
+BO_22_23_fit <- BO_22_23_fit %>%
+  left_join(BO_prop_sample %>% select(Year, Gen, Transect, Sequence, Donor, Recipient, SegPos, prop_surv_to_flower),
+            by = c("Year", "Gen", "Transect", "Sequence", "Donor", "Recipient", "SegPos"))
+
+# Create the new column
+BO_22_23_fit <- BO_22_23_fit %>%
+  mutate(est_fitness = prop_surv_to_flower * est_fecundity)
+
+```
+
+
+```{r}
+#Subset the data for each year and each generation
+BO_22_fit <- BO_22_23_fit %>%
+  filter(Year == 2022)
+
+BO_23_fit_G1 <- BO_22_23_fit %>%
+  filter(Year == 2023) %>%
+  filter(Gen == "G1")
+
+BO_23_fit_G2 <- BO_22_23_fit %>%
+  filter(Year == 2023) %>%
+  filter(Gen == "G2")
+
+```
+
+
+Now compare Generation 1 from BO in both 2022 and 2023, but first we need to determine which genotypes are the same in 2022 and 2023
+
+```{r}
+# Create a dataframe with common "Genotype" values for 2022
+BO_common_22_23_G1_22 <- semi_join(BO_22_fit, BO_23_fit_G1, by = "Genotype")
+
+# Create a dataframe with common "Genotype" values for 2022
+BO_common_22_23_G1_23 <- semi_join(BO_23_fit_G1, BO_22_fit, by = "Genotype")
+
+# Merge these two dataframes to have one finalized dataset to compare G1 2022 and G1 2023
+BO_common_22_23_G1 <- full_join(BO_common_22_23_G1_22, BO_common_22_23_G1_23, by = intersect(names(BO_common_22_23_G1_22), names(BO_common_22_23_G1_23)))
+```
+
+**Determine if 2022 and 2023 trait means are significantly different in Generation 1**
+Any difference would be due to environmental effects (because these are the same gneotypes)
+
+#MATERNAL#2022v2023#
+```{r}
+# Define the traits to analyze
+traits <- c("corolla_diam_mm", "skel_dryweight_mg_SEG", "SLA_SEG", "d13C_SEG", "msm_all", "LMA_SEG", "fl_duration", "mean_seeds_per_fruit", "est_fecundity", "est_fitness")
+
+# Loop over each trait
+for (trait in traits) {
+  
+  # Calculate the mean trait value for each maternal (Recipient) family for 2022
+  maternal_means_22 <- BO_common_22_23_G1_22 %>%
+    group_by(Recipient, Donor) %>%
+    summarise(mean_trait = mean(get(trait), na.rm = TRUE))
+  
+  
+  # Calculate the mean trait value for each maternal (Recipient) family for 2023 G1
+  maternal_means_23_G1 <- BO_common_22_23_G1_23 %>%
+    group_by(Recipient, Donor) %>%
+    summarise(mean_trait = mean(get(trait), na.rm = TRUE))
+  
+  
+  # Add year information
+  maternal_means_22 <- maternal_means_22 %>%
+    mutate(Year = "2022")
+  
+  maternal_means_23_G1 <- maternal_means_23_G1 %>%
+    mutate(Year = "2023_G1")
+  
+  # Combine the dataframes
+  mat_combined_data_year <- bind_rows(maternal_means_22, maternal_means_23_G1)
+  
+  # Create the histogram
+  ggplot(mat_combined_data_year, aes(x = mean_trait, fill = Year)) +
+    geom_histogram(position = "identity", alpha = 0.6, binwidth = 0.2) +
+    labs(title = paste("Comparison of Recipient Mean", trait),
+         x = paste("Mean", trait),
+         y = "Frequency") +
+    scale_fill_manual(values = c("2022" = "blue", "2023_G1" = "red")) +
+    theme_minimal()
+  
+  # Split the data by year
+  trait_2022 <- na.omit(maternal_means_22$mean_trait)
+  trait_2023 <- na.omit(maternal_means_23_G1$mean_trait)
+  
+  # Check normality with Shapiro-Wilk test
+  shapiro_test_2022 <- shapiro.test(trait_2022)
+  shapiro_test_2023 <- shapiro.test(trait_2023)
+  
+  # Print Shapiro-Wilk test results
+  print(paste("Shapiro-Wilk test for 2022", trait, ":"))
+  print(shapiro_test_2022)
+  
+  print(paste("Shapiro-Wilk test for 2023", trait, ":"))
+  print(shapiro_test_2023)
+  
+  # Perform Levene's test for homogeneity of variances
+  levene_test <- leveneTest(mean_trait ~ Year, data = mat_combined_data_year)
+  print(paste("Levene's test for", trait, ":"))
+  print(levene_test)
+  
+  # Perform Mann-Whitney U test (Wilcoxon rank-sum test)
+  mann_whitney_test <- wilcox.test(mean_trait ~ Year, data = mat_combined_data_year)
+  print(paste("Mann-Whitney U test for", trait, ":"))
+  print(mann_whitney_test)
+  
+  # Optionally perform t-test if data is normally distributed
+ # if (shapiro_test_2022$p.value > 0.05 && shapiro_test_2023$p.value > 0.05 && levene_test$`Pr(>F)`[1] > 0.05) {
+    t_test_result_year <- t.test(mean_trait ~ Year, data = mat_combined_data_year)
+    print(paste("t-test for", trait, ":"))
+    print(t_test_result_year)
+  #} else {
+  #  print(paste("Skipping t-test for", trait, "due to non-normal distribution or unequal variances"))
+  }
+
+```
+
+#PATERNAL#2022v2023#
+```{r}
+# Define the traits to analyze
+traits <- c("corolla_diam_mm", "skel_dryweight_mg_SEG", "SLA_SEG", "d13C_SEG", "msm_all", "LMA_SEG", "fl_duration", "mean_seeds_per_fruit", "est_fecundity")
+
+# Loop over each trait
+for (trait in traits) {
+  
+  # Calculate the mean trait value for each paternal (Donor) family for 2022
+  paternal_means_22 <- BO_common_22_23_G1_22 %>%
+    group_by(Donor) %>%
+    summarise(mean_trait = mean(get(trait), na.rm = TRUE))
+  
+  # Calculate the mean trait value for each paternal (Donor) family for 2023 G1
+  paternal_means_23_G1 <- BO_common_22_23_G1_23 %>%
+    group_by(Donor) %>%
+    summarise(mean_trait = mean(get(trait), na.rm = TRUE))
+  
+  # Add year information
+  paternal_means_22 <- paternal_means_22 %>%
+    mutate(Year = "2022")
+  
+  paternal_means_23_G1 <- paternal_means_23_G1 %>%
+    mutate(Year = "2023_G1")
+  
+  # Combine the dataframes
+  pat_combined_data_year <- bind_rows(paternal_means_22, paternal_means_23_G1)
+  
+  # Create the histogram
+  ggplot(pat_combined_data_year, aes(x = mean_trait, fill = Year)) +
+    geom_histogram(position = "identity", alpha = 0.6, binwidth = 0.2) +
+    labs(title = paste("Comparison of Recipient Mean", trait),
+         x = paste("Mean", trait),
+         y = "Frequency") +
+    scale_fill_manual(values = c("2022" = "blue", "2023_G1" = "red")) +
+    theme_minimal()
+  
+  # Split the data by year
+  trait_2022 <- na.omit(paternal_means_22$mean_trait)
+  trait_2023 <- na.omit(paternal_means_23_G1$mean_trait)
+  
+  # Check normality with Shapiro-Wilk test
+  shapiro_test_2022 <- shapiro.test(trait_2022)
+  shapiro_test_2023 <- shapiro.test(trait_2023)
+  
+  # Print Shapiro-Wilk test results
+  print(paste("Shapiro-Wilk test for 2022", trait, ":"))
+  print(shapiro_test_2022)
+  
+  print(paste("Shapiro-Wilk test for 2023", trait, ":"))
+  print(shapiro_test_2023)
+  
+  # Perform Levene's test for homogeneity of variances
+  levene_test <- leveneTest(mean_trait ~ Year, data = pat_combined_data_year)
+  print(paste("Levene's test for", trait, ":"))
+  print(levene_test)
+  
+  # Perform Mann-Whitney U test (Wilcoxon rank-sum test)
+  mann_whitney_test <- wilcox.test(mean_trait ~ Year, data = pat_combined_data_year)
+  print(paste("Mann-Whitney U test for", trait, ":"))
+  print(mann_whitney_test)
+  
+  # Optionally perform t-test if data is normally distributed
+ # if (shapiro_test_2022$p.value > 0.05 && shapiro_test_2023$p.value > 0.05 && levene_test$`Pr(>F)`[1] > 0.05) {
+    t_test_result_year <- t.test(mean_trait ~ Year, data = pat_combined_data_year)
+    print(paste("t-test for", trait, ":"))
+    print(t_test_result_year)
+  #} else {
+  #  print(paste("Skipping t-test for", trait, "due to non-normal distribution or unequal variances"))
+  }
+ # }
+
+```
+
+#CALCULATING PATERNAL FITNESS ESTIMATES
+```{r}
+# Define the datasets and the years they correspond to
+datasets <- list(
+  "2022" = BO_common_22_23_G1_22,
+  "2023_G1" = BO_common_22_23_G1_23
+)
+
+# Initialize an empty list to store results
+paternal_means_list <- list()
+
+# Loop over each dataset and perform the calculations
+for (year in names(datasets)) {
+  # Calculate the mean trait value for each maternal (Recipient) family
+  maternal_means <- datasets[[year]] %>%
+    group_by(Recipient, Donor) %>%
+    summarise(mat_mean_est_fitness = mean(est_fitness, na.rm = TRUE))
+  
+  # Calculate the mean est_fitness for each Donor
+  paternal_means <- maternal_means %>%
+    group_by(Donor) %>%
+    summarise(pat_mean_est_fitness = mean(mat_mean_est_fitness, na.rm = TRUE)) %>%
+    mutate(Year = year)
+  
+  # Store the result in the list
+  paternal_means_list[[year]] <- paternal_means
+}
+
+# Combine the dataframes for different years
+pat_combined_data_year <- bind_rows(paternal_means_list)
+
+# Split the data by year
+trait_2022 <- na.omit(paternal_means_list[["2022"]]$pat_mean_est_fitness)
+trait_2023 <- na.omit(paternal_means_list[["2023_G1"]]$pat_mean_est_fitness)
+
+# Check normality with Shapiro-Wilk test
+shapiro_test_2022 <- shapiro.test(trait_2022)
+shapiro_test_2023 <- shapiro.test(trait_2023)
+
+# Print Shapiro-Wilk test results
+print("Shapiro-Wilk test for 2022:")
+print(shapiro_test_2022)
+
+print("Shapiro-Wilk test for 2023:")
+print(shapiro_test_2023)
+
+# Perform Levene's test for homogeneity of variances
+levene_test <- leveneTest(pat_mean_est_fitness ~ Year, data = pat_combined_data_year)
+print("Levene's test:")
+print(levene_test)
+
+# Perform Mann-Whitney U test (Wilcoxon rank-sum test)
+mann_whitney_test <- wilcox.test(pat_mean_est_fitness ~ Year, data = pat_combined_data_year)
+print("Mann-Whitney U test:")
+print(mann_whitney_test)
+
+# Optionally perform t-test if data is normally distributed
+# if (shapiro_test_2022$p.value > 0.05 && shapiro_test_2023$p.value > 0.05 && levene_test$`Pr(>F)`[1] > 0.05) {
+t_test_result_year <- t.test(pat_mean_est_fitness ~ Year, data = pat_combined_data_year)
+print("t-test:")
+print(t_test_result_year)
+# } else {
+#   print("Skipping t-test due to non-normal distribution or unequal variances")
+# }
+```
+
+#PHENOTYPE#2022v2023
+```{r}
+# Define the traits to analyze
+traits <- c("corolla_diam_mm", "skel_dryweight_mg_SEG", "SLA_SEG", "d13C_SEG", "msm_all", "LMA_SEG", "fl_duration", "mean_seeds_per_fruit", "est_fecundity", "est_fitness")
+
+# Loop over each trait
+for (trait in traits) {
+  
+  # Convert 'Year' to factor if it's not already
+  if (!is.factor(BO_common_22_23_G1$Year)) {
+    BO_common_22_23_G1$Year <- as.factor(BO_common_22_23_G1$Year)
+  }
+  
+  # Create the histogram
+  ggplot(BO_common_22_23_G1, aes_string(x = trait, fill = "Year")) +
+    geom_histogram(position = "identity", alpha = 0.6, binwidth = 0.2) +
+    labs(title = paste("Comparison of", trait),
+         x = trait,
+         y = "Frequency") +
+    scale_fill_manual(values = c("2022" = "blue", "2023" = "red")) +
+    theme_minimal()
+  
+  # Split the data by year
+  trait_2022 <- na.omit(BO_common_22_23_G1_22[[trait]])
+  trait_2023 <- na.omit(BO_common_22_23_G1_23[[trait]])
+  
+  # Check normality with Shapiro-Wilk test
+  shapiro_test_2022 <- shapiro.test(trait_2022)
+  shapiro_test_2023 <- shapiro.test(trait_2023)
+  
+  # Print Shapiro-Wilk test results
+  print(paste("Shapiro-Wilk test for 2022", trait, ":"))
+  print(shapiro_test_2022)
+  
+  print(paste("Shapiro-Wilk test for 2023", trait, ":"))
+  print(shapiro_test_2023)
+  
+  # Perform Levene's test for homogeneity of variances
+  levene_test <- leveneTest(as.formula(paste(trait, "~ as.factor(Year)")), data = BO_common_22_23_G1)
+  print(paste("Levene's test for", trait, ":"))
+  print(levene_test)
+  
+  # Perform Mann-Whitney U test (Wilcoxon rank-sum test)
+  mann_whitney_test <- wilcox.test(as.formula(paste(trait, "~ Year")), data = BO_common_22_23_G1)
+  print(paste("Mann-Whitney U test for", trait, ":"))
+  print(mann_whitney_test)
+  
+  # Optionally perform t-test if data is normally distributed and variances are equal
+  #if (shapiro_test_2022$p.value > 0.05 && shapiro_test_2023$p.value > 0.05 && levene_test$`Pr(>F)`[1] > 0.05) {
+    t_test_result_year <- t.test(as.formula(paste(trait, "~ Year")), data = BO_common_22_23_G1)
+    print(paste("t-test for", trait, ":"))
+    print(t_test_result_year)
+  } #else {
+    #print(paste("Skipping t-test for", trait, "due to non-normal distribution or unequal variances"))
+  #}
+#}
+```
+
+
+
+**Determine if G1 and G2 trait means are significantly different in 2023**
+Any difference would be due to either the effect of greenhouse produced seeds or a generation of selection
+
+#MATERNAL#G1vG2#
+```{r}
+# Define the traits to analyze
+traits <- c("corolla_diam_mm_SEG", "skel_dryweight_mg_SEG", "SLA_SEG", "d13C_SEG", "msm_all", "LMA_SEG", "fl_duration", "mean_seeds_per_fruit", "est_fecundity", "est_fitness")
+
+# Loop over each trait
+for (trait in traits) {
+  
+  # Create a dataframe with common "Genotype" values for 2023
+  BO_common_23_G1 <- semi_join(BO_23_fit_G1, BO_23_fit_G2, by = "Genotype")
+  BO_common_23_G2 <- semi_join(BO_23_fit_G2, BO_23_fit_G1, by = "Genotype")
+  
+  # Merge these two dataframes to have one finalized dataset to compare G1 2023 and G2 2023
+  BO_common_23_G1_G2 <- full_join(BO_common_23_G1, BO_common_23_G2, by = intersect(names(BO_common_23_G1), names(BO_common_23_G2)))
+
+  # Calculate the mean trait value for each maternal (Recipient) family for G1, 2023
+  maternal_means_23_G1 <- BO_common_23_G1 %>%
+    group_by(Recipient, Donor) %>%
+    summarise(mean_trait = mean(get(trait), na.rm = TRUE)) %>%
+    mutate(Gen = "1")
+  
+  # Calculate the mean trait value for each maternal (Recipient) family for G2, 2023
+  maternal_means_23_G2 <- BO_common_23_G2 %>%
+    group_by(Recipient, Donor) %>%
+    summarise(mean_trait = mean(get(trait), na.rm = TRUE)) %>%
+    mutate(Gen = "2")
+  
+  # Combine the dataframes
+  mat_combined_data_gen <- bind_rows(maternal_means_23_G1, maternal_means_23_G2)
+
+  # Create the histogram
+  ggplot(mat_combined_data_gen, aes(x = mean_trait, fill = Gen)) +
+    geom_histogram(position = "identity", alpha = 0.6, binwidth = 0.2) +
+    labs(title = paste("Comparison of Recipient Mean", trait, ": G1 vs G2"),
+         x = paste("Mean", trait),
+         y = "Frequency") +
+    scale_fill_manual(values = c("1" = "blue", "2" = "red")) +
+    theme_minimal()
+  
+  # Split the data by generation
+  trait_G1 <- na.omit(maternal_means_23_G1$mean_trait)
+  trait_G2 <- na.omit(maternal_means_23_G2$mean_trait)
+  
+  # Check normality with Shapiro-Wilk test
+  shapiro_test_G1 <- shapiro.test(trait_G1)
+  shapiro_test_G2 <- shapiro.test(trait_G2)
+  
+  # Print Shapiro-Wilk test results
+  print(shapiro_test_G1)
+  print(shapiro_test_G2)
+  
+  # Perform Levene's test for homogeneity of variances
+  levene_test <- leveneTest(mean_trait ~ as.factor(Gen), data = mat_combined_data_gen)
+  
+  # Print Levene's test result
+  print(levene_test)
+  
+  # Perform Mann-Whitney U test (Wilcoxon rank-sum test) instead of t-test
+  mann_whitney_test <- wilcox.test(mean_trait ~ Gen, data = mat_combined_data_gen)
+  
+  # Print Mann-Whitney test result
+  print(mann_whitney_test)
+  
+  # Perform t-test
+  t_test_result_gen <- t.test(mean_trait ~ Gen, data = mat_combined_data_gen)
+  
+  # Print t-test result
+  print(t_test_result_gen)
+
+}
+
+```
+
+#PATERNAL#G1vG2#
+```{r}
+# Define the traits to analyze
+traits <- c("corolla_diam_mm_SEG", "skel_dryweight_mg_SEG", "SLA_SEG", "d13C_SEG", "msm_all", "LMA_SEG", "fl_duration", "mean_seeds_per_fruit", "est_fecundity")
+
+# Loop over each trait
+for (trait in traits) {
+  
+  # Create a dataframe with common "Genotype" values for 2023
+  BO_common_23_G1 <- semi_join(BO_23_fit_G1, BO_23_fit_G2, by = "Genotype")
+  BO_common_23_G2 <- semi_join(BO_23_fit_G2, BO_23_fit_G1, by = "Genotype")
+  
+  # Merge these two dataframes to have one finalized dataset to compare G1 2023 and G2 2023
+  BO_common_23_G1_G2 <- full_join(BO_common_23_G1, BO_common_23_G2, by = intersect(names(BO_common_23_G1), names(BO_common_23_G2)))
+
+  # Calculate the mean trait value for each paternal (Donor) family for G1, 2023
+  paternal_means_23_G1 <- BO_common_23_G1 %>%
+    group_by(Donor) %>%
+    summarise(mean_trait = mean(get(trait), na.rm = TRUE), .groups = "drop") %>%
+    mutate(Gen = "1")
+  
+  # Calculate the mean trait value for each paternal (Donor) family for G2, 2023
+  paternal_means_23_G2 <- BO_common_23_G2 %>%
+    group_by(Donor) %>%
+    summarise(mean_trait = mean(get(trait), na.rm = TRUE), .groups = "drop") %>%
+    mutate(Gen = "2")
+  
+  # Combine the dataframes
+  pat_combined_data_gen <- bind_rows(paternal_means_23_G1, paternal_means_23_G2)
+
+  # Create the histogram
+  ggplot(pat_combined_data_gen, aes(x = mean_trait, fill = Gen)) +
+    geom_histogram(position = "identity", alpha = 0.6, binwidth = 0.2) +
+    labs(title = paste("Comparison of Donor Mean", trait, ": G1 vs G2"),
+         x = paste("Mean", trait),
+         y = "Frequency") +
+    scale_fill_manual(values = c("1" = "blue", "2" = "red")) +
+    theme_minimal()
+  
+  # Split the data by generation and ensure numeric conversion
+  trait_G1 <- na.omit(as.numeric(paternal_means_23_G1$mean_trait))
+  trait_G2 <- na.omit(as.numeric(paternal_means_23_G2$mean_trait))
+  
+  # Check normality with Shapiro-Wilk test if sample size is appropriate
+  if (length(trait_G1) >= 3 && length(trait_G1) <= 5000) {
+    shapiro_test_G1 <- shapiro.test(trait_G1)
+    print(shapiro_test_G1)
+  } else {
+    print(paste("Sample size for trait_G1 is not suitable for Shapiro-Wilk test:", length(trait_G1)))
+  }
+  
+  if (length(trait_G2) >= 3 && length(trait_G2) <= 5000) {
+    shapiro_test_G2 <- shapiro.test(trait_G2)
+    print(shapiro_test_G2)
+  } else {
+    print(paste("Sample size for trait_G2 is not suitable for Shapiro-Wilk test:", length(trait_G2)))
+  }
+  
+  # Perform Levene's test for homogeneity of variances
+  levene_test <- leveneTest(mean_trait ~ as.factor(Gen), data = pat_combined_data_gen)
+  print(levene_test)
+  
+  # Perform Mann-Whitney U test (Wilcoxon rank-sum test)
+  mann_whitney_test <- wilcox.test(mean_trait ~ Gen, data = pat_combined_data_gen)
+  print(mann_whitney_test)
+  
+  # Perform t-test
+  t_test_result_gen <- t.test(mean_trait ~ Gen, data = pat_combined_data_gen)
+  print(t_test_result_gen)
+}
+
+```
+
+#CALCULATING PATERNAL FITNESS ESTIMATES
+```{r}
+# Define the datasets and the years they correspond to
+datasets <- list(
+  "2023_G1" = BO_common_23_G1,
+  "2023_G2" = BO_common_23_G2
+)
+
+# Initialize an empty list to store results
+paternal_means_list <- list()
+
+# Loop over each dataset and perform the calculations
+for (year in names(datasets)) {
+  # Calculate the mean trait value for each maternal (Recipient) family
+  maternal_means <- datasets[[year]] %>%
+    group_by(Recipient, Donor) %>%
+    summarise(mat_mean_est_fitness = mean(est_fitness, na.rm = TRUE))
+  
+  # Calculate the mean est_fitness for each Donor
+  paternal_means <- maternal_means %>%
+    group_by(Donor) %>%
+    summarise(pat_mean_est_fitness = mean(mat_mean_est_fitness, na.rm = TRUE)) %>%
+    mutate(Year = year)
+  
+  # Store the result in the list
+  paternal_means_list[[year]] <- paternal_means
+}
+
+# Combine the dataframes for different years
+pat_combined_data_year <- bind_rows(paternal_means_list)
+
+# Split the data by year
+trait_2023_G1 <- na.omit(paternal_means_list[["2023_G1"]]$pat_mean_est_fitness)
+trait_2023_G2 <- na.omit(paternal_means_list[["2023_G2"]]$pat_mean_est_fitness)
+
+# Check normality with Shapiro-Wilk test
+shapiro_test_2023_G1 <- shapiro.test(trait_2023_G1)
+shapiro_test_2023_G2 <- shapiro.test(trait_2023_G2)
+
+# Print Shapiro-Wilk test results
+print("Shapiro-Wilk test for 2023 G1:")
+print(shapiro_test_2023_G1)
+
+print("Shapiro-Wilk test for 2023 G2:")
+print(shapiro_test_2023_G2)
+
+# Perform Levene's test for homogeneity of variances
+levene_test <- leveneTest(pat_mean_est_fitness ~ Year, data = pat_combined_data_year)
+print("Levene's test:")
+print(levene_test)
+
+# Perform Mann-Whitney U test (Wilcoxon rank-sum test)
+mann_whitney_test <- wilcox.test(pat_mean_est_fitness ~ Year, data = pat_combined_data_year)
+print("Mann-Whitney U test:")
+print(mann_whitney_test)
+
+# Optionally perform t-test if data is normally distributed
+# if (shapiro_test_2022$p.value > 0.05 && shapiro_test_2023$p.value > 0.05 && levene_test$`Pr(>F)`[1] > 0.05) {
+t_test_result_year <- t.test(pat_mean_est_fitness ~ Year, data = pat_combined_data_year)
+print("t-test:")
+print(t_test_result_year)
+# } else {
+#   print("Skipping t-test due to non-normal distribution or unequal variances")
+# }
+```
+
+#PHENOTYPE#G1vG2
+```{r}
+# Define the traits to analyze
+traits <- c("corolla_diam_mm_SEG", "skel_dryweight_mg_SEG", "SLA_SEG", "d13C_SEG", "msm_all", "LMA_SEG", "fl_duration", "mean_seeds_per_fruit", "est_fecundity", "est_fitness")
+
+# Loop over each trait
+for (trait in traits) {
+  
+  # Create a dataframe with common "Genotype" values for 2023
+  BO_common_23_G1 <- semi_join(BO_23_fit_G1, BO_23_fit_G2, by = "Genotype")
+  BO_common_23_G2 <- semi_join(BO_23_fit_G2, BO_23_fit_G1, by = "Genotype")
+  
+  # Merge these two dataframes to have one finalized dataset to compare G1 2023 and G2 2023
+  BO_common_23_G1_G2 <- full_join(BO_common_23_G1, BO_common_23_G2, by = intersect(names(BO_common_23_G1), names(BO_common_23_G2)))
+  
+  # Convert 'Gen' to factor if it's not already
+  if (!is.factor(BO_common_23_G1_G2$Gen)) {
+    BO_common_23_G1_G2$Gen <- as.factor(BO_common_23_G1_G2$Gen)
+  }
+  
+  # Create the histogram
+  ggplot(BO_common_23_G1_G2, aes_string(x = trait, fill = "Gen")) +
+    geom_histogram(position = "identity", alpha = 0.6, binwidth = 0.2) +
+    labs(title = paste("Comparison of", trait),
+         x = trait,
+         y = "Frequency") +
+    scale_fill_manual(values = c("1" = "blue", "2" = "red")) +
+    theme_minimal()
+  
+  # Split the data by generation and ensure numeric conversion
+  trait_G1 <- na.omit(as.numeric(BO_common_23_G1[[trait]]))
+  trait_G2 <- na.omit(as.numeric(BO_common_23_G2[[trait]]))
+  
+  # Check normality with Shapiro-Wilk test if sample size is appropriate
+  if (length(trait_G1) >= 3 && length(trait_G1) <= 5000) {
+    shapiro_test_G1 <- shapiro.test(trait_G1)
+    print(paste("Shapiro-Wilk test for G1", trait, ":"))
+    print(shapiro_test_G1)
+  } else {
+    print(paste("Sample size for G1", trait, "is not suitable for Shapiro-Wilk test:", length(trait_G1)))
+  }
+  
+  if (length(trait_G2) >= 3 && length(trait_G2) <= 5000) {
+    shapiro_test_G2 <- shapiro.test(trait_G2)
+    print(paste("Shapiro-Wilk test for G2", trait, ":"))
+    print(shapiro_test_G2)
+  } else {
+    print(paste("Sample size for G2", trait, "is not suitable for Shapiro-Wilk test:", length(trait_G2)))
+  }
+  
+  # Perform Levene's test for homogeneity of variances
+  levene_test <- leveneTest(as.formula(paste(trait, "~ as.factor(Gen)")), data = BO_common_23_G1_G2)
+  print(paste("Levene's test for", trait, ":"))
+  print(levene_test)
+  
+  # Perform Mann-Whitney U test (Wilcoxon rank-sum test)
+  mann_whitney_test <- wilcox.test(as.formula(paste(trait, "~ Gen")), data = BO_common_23_G1_G2)
+  print(paste("Mann-Whitney U test for", trait, ":"))
+  print(mann_whitney_test)
+  
+  # Perform t-test
+  t_test_result_gen <- t.test(as.formula(paste(trait, "~ Gen")), data = BO_common_23_G1_G2)
+  print(paste("t-test for", trait, ":"))
+  print(t_test_result_gen)
+}
+
+```
+
+

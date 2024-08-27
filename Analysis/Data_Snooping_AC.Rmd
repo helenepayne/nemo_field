@@ -1,0 +1,384 @@
+---
+title: "Data_Snooping_AC"
+author: "Helen Payne"
+date: "2024-06-27"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r}
+# Load necessary library
+library(tidyverse)
+library(lme4)
+
+```
+
+**DATA SNOOPING: looking into survival**
+Next we wanted to add in survival into AC_22_23_fit, but in order to do this, we need to get the data from AC_22_23_full
+```{r}
+#read in both datasets
+AC_22_23_full <- read_csv(here::here("data_sheets", "compiled_sheets", "AC_22_23_full.csv"))
+
+AC_22_23_fit <- read_csv(here::here("data_sheets", "compiled_sheets", "AC_22_23_fit.csv"))
+
+
+# Calculate the mean surv_to_flower for each group in AC_22_23_full and add it as a new column
+AC_22_23_full <- AC_22_23_full %>%
+  group_by(Year, Gen, Transect, Sequence, Donor, Recipient, SegPos) %>%
+  mutate(prop_surv_to_flower = mean(surv_to_flower, na.rm = TRUE)) %>%
+  ungroup()  # Remove grouping
+
+AC_prop_sample <- AC_22_23_full %>%
+  select(c(Year, Gen, Transect, Sequence, Donor, Recipient, SegPos, prop_surv_to_flower))  %>%
+    distinct()
+
+AC_22_23_fit <- AC_22_23_fit %>%
+  left_join(AC_prop_sample %>% select(Year, Gen, Transect, Sequence, Donor, Recipient, SegPos, prop_surv_to_flower),
+            by = c("Year", "Gen", "Transect", "Sequence", "Donor", "Recipient", "SegPos"))
+```
+
+SURVIVAL:
+```{r}
+# Create the data snooping scatterplot
+ggplot(data = AC_22_23_fit, aes(x = corolla_diam_mm_SEG, y = prop_surv_to_flower)) +
+  geom_point() +
+  labs(
+    title = "Scatter Plot of Corolla Diameter vs. Proportion Surviving to Flower",
+    x = "Corolla Diameter (mm)",
+    y = "Proportion Surviving to Flower"
+  ) +
+  theme_minimal()
+
+
+# Create the data snooping scatterplot
+ggplot(data = AC_22_23_fit, aes(x = skel_dryweight_mg_SEG, y = prop_surv_to_flower)) +
+  geom_point() +
+  labs(
+    title = "Scatter Plot of Corolla Diameter vs. Proportion Surviving to Flower",
+    x = "Skeleton Weight (mg)",
+    y = "Proportion Surviving to Flower"
+  ) +
+  theme_minimal()
+
+# Create the data snooping scatterplot
+ggplot(data = AC_22_23_fit, aes(x = mean_seeds_per_fruit, y = prop_surv_to_flower)) +
+  geom_point() +
+  labs(
+    title = "Scatter Plot of Corolla Diameter vs. Proportion Surviving to Flower",
+    x = "Mean Seeds Per Fruit",
+    y = "Proportion Surviving to Flower"
+  ) +
+  theme_minimal()
+
+# Create the data snooping scatterplot
+ggplot(data = AC_22_23_fit, aes(x = SLA_SEG, y = prop_surv_to_flower)) +
+  geom_point() +
+  labs(
+    title = "Scatter Plot of Corolla Diameter vs. Proportion Surviving to Flower",
+    x = "SLA",
+    y = "Proportion Surviving to Flower"
+  ) +
+  theme_minimal()
+
+# Create the data snooping scatterplot
+ggplot(data = AC_22_23_fit, aes(x = LMA_SEG, y = prop_surv_to_flower)) +
+  geom_point() +
+  labs(
+    title = "Scatter Plot of Corolla Diameter vs. Proportion Surviving to Flower",
+    x = "LMA",
+    y = "Proportion Surviving to Flower"
+  ) +
+  theme_minimal()
+
+# Create the data snooping scatterplot
+ggplot(data = AC_22_23_fit, aes(x = d13C_SEG, y = prop_surv_to_flower)) +
+  geom_point() +
+  labs(
+    title = "Scatter Plot of Corolla Diameter vs. Proportion Surviving to Flower",
+    x = "d13C",
+    y = "Proportion Surviving to Flower"
+  ) +
+  theme_minimal()
+```
+
+
+ESTIMATED LIFETIME FECUNDITY
+```{r}
+# Create the data snooping scatterplot
+ggplot(data = AC_22_23_fit, aes(x = corolla_diam_mm_SEG, y = est_fecundity)) +
+  geom_point() +
+  labs(
+    title = "Corolla Diameter vs. Proportion Surviving to Flower",
+    x = "Corolla Diameter (mm)",
+    y = "Estimated Fecundity"
+  ) +
+  theme_minimal()
+
+
+# Create the data snooping scatterplot
+ggplot(data = AC_22_23_fit, aes(x = skel_dryweight_mg_SEG, y = est_fecundity)) +
+  geom_point() +
+  labs(
+    title = "Skeleton Weight vs. Proportion Surviving to Flower",
+    x = "Skeleton Weight (mg)",
+    y = "Estimated Fecundity"
+  ) +
+  theme_minimal()
+
+# Create the data snooping scatterplot
+ggplot(data = AC_22_23_fit, aes(x = mean_seeds_per_fruit, y = est_fecundity)) +
+  geom_point() +
+  labs(
+    title = "Mean Seeds Per Fruit vs. Proportion Surviving to Flower",
+    x = "Mean Seeds Per Fruit",
+    y = "Estimated Fecundity"
+  ) +
+  theme_minimal()
+
+# Create the data snooping scatterplot
+ggplot(data = AC_22_23_fit, aes(x = SLA_SEG, y = est_fecundity)) +
+  geom_point() +
+  labs(
+    title = "SLA vs. Proportion Surviving to Flower",
+    x = "SLA",
+    y = "Estimated Fecundity"
+  ) +
+  theme_minimal()
+
+# Create the data snooping scatterplot
+ggplot(data = AC_22_23_fit, aes(x = LMA_SEG, y = est_fecundity)) +
+  geom_point() +
+  labs(
+    title = "LMA vs. Proportion Surviving to Flower",
+    x = "LMA",
+    y = "Estimated Fecundity"
+  ) +
+  theme_minimal()
+
+# Create the data snooping scatterplot
+ggplot(data = AC_22_23_fit, aes(x = d13C_SEG, y = est_fecundity)) +
+  geom_point() +
+  labs(
+    title = "d13C vs. Proportion Surviving to Flower",
+    x = "delta Carbon 13",
+    y = "Estimated Fecundity"
+  ) +
+  theme_minimal()
+```
+
+OLS LM: Donor, Recipient, Transect
+```{r}
+#corolla_daim and Skel dryweight model
+mod_1 <- lmer(est_fecundity ~ corolla_diam_mm + skel_dryweight_mg + (1|Transect)  + (1 | Donor)  + (1 | Donor: Recipient), data = AC_22_23_fit)
+
+residuals <- resid(mod_1)
+
+# Q-Q plot for normality
+qqnorm(residuals) #good
+
+
+# Histogram for normality
+hist(residuals, breaks = 20, main = "Histogram of Residuals", xlab = "Residuals") #normal
+
+AIC(mod_1)
+mod_1
+
+# now include SLA
+mod_2 <- lmer(est_fecundity ~ corolla_diam_mm_SEG + skel_dryweight_mg_SEG + SLA_SEG + (1|Transect)  + (1 | Donor)  + (1 | Donor: Recipient), data = AC_22_23_fit)
+
+residuals <- resid(mod_2)
+
+# Q-Q plot for normality
+qqnorm(residuals) #good
+
+
+# Histogram for normality
+hist(residuals, breaks = 20, main = "Histogram of Residuals", xlab = "Residuals") #normal
+
+AIC(mod_2)
+mod_2
+
+# now include d13C
+mod_3 <- lmer(est_fecundity ~ corolla_diam_mm_SEG + skel_dryweight_mg_SEG + SLA_SEG + d13C + (1|Transect)  + (1 | Donor) + (1 | Donor: Recipient), data = AC_22_23_fit)
+
+residuals <- resid(mod_3)
+
+# Q-Q plot for normality
+qqnorm(residuals) #good
+
+
+# Histogram for normality
+hist(residuals, breaks = 20, main = "Histogram of Residuals", xlab = "Residuals") #normal
+
+AIC(mod_3)
+mod_3
+
+# now include SLA
+mod_4 <- lmer(est_fecundity ~ corolla_diam_mm_SEG + skel_dryweight_mg_SEG + SLA_SEG + d13C + msm_all + (1|Transect)  + (1 | Donor) + (1 | Donor: Recipient), data = AC_22_23_fit)
+
+residuals <- resid(mod_4)
+
+# Q-Q plot for normality
+qqnorm(residuals) #good
+
+
+# Histogram for normality
+hist(residuals, breaks = 20, main = "Histogram of Residuals", xlab = "Residuals") #normal
+
+AIC(mod_4)
+BIC(mod_4)
+mod_4
+```
+
+**Next Step:**
+Using the regression coefficients to calculate the selection gradient, then multiplying this by the phenotypic variance to determine the selection differential for each trait
+```{r}
+# Extract the fixed effects coefficients
+mod_coef <- fixef(mod_4)
+
+
+# Display the coefficients
+print(mod_coef)
+
+# Calculate variances of the traits
+corolla_var <- var(AC_22_23_fit$corolla_diam_mm_SEG, na.rm = TRUE)
+skel_var <- var(AC_22_23_fit$skel_dryweight_mg_SEG, na.rm = TRUE)
+SLA_var <- var(AC_22_23_fit$SLA_SEG, na.rm = TRUE)
+d13C_var <- var(AC_22_23_fit$d13C_SEG, na.rm = TRUE)
+msm_var <- var(AC_22_23_fit$msm_all, na.rm = TRUE)
+
+# Ensure the coefficients exist before calculation
+corolla_selection_diff <- ifelse(!is.na(mod_coef["corolla_diam_mm_SEG"]), mod_coef["corolla_diam_mm_SEG"] * corolla_var, NA)
+skel_selection_diff <- ifelse(!is.na(mod_coef["skel_dryweight_mg_SEG"]), mod_coef["skel_dryweight_mg_SEG"] * skel_var, NA)
+SLA_diff <- ifelse(!is.na(mod_coef["SLA_SEG"]), mod_coef["SLA_SEG"] * SLA_var, NA)
+d13C_diff <- ifelse(!is.na(mod_coef["d13C_SEG"]), mod_coef["d13C_SEG"] * d13C_var, NA)
+msm_diff <- ifelse(!is.na(mod_coef["msm_all"]), mod_coef["msm_all"] * msm_var, NA)
+
+# Print selection differentials
+print(corolla_selection_diff)
+print(skel_selection_diff)
+print(SLA_diff)
+print(d13C_diff)
+print(msm_diff)
+
+# Combine into a dataframe and handle NA values
+selection_diff_mod4 <- data.frame(
+  Trait = c("corolla_diam_mm", "skel_dryweight_mg", "SLA", "d13C", "msm"),
+  Selection_Differential = c(corolla_selection_diff, skel_selection_diff, SLA_diff, d13C_diff, msm_diff)
+)
+
+# Remove rows with NA values
+selection_diff_mod4 <- selection_diff_mod4[complete.cases(selection_diff_mod4), ]
+
+# Print the dataframe
+print(selection_diff_mod4)
+
+```
+
+
+OLS LM: Donor, Transect
+```{r}
+mod_5 <- lmer(est_fecundity ~ corolla_diam_mm_SEG + skel_dryweight_mg_SEG + SLA_SEG + d13C + msm_all + (1|Transect)  + (1 | Donor) , data = AC_22_23_fit)
+
+residuals <- resid(mod_5)
+
+# Q-Q plot for normality
+qqnorm(residuals) #good
+
+
+# Histogram for normality
+hist(residuals, breaks = 20, main = "Histogram of Residuals", xlab = "Residuals") #normal
+
+
+AIC(mod_5) #very similar to mod 4, but slightly better
+BIC(mod_5)
+mod_5
+```
+
+
+OLS LM: Transect
+```{r}
+mod_6 <- lm(est_fecundity ~ corolla_diam_mm_SEG + skel_dryweight_mg_SEG + SLA_SEG + d13C + msm_all + (1|Transect), data = AC_22_23_fit)
+
+residuals <- resid(mod_6)
+
+# Q-Q plot for normality
+qqnorm(residuals) #good
+
+
+# Histogram for normality
+hist(residuals, breaks = 20, main = "Histogram of Residuals", xlab = "Residuals") #normal
+
+
+AIC(mod_6) #very similar to mod 4 and 5
+BIC(mod_6)
+mod_6
+```
+
+OLS LM: Transect and Recipient
+```{r}
+mod_7 <- lmer(est_fecundity ~ corolla_diam_mm_SEG + skel_dryweight_mg_SEG + SLA_SEG + d13C + msm_all + (1|Transect) + (1|Recipient), data = AC_22_23_fit)
+
+residuals <- resid(mod_7)
+
+# Q-Q plot for normality
+qqnorm(residuals) #good
+
+
+# Histogram for normality
+hist(residuals, breaks = 20, main = "Histogram of Residuals", xlab = "Residuals") #normal
+
+
+AIC(mod_7) #very similar to mod 4 and 5 and 6
+BIC(mod_7)
+mod_7
+```
+
+
+
+```{r}
+# Extract the fixed effects coefficients
+mod_coef <- fixef(mod_5)
+
+# Display the coefficients
+print(mod_coef)
+
+# Calculate variances of the traits
+corolla_var <- var(AC_22_23_fit$corolla_diam_mm, na.rm = TRUE)
+skel_var <- var(AC_22_23_fit$skel_dryweight_mg, na.rm = TRUE)
+SLA_var <- var(AC_22_23_fit$SLA_SEG, na.rm = TRUE)
+d13C_var <- var(AC_22_23_fit$d13C_SEG, na.rm = TRUE)
+msm_var <- var(AC_22_23_fit$msm_all, na.rm = TRUE)
+
+# Ensure the coefficients exist before calculation
+corolla_selection_diff <- ifelse(!is.na(mod_coef["corolla_diam_mm_SEG"]), mod_coef["corolla_diam_mm_SEG"] * corolla_var, NA)
+skel_selection_diff <- ifelse(!is.na(mod_coef["skel_dryweight_mg_SEG"]), mod_coef["skel_dryweight_mg_SEG"] * skel_var, NA)
+SLA_diff <- ifelse(!is.na(mod_coef["SLA_SEG"]), mod_coef["SLA_SEG"] * SLA_var, NA)
+d13C_diff <- ifelse(!is.na(mod_coef["d13C_SEG"]), mod_coef["d13C_SEG"] * d13C_var, NA)
+msm_diff <- ifelse(!is.na(mod_coef["msm_all"]), mod_coef["msm_all"] * msm_var, NA)
+
+# Print selection differentials
+print(corolla_selection_diff)
+print(skel_selection_diff)
+print(SLA_diff)
+print(d13C_diff)
+print(msm_diff)
+
+# Combine into a dataframe
+selection_diff_mod5 <- data.frame(
+  traits = c("corolla_diam_mm", "skel_dryweight_mg", "SLA", "d13C", "msm"),
+  Selection_Differential = c(corolla_selection_diff, skel_selection_diff, SLA_diff, d13C_diff, msm_diff)
+)
+
+# Print the dataframe
+print(selection_diff_mod5)
+```
+
+
+```{r}
+variance_components_AC <- read_csv(here::here("data_sheets", "compiled_sheets", "AC_Va_h2_R.csv")) %>%
+    merge(selection_diff_mod4, by = traits)
+
+```
+
