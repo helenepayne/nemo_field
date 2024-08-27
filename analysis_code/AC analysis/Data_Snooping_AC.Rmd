@@ -1,0 +1,223 @@
+---
+title: "Data_Snooping_AC"
+author: "Helen Payne"
+date: "2024-06-27"
+output: html_document
+---
+
+```{r}
+# Load necessary library
+library(tidyverse)
+library(lme4)
+
+```
+
+**DATA SNOOPING: looking into survival**
+Next we wanted to add in survival into AC_22_23_fit, but in order to do this, we need to get the data from AC_22_23_full
+```{r}
+AC_22_23_full <- read_csv(here::here("data_sheets", "compiled_sheets", "AC_22_23_full.csv"))
+
+# Calculate the mean surv_to_flower for each group in AC_22_23_full and add it as a new column
+AC_22_23_full <- AC_22_23_full %>%
+  group_by(Year, Gen, Transect, Sequence, Donor, Recipient, SegPos) %>%
+  mutate(prop_surv_to_flower = mean(surv_to_flower, na.rm = TRUE)) %>%
+  ungroup()  # Remove grouping
+
+AC_prop_sample <- AC_22_23_full %>%
+  select(c(Year, Gen, Transect, Sequence, Donor, Recipient, SegPos, prop_surv_to_flower))  %>%
+    distinct()
+
+AC_22_23_fit <- AC_22_23_fit %>%
+  left_join(AC_prop_sample %>% select(Year, Gen, Transect, Sequence, Donor, Recipient, SegPos, prop_surv_to_flower),
+            by = c("Year", "Gen", "Transect", "Sequence", "Donor", "Recipient", "SegPos"))
+```
+
+
+```{r}
+# Create the data snooping scatterplot
+ggplot(data = AC_22_23_fit, aes(x = corolla_diam_mm_SEG, y = prop_surv_to_flower)) +
+  geom_point() +
+  labs(
+    title = "Scatter Plot of Corolla Diameter vs. Proportion Surviving to Flower",
+    x = "Corolla Diameter (mm)",
+    y = "Proportion Surviving to Flower"
+  ) +
+  theme_minimal()
+
+
+# Create the data snooping scatterplot
+ggplot(data = AC_22_23_fit, aes(x = skel_dryweight_mg_SEG, y = prop_surv_to_flower)) +
+  geom_point() +
+  labs(
+    title = "Scatter Plot of Corolla Diameter vs. Proportion Surviving to Flower",
+    x = "Skeleton Weight (mg)",
+    y = "Proportion Surviving to Flower"
+  ) +
+  theme_minimal()
+
+# Create the data snooping scatterplot
+ggplot(data = AC_22_23_fit, aes(x = mean_seeds_per_fruit, y = prop_surv_to_flower)) +
+  geom_point() +
+  labs(
+    title = "Scatter Plot of Corolla Diameter vs. Proportion Surviving to Flower",
+    x = "Mean Seeds Per Fruit",
+    y = "Proportion Surviving to Flower"
+  ) +
+  theme_minimal()
+
+# Create the data snooping scatterplot
+ggplot(data = AC_22_23_fit, aes(x = SLA_SEG, y = prop_surv_to_flower)) +
+  geom_point() +
+  labs(
+    title = "Scatter Plot of Corolla Diameter vs. Proportion Surviving to Flower",
+    x = "SLA",
+    y = "Proportion Surviving to Flower"
+  ) +
+  theme_minimal()
+
+# Create the data snooping scatterplot
+ggplot(data = AC_22_23_fit, aes(x = LMA_SEG, y = prop_surv_to_flower)) +
+  geom_point() +
+  labs(
+    title = "Scatter Plot of Corolla Diameter vs. Proportion Surviving to Flower",
+    x = "LMA",
+    y = "Proportion Surviving to Flower"
+  ) +
+  theme_minimal()
+
+# Create the data snooping scatterplot
+ggplot(data = AC_22_23_fit, aes(x = d13C_SEG, y = prop_surv_to_flower)) +
+  geom_point() +
+  labs(
+    title = "Scatter Plot of Corolla Diameter vs. Proportion Surviving to Flower",
+    x = "d13C",
+    y = "Proportion Surviving to Flower"
+  ) +
+  theme_minimal()
+```
+
+```{r}
+# Create the data snooping scatterplot
+ggplot(data = AC_22_23_fit, aes(x = corolla_diam_mm_SEG, y = est_fecundity)) +
+  geom_point() +
+  labs(
+    title = "Corolla Diameter vs. Proportion Surviving to Flower",
+    x = "Corolla Diameter (mm)",
+    y = "Estimated Fecundity"
+  ) +
+  theme_minimal()
+
+
+# Create the data snooping scatterplot
+ggplot(data = AC_22_23_fit, aes(x = skel_dryweight_mg_SEG, y = est_fecundity)) +
+  geom_point() +
+  labs(
+    title = "Skeleton Weight vs. Proportion Surviving to Flower",
+    x = "Skeleton Weight (mg)",
+    y = "Estimated Fecundity"
+  ) +
+  theme_minimal()
+
+# Create the data snooping scatterplot
+ggplot(data = AC_22_23_fit, aes(x = mean_seeds_per_fruit, y = est_fecundity)) +
+  geom_point() +
+  labs(
+    title = "Mean Seeds Per Fruit vs. Proportion Surviving to Flower",
+    x = "Mean Seeds Per Fruit",
+    y = "Estimated Fecundity"
+  ) +
+  theme_minimal()
+
+# Create the data snooping scatterplot
+ggplot(data = AC_22_23_fit, aes(x = SLA_SEG, y = est_fecundity)) +
+  geom_point() +
+  labs(
+    title = "SLA vs. Proportion Surviving to Flower",
+    x = "SLA",
+    y = "Estimated Fecundity"
+  ) +
+  theme_minimal()
+
+# Create the data snooping scatterplot
+ggplot(data = AC_22_23_fit, aes(x = LMA_SEG, y = est_fecundity)) +
+  geom_point() +
+  labs(
+    title = "LMA vs. Proportion Surviving to Flower",
+    x = "LMA",
+    y = "Estimated Fecundity"
+  ) +
+  theme_minimal()
+
+# Create the data snooping scatterplot
+ggplot(data = AC_22_23_fit, aes(x = d13C_SEG, y = est_fecundity)) +
+  geom_point() +
+  labs(
+    title = "d13C vs. Proportion Surviving to Flower",
+    x = "delta Carbon 13",
+    y = "Estimated Fecundity"
+  ) +
+  theme_minimal()
+```
+
+
+```{r}
+#corolla_daim and Skel dryweight model
+mod_1 <- lmer(est_fecundity ~ corolla_diam_mm + skel_dryweight_mg + Transect + (1 | Donor)  + (1 | Donor: Recipient), data = AC_22_23_fit)
+
+residuals <- resid(mod_1)
+
+# Q-Q plot for normality
+qqnorm(residuals) #good
+
+
+# Histogram for normality
+hist(residuals, breaks = 20, main = "Histogram of Residuals", xlab = "Residuals") #normal
+
+AIC(mod_1)
+mod_1
+
+# now include SLA
+mod_2 <- lmer(est_fecundity ~ corolla_diam_mm_SEG + skel_dryweight_mg_SEG + SLA_SEG + Transect + (1 | Donor)  + (1 | Donor: Recipient), data = AC_22_23_fit)
+
+residuals <- resid(mod_2)
+
+# Q-Q plot for normality
+qqnorm(residuals) #good
+
+
+# Histogram for normality
+hist(residuals, breaks = 20, main = "Histogram of Residuals", xlab = "Residuals") #normal
+
+AIC(mod_2)
+mod_2
+
+# now include d13C
+mod_3 <- lmer(est_fecundity ~ corolla_diam_mm_SEG + skel_dryweight_mg_SEG + SLA_SEG + d13C + Transect + (1 | Donor) + (1 | Donor: Recipient), data = AC_22_23_fit)
+
+residuals <- resid(mod_3)
+
+# Q-Q plot for normality
+qqnorm(residuals) #good
+
+
+# Histogram for normality
+hist(residuals, breaks = 20, main = "Histogram of Residuals", xlab = "Residuals") #normal
+
+AIC(mod_3)
+mod_3
+
+# now include SLA
+mod_4 <- lmer(est_fecundity ~ corolla_diam_mm_SEG + skel_dryweight_mg_SEG + SLA_SEG + d13C + msm_all + Transect + (1 | Donor) + (1 | Donor: Recipient), data = AC_22_23_fit)
+
+residuals <- resid(mod_4)
+
+# Q-Q plot for normality
+qqnorm(residuals) #good
+
+
+# Histogram for normality
+hist(residuals, breaks = 20, main = "Histogram of Residuals", xlab = "Residuals") #normal
+
+AIC(mod_4)
+mod_4
+```

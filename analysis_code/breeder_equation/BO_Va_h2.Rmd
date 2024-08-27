@@ -1,0 +1,201 @@
+---
+title: "BO_Va_h2"
+author: "Helen Payne"
+date: "2024-06-14"
+output: html_document
+---
+
+
+```{r}
+#Load Packages
+library(tidyverse)
+library(janitor)
+library(here)
+library(lubridate)
+library(stringr)
+library(fullfact) #Used to estimate additive genetic variance for both dams and sires
+library(lme4)
+library(ggplot2)
+library(lme4)
+library(variability)
+```
+
+Read in the data:
+```{r}
+BO_22_23_fit <- read_csv(here::here("data_sheets", "compiled_sheets", "BO_22_23_fit.csv"))
+```
+```{r}
+# Create the mixed model for corolla area
+
+corolla_model <- lmer(corolla_diam_mm_SEG ~ (1 | Recipient) + (1 | Donor), data = BO_22_23_fit)
+
+# Extract residuals from the model
+residuals <- resid(corolla_model) 
+
+# Q-Q plot for normality
+qqnorm(residuals) #looks good
+
+# Histogram for normality
+hist(residuals, breaks = 20, main = "Histogram of Residuals", xlab = "Residuals") #normal
+
+```
+
+```{r}
+# Create the mixed model for skeleton weight
+skel_model <- lmer(skel_dryweight_mg_SEG ~ (1 | Recipient) + (1 | Donor), data = BO_22_23_fit)
+
+# Check if the model is singular
+isSingular(skel_model) #TRUE, likely due to over-fitting, will not include
+
+```
+
+
+```{r}
+# Create the mixed model for flowering duration
+fl_duration_model <- lmer(fl_duration ~ (1 | Recipient) + (1 | Donor), data = BO_22_23_fit)
+
+# Check if the model is singular
+isSingular(fl_duration_model) #TRUE, likely due to over-fitting, will not include
+```
+
+
+```{r}
+# Create the mixed model for estimated fecundity, sqrt transforming estimated fecundity
+est_fecundity_model <- lmer(log(est_fecundity + 1) ~ (1 | Recipient) + (1 | Donor), data = BO_22_23_fit)
+
+# Extract residuals from the model
+residuals <- resid(est_fecundity_model)
+
+# Q-Q plot for normality
+qqnorm(residuals) #good enough
+
+
+# Histogram for normality
+hist(residuals, breaks = 20, main = "Histogram of Residuals", xlab = "Residuals") #normal-ish
+
+```
+
+```{r}
+# Create the mixed model for mean seed mass, sqrt transformed mean seed mass
+msm_model <- lmer(sqrt(msm_all) ~ (1 | Recipient) + (1 | Donor), data = BO_22_23_fit)
+
+# Extract residuals from the model
+residuals <- resid(msm_model)
+
+# Q-Q plot for normality
+qqnorm(residuals) #good enough
+
+
+# Histogram for normality
+hist(residuals, breaks = 20, main = "Histogram of Residuals", xlab = "Residuals") #normal-ish
+
+```
+
+```{r}
+# Create the mixed model for SLA
+SLA_model <- lmer(log(SLA_SEG) ~ (1 | Recipient) + (1 | Donor), data = BO_22_23_fit)
+
+# Extract residuals from the model
+residuals <- resid(SLA_model)
+
+# Q-Q plot for normality
+qqnorm(residuals) #good
+
+
+# Histogram for normality
+hist(residuals, breaks = 20, main = "Histogram of Residuals", xlab = "Residuals") #normal-ish
+
+```
+
+
+```{r}
+# Create the mixed model for mean seed mass, log transformed mean seed mass
+LMA_model <- lmer((LMA_SEG) ~ (1 | Recipient) + (1 | Donor), data = BO_22_23_fit)
+
+# Extract residuals from the model
+residuals <- resid(LMA_model)
+
+# Q-Q plot for normality
+qqnorm(residuals) #looks good!
+
+
+# Histogram for normality
+hist(residuals, breaks = 20, main = "Histogram of Residuals", xlab = "Residuals") #normal
+
+```
+
+
+```{r}
+# Create the mixed model for d13C, log transformed mean seed mass
+d13C_model <- lmer(d13C_SEG ~ (1 | Recipient) + (1 | Donor), data = BO_22_23_fit)
+
+# Extract residuals from the model
+residuals <- resid(msm_model)
+
+# Q-Q plot for normality
+qqnorm(residuals) #good enough
+
+
+# Histogram for normality
+hist(residuals, breaks = 20, main = "Histogram of Residuals", xlab = "Residuals") #normal-ish
+
+```
+
+
+
+```{r}
+# Function to extract variance components and calculate required values
+calculate_variances <- function(model, trait_name) {
+  var_components <- as.data.frame(VarCorr(model))
+  
+  Va_mat <- var_components$vcov[var_components$grp == "Recipient"]
+  Va_pat <- var_components$vcov[var_components$grp == "Donor"]
+  res_var <- var_components$vcov[var_components$grp == "Residual"]
+  
+  # Calculate the standard deviation
+  Vp <- Va_mat + Va_pat + res_var
+  Va_sd_mat <- sqrt(Va_mat)
+  Va_sd_pat <- sqrt(Va_pat)
+  Vp_sd <- sqrt(Vp)
+  
+  # Calculate narrow-sense heritability
+  h2 <- (Va_pat) / Vp  # assumed calculation
+  
+  # Create the dataframe and add the traits column
+  df <- data.frame(traits = trait_name, Va_mat, Va_sd_mat, Va_pat, Va_sd_pat, Vp, Vp_sd, h2)
+  
+  return(df)
+}
+
+# Calculate variances for each model and add trait names
+corolla_variances <- calculate_variances(corolla_model, "corolla_diam_mm")
+skel_variances <- calculate_variances(skel_model, "skel_biomass_mg")
+d13C_variances <- calculate_variances(d13C_model, "delta Carbon 13")
+est_fecundity_variances <- calculate_variances(est_fecundity_model, "estimated fecundity")
+LMA_variances <- calculate_variances(LMA_model, "LMA")
+msm_variances <- calculate_variances(msm_model, "mean seed mass")
+SLA_variances <- calculate_variances(SLA_model, "SLA")
+
+# Combine the results into a single dataframe
+variance_components_BO <- rbind(
+  corolla_variances,
+  skel_variances,
+  d13C_variances,
+  est_fecundity_variances,
+  LMA_variances,
+  msm_variances,
+  SLA_variances
+)
+
+# Print the dataframe
+print(variance_components_BO)
+
+```
+
+
+```{r}
+#Save the csv file
+write_csv(variance_components_BO, here::here("data_sheets", "compiled_sheets", "BO_Va_h2.csv"))
+
+```
+

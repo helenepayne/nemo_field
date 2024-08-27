@@ -1,0 +1,5 @@
+traits,V_mat,V_sd_mat,Va_mat,V_pat,V_sd_pat,Va_pat,Vp,Vp_sd,h2,n_obs
+corolla_diameter,2.048,1.431,8.192,0.3126,0.5591,1.251,14.53,3.811,0.0861,161
+skel_biomass_mg,NA,NA,NA,9.319e-4,0.03053,0.003728,NA,NA,NA,212
+delta_C_13,NA,NA,NA,0.02567,0.1602,0.1027,NA,NA,NA,202
+est_fitness,0.07652,0.2766,0.3061,0.01406,0.1186,0.05624,2.944,1.716,0.0191,229

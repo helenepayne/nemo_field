@@ -1,0 +1,487 @@
+---
+title: "AC_Va_h2"
+author: "Helen Payne"
+date: "2024-06-10"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+
+```{r}
+#Load Packages
+library(tidyverse)
+library(janitor)
+library(here)
+library(lubridate)
+library(stringr)
+library(fullfact) #Used to estimate additive genetic variance for both dams and sires
+library(lme4)
+library(ggplot2)
+library(lme4)
+library(variability)
+library(MuMIn)  # For calculating R² for mixed models
+```
+
+Read in the data:
+```{r}
+AC_22_23_fit <- read_csv(here::here("data_sheets", "compiled_sheets", "AC_22_23_fit.csv"))
+```
+
+
+```{r}
+# Create the mixed model for corolla area
+corolla_model <- lmer(corolla_diam_mm_SEG ~ (1 | Recipient) + (1 | Donor), data = AC_22_23_fit)
+
+# Extract residuals from the model
+residuals <- resid(corolla_model) 
+
+# Q-Q plot for normality
+qqnorm(residuals) #looks good
+
+# Histogram for normality
+hist(residuals, breaks = 20, main = "Histogram of Residuals", xlab = "Residuals") #normal
+
+
+## Create the mixed model for corolla area that includes transect
+corolla_model_2 <- lmer(corolla_diam_mm_SEG ~ Transect + (1 | Recipient) + (1 | Donor), data = AC_22_23_fit)
+
+# Extract residuals from the model
+residuals <- resid(corolla_model_2) 
+
+# Q-Q plot for normality
+qqnorm(residuals) #looks good
+
+# Histogram for normality
+hist(residuals, breaks = 20, main = "Histogram of Residuals", xlab = "Residuals") #normal
+
+#####
+#Calculate the group means
+group_means <- AC_22_23_fit %>%
+  group_by(Transect) %>%
+  summarise(mean_corolla_diam = mean(corolla_diam_mm_SEG, na.rm = TRUE))
+
+#Mean center the variable by Transect
+AC_22_23_fit <- AC_22_23_fit %>%
+  left_join(group_means, by = "Transect") %>%
+  mutate(corolla_diam_mm_SEG_centered = corolla_diam_mm_SEG - mean_corolla_diam) %>%
+  select(-mean_corolla_diam)  # Optional: Remove the mean_corolla_diam column
+#####
+
+#Fit the model using the mean-centered variable
+corolla_model_3 <- lmer((corolla_diam_mm_SEG_centered) ~ Transect + (1 | Recipient) + (1 | Donor), data = AC_22_23_fit)
+
+# Extract residuals from the model
+residuals <- resid(corolla_model_3) 
+
+# Q-Q plot for normality
+qqnorm(residuals) #looks good
+
+# Histogram for normality
+hist(residuals, breaks = 20, main = "Histogram of Residuals", xlab = "Residuals") #normal
+
+
+```
+
+```{r}
+# Compare models using AIC, BIC, and log-likelihood
+corolla_model_comparison <- data.frame(
+  Model = c("corolla_model", "corolla_model_2", "corolla_model_3"),
+  AIC = c(AIC(corolla_model), AIC(corolla_model_2), AIC(corolla_model_3)),
+  BIC = c(BIC(corolla_model), BIC(corolla_model_2), BIC(corolla_model_3)),
+  LogLikelihood = c(logLik(corolla_model), logLik(corolla_model_2), logLik(corolla_model_3))
+)
+
+# Print model comparison
+print(corolla_model_comparison)
+
+#model 3 appears the best
+```
+
+
+```{r}
+
+# Create the mixed model for skeleton weight, with skeleton weight log transformed
+skel_model <- lmer(log(skel_dryweight_mg_SEG) ~ (1 | Recipient) + (1 | Donor), data = AC_22_23_fit)
+
+# Extract residuals from the model
+residuals <- resid(skel_model)
+
+# Q-Q plot for normality
+qqnorm(residuals) #looks good
+
+
+# Histogram for normality
+hist(residuals, breaks = 20, main = "Histogram of Residuals", xlab = "Residuals") #normal
+
+
+# Create the mixed model for skeleton weight, with skeleton weight log transformed
+skel_model_2 <- lmer(log(skel_dryweight_mg_SEG) ~ Transect + (1 | Recipient) + (1 | Donor), data = AC_22_23_fit)
+
+# Extract residuals from the model
+residuals <- resid(skel_model_2)
+
+# Q-Q plot for normality
+qqnorm(residuals) #looks good
+
+
+# Histogram for normality
+hist(residuals, breaks = 20, main = "Histogram of Residuals", xlab = "Residuals") #normal
+
+
+#####
+#Calculate the group means
+group_means <- AC_22_23_fit %>%
+  group_by(Transect) %>%
+  summarise(mean_skel_dryweight_mg_SEG = mean(skel_dryweight_mg_SEG, na.rm = TRUE))
+
+#Mean center the variable by Transect
+AC_22_23_fit <- AC_22_23_fit %>%
+  left_join(group_means, by = "Transect") %>%
+  mutate(skel_dryweight_mg_SEG_centered = skel_dryweight_mg_SEG - mean_skel_dryweight_mg_SEG) %>%
+  select(-mean_skel_dryweight_mg_SEG)  # Optional: Remove the mean_corolla_diam column
+#####
+
+#Fit the model using the mean-centered variable
+skel_model_3 <- lmer((skel_dryweight_mg_SEG_centered) ~ Transect + (1 | Recipient) + (1 | Donor), data = AC_22_23_fit)
+
+# # Check if the model is singular
+isSingular(skel_model_3) #TRUE, likely due to over-fitting, will not include
+```
+
+```{r}
+
+# Compare models using AIC, BIC, and log-likelihood
+skel_model_comparison <- data.frame(
+  Model = c("skel_model", "skel_model_2", "skel_model_3"),
+  AIC = c(AIC(skel_model), AIC(skel_model_2), AIC(skel_model_3)),
+  BIC = c(BIC(skel_model), BIC(skel_model_2), BIC(skel_model_3)),
+  LogLikelihood = c(logLik(skel_model), logLik(skel_model_2), logLik(skel_model_3))
+)
+
+# Print model comparison
+print(skel_model_comparison)
+
+#model 1 and 2 appear pretty similar, use one of those
+
+```
+
+
+
+```{r}
+# Create the mixed model for flowering duration
+fl_duration_model <- lmer(fl_duration ~ (1 | Recipient) + (1 | Donor), data = AC_22_23_fit)
+
+# Check if the model is singular
+isSingular(fl_duration_model) #TRUE, likely due to over-fitting, will not include
+```
+
+
+```{r}
+# Create the mixed model for estimated fecundity, sqrt transforming estimated fecundity
+est_fecundity_model <- lmer(sqrt(est_fecundity) ~ (1 | Recipient) + (1 | Donor), data = AC_22_23_fit)
+
+# Extract residuals from the model
+residuals <- resid(est_fecundity_model)
+
+# Q-Q plot for normality
+qqnorm(residuals) #good enough
+
+# Histogram for normality
+hist(residuals, breaks = 20, main = "Histogram of Residuals", xlab = "Residuals") #normal-ish
+
+
+
+# Create the mixed model for estimated fecundity, sqrt transforming estimated fecundity
+est_fecundity_model_2 <- lmer(sqrt(est_fecundity) ~ Transect + (1 | Recipient) + (1 | Donor), data = AC_22_23_fit)
+
+# Extract residuals from the model
+residuals <- resid(est_fecundity_model_2)
+
+# Q-Q plot for normality
+qqnorm(residuals) #good enough
+
+
+# Histogram for normality
+hist(residuals, breaks = 20, main = "Histogram of Residuals", xlab = "Residuals") #normal-ish
+
+
+#####
+#Calculate the group means
+group_means <- AC_22_23_fit %>%
+  group_by(Transect) %>%
+  summarise(mean_est_fecundity = mean(est_fecundity, na.rm = TRUE))
+
+#Mean center the variable by Transect
+AC_22_23_fit <- AC_22_23_fit %>%
+  left_join(group_means, by = "Transect") %>%
+  mutate(est_fecundity_centered = est_fecundity - mean_est_fecundity) %>%
+  select(-mean_est_fecundity)  # Optional: Remove the mean_corolla_diam column
+#####
+
+#Fit the model using the mean-centered variable
+est_fecundity_model_3 <- lmer((est_fecundity_centered) ~ Transect + (1 | Recipient) + (1 | Donor), data = AC_22_23_fit)
+
+# Extract residuals from the model
+residuals <- resid(est_fecundity_model_3)
+
+# Q-Q plot for normality
+qqnorm(residuals) #good enough
+
+
+# Histogram for normality
+hist(residuals, breaks = 20, main = "Histogram of Residuals", xlab = "Residuals") #normal-ish
+
+```
+
+```{r}
+
+# Compare models using AIC, BIC, and log-likelihood
+est_fecundity_model_comparison <- data.frame(
+  Model = c("est_fecundity_model", "est_fecundity_model_2", "est_fecundity_model_3"),
+  AIC = c(AIC(est_fecundity_model), AIC(est_fecundity_model_2), AIC(est_fecundity_model_3)),
+  BIC = c(BIC(est_fecundity_model), BIC(est_fecundity_model_2), BIC(est_fecundity_model_3)),
+  LogLikelihood = c(logLik(est_fecundity_model), logLik(est_fecundity_model_2), logLik(est_fecundity_model_3))
+)
+
+# Print model comparison
+print(est_fecundity_model_comparison)
+
+#model 2 is the best
+
+```
+
+
+```{r}
+# Create the mixed model for mean seed mass, log transformed mean seed mass
+msm_model <- lmer(log(msm_all) ~ (1 | Recipient) + (1 | Donor), data = AC_22_23_fit)
+
+# Extract residuals from the model
+residuals <- resid(msm_model)
+
+# Q-Q plot for normality
+qqnorm(residuals) #good enough
+
+# Histogram for normality
+hist(residuals, breaks = 20, main = "Histogram of Residuals", xlab = "Residuals") #normal-ish
+
+
+# Create the mixed model for mean seed mass, log transformed mean seed mass
+msm_model_2 <- lmer(log(msm_all) ~ Transect + (1 | Recipient) + (1 | Donor), data = AC_22_23_fit)
+
+# Extract residuals from the model
+residuals <- resid(msm_model)
+
+# Q-Q plot for normality
+qqnorm(residuals) #good enough
+
+# Histogram for normality
+hist(residuals, breaks = 20, main = "Histogram of Residuals", xlab = "Residuals") #normal-ish
+
+
+#####
+#Calculate the group means
+group_means <- AC_22_23_fit %>%
+  group_by(Transect) %>%
+  summarise(mean_msm = mean(msm_all, na.rm = TRUE))
+
+#Mean center the variable by Transect
+AC_22_23_fit <- AC_22_23_fit %>%
+  left_join(group_means, by = "Transect") %>%
+  mutate(msm_centered = msm_all - mean_msm) %>%
+  select(-mean_msm)  # Optional: Remove the mean_corolla_diam column
+#####
+
+#Fit the model using the mean-centered variable
+msm_model_3 <- lmer((msm_centered) ~ Transect + (1 | Recipient) + (1 | Donor), data = AC_22_23_fit)
+
+# Extract residuals from the model
+residuals <- resid(msm_model_3)
+
+# Q-Q plot for normality
+qqnorm(residuals) #good enough
+
+
+# Histogram for normality
+hist(residuals, breaks = 20, main = "Histogram of Residuals", xlab = "Residuals") #normal-ish
+
+```
+
+```{r}
+
+# Compare models using AIC, BIC, and log-likelihood
+msm_model_comparison <- data.frame(
+  Model = c("msm_model", "msm_model_2", "msm_model_3"),
+  AIC = c(AIC(msm_model), AIC(msm_model_2), AIC(msm_model_3)),
+  BIC = c(BIC(msm_model), BIC(msm_model_2), BIC(msm_model_3)),
+  LogLikelihood = c(logLik(msm_model), logLik(msm_model_2), logLik(msm_model_3))
+)
+
+# Print model comparison
+print(msm_model_comparison)
+
+#model 1 is the best
+
+```
+
+```{r}
+# Create the mixed model for SLA
+SLA_model <- lmer(SLA_SEG ~ (1 | Recipient) + (1 | Donor), data = AC_22_23_fit)
+
+# Extract residuals from the model
+residuals <- resid(SLA_model)
+
+# Q-Q plot for normality
+qqnorm(residuals) #okay.. 
+
+
+# Histogram for normality
+hist(residuals, breaks = 20, main = "Histogram of Residuals", xlab = "Residuals") #definitely a few outliers, but maybe okay?
+
+
+# Create the mixed model for SLA
+SLA_model_2 <- lmer(SLA_SEG ~ Transect + (1 | Recipient) + (1 | Donor), data = AC_22_23_fit)
+
+# Check if the model is singular
+isSingular(SLA_model_2) #TRUE, likely due to over-fitting, will not include
+
+#Use model 1
+```
+
+
+
+```{r}
+# Create the mixed model for mean seed mass, log transformed mean seed mass
+LMA_model <- lmer(LMA_SEG ~ (1 | Recipient) + (1 | Donor), data = AC_22_23_fit)
+
+# Check if the model is singular
+isSingular(LMA_model) #TRUE, likely due to over-fitting, will not include
+```
+
+```{r}
+# Create the mixed model for d13C, log transformed mean seed mass
+d13C_model <- lmer(d13C_SEG ~ (1 | Recipient) + (1 | Donor), data = AC_22_23_fit)
+
+# Extract residuals from the model
+residuals <- resid(d13C_model)
+
+# Q-Q plot for normality
+qqnorm(residuals) #good enough
+
+
+# Histogram for normality
+hist(residuals, breaks = 20, main = "Histogram of Residuals", xlab = "Residuals") #normal-ish
+
+
+# Create the mixed model for d13C, log transformed mean seed mass
+d13C_model_2 <- lmer(d13C_SEG ~ Transect + (1 | Recipient) + (1 | Donor), data = AC_22_23_fit)
+
+# Extract residuals from the model
+residuals <- resid(d13C_model_2)
+
+# Q-Q plot for normality
+qqnorm(residuals) #good enough
+
+
+# Histogram for normality
+hist(residuals, breaks = 20, main = "Histogram of Residuals", xlab = "Residuals") #normal-ish
+
+#####
+#Calculate the group means
+group_means <- AC_22_23_fit %>%
+  group_by(Transect) %>%
+  summarise(mean_d13C_SEG = mean(d13C_SEG, na.rm = TRUE))
+
+#Mean center the variable by Transect
+AC_22_23_fit <- AC_22_23_fit %>%
+  left_join(group_means, by = "Transect") %>%
+  mutate(d13C_SEG_centered = d13C_SEG - mean_d13C_SEG) %>%
+  select(-mean_d13C_SEG)  # Optional: Remove the mean_corolla_diam column
+#####
+
+#Fit the model using the mean-centered variable
+d13C_model_3 <- lmer((d13C_SEG_centered) ~ Transect + (1 | Recipient) + (1 | Donor), data = AC_22_23_fit)
+
+# Extract residuals from the model
+residuals <- resid(d13C_model_3)
+
+# Q-Q plot for normality
+qqnorm(residuals) #good enough
+
+
+# Histogram for normality
+hist(residuals, breaks = 20, main = "Histogram of Residuals", xlab = "Residuals") #normal-ish
+
+```
+
+```{r}
+
+# Compare models using AIC, BIC, and log-likelihood
+d13C_model_comparison <- data.frame(
+  Model = c("d13C_model", "d13C_model_2", "d13C_model_3"),
+  AIC = c(AIC(d13C_model), AIC(d13C_model_2), AIC(d13C_model_3)),
+  BIC = c(BIC(d13C_model), BIC(d13C_model_2), BIC(d13C_model_3)),
+  LogLikelihood = c(logLik(d13C_model), logLik(d13C_model_2), logLik(d13C_model_3))
+)
+
+# Print model comparison
+print(d13C_model_comparison)
+
+#model 3 is the best
+
+```
+
+
+```{r}
+# Function to extract variance components and calculate required values
+calculate_variances <- function(model, trait_name) {
+  var_components <- as.data.frame(VarCorr(model))
+  
+  Va_mat <- var_components$vcov[var_components$grp == "Recipient"]
+  Va_pat <- var_components$vcov[var_components$grp == "Donor"]
+  res_var <- var_components$vcov[var_components$grp == "Residual"]
+  
+  # Calculate the standard deviation
+  Vp <- Va_mat + Va_pat + res_var
+  Va_sd_mat <- sqrt(Va_mat)
+  Va_sd_pat <- sqrt(Va_pat)
+  Vp_sd <- sqrt(Vp)
+  
+  # Calculate narrow-sense heritability
+  h2 <- (Va_pat) / Vp  # assumed calculation
+  
+  # Create the dataframe and add the traits column
+  df <- data.frame(traits = trait_name, Va_mat, Va_sd_mat, Va_pat, Va_sd_pat, Vp, Vp_sd, h2)
+  
+  return(df)
+}
+
+# Calculate variances for each model and add trait names
+corolla_variances <- calculate_variances(corolla_model_3, "corolla_diam_mm")
+skel_variances <- calculate_variances(skel_model_2, "skel_biomass_mg")
+d13C_variances <- calculate_variances(d13C_model_3, "delta_C_13")
+est_fecundity_variances <- calculate_variances(est_fecundity_model_2, "estimated_fecundity")
+msm_variances <- calculate_variances(msm_model, "mean_seed_mass")
+SLA_variances <- calculate_variances(SLA_model, "SLA")
+
+# Combine the results into a single dataframe
+variance_components_AC <- rbind(
+  corolla_variances,
+  skel_variances,
+  d13C_variances,
+  est_fecundity_variances,
+  msm_variances,
+  SLA_variances
+)
+
+# Print the dataframe
+print(variance_components_AC)
+
+```
+
+
+```{r}
+#Save the csv file
+write_csv(x = variance_components_AC, here::here("data_sheets", "compiled_sheets", "AC_Va_h2_R.csv"))
+
+```

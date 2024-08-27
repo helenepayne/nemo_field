@@ -1,0 +1,353 @@
+---
+title: "HR_Va_h2"
+author: "Helen Payne"
+date: "2024-06-14"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+
+
+```{r}
+#Load Packages
+library(tidyverse)
+library(lme4)
+
+```
+
+Read in the data:
+```{r}
+HR_22_23_fit <- read_csv(here::here("data_sheets", "compiled_sheets", "HR_22_23_fit.csv"))
+```
+```{r}
+# Create the mixed model for corolla area
+
+corolla_model <- lmer(corolla_diam_mm_SEG ~ (1 | Recipient) + (1 | Donor), data = HR_22_23_fit)
+
+# Extract residuals from the model
+residuals <- resid(corolla_model) 
+
+# Q-Q plot for normality
+qqnorm(residuals) #looks good
+
+# Histogram for normality
+hist(residuals, breaks = 20, main = "Histogram of Residuals", xlab = "Residuals") #normal
+
+```
+
+```{r}
+# Create the mixed model for skeleton weight, with skeleton weight log transformed
+skel_model <- lmer(log(skel_dryweight_mg_SEG) ~ (1 | Recipient) + (1 | Donor), data = HR_22_23_fit)
+
+# Extract residuals from the model
+residuals <- resid(skel_model)
+
+# Q-Q plot for normality
+qqnorm(residuals) #looks good
+
+
+# Histogram for normality
+hist(residuals, breaks = 20, main = "Histogram of Residuals", xlab = "Residuals") #normal
+
+```
+
+
+```{r}
+# Create the mixed model for flowering duration
+fl_duration_model <- lmer(fl_duration ~ (1 | Recipient) + (1 | Donor), data = HR_22_23_fit)
+
+# Check if the model is singular
+isSingular(fl_duration_model) #TRUE, likely due to over-fitting, will not include
+```
+
+
+```{r}
+# Create the mixed model for estimated fecundity, log transforming estimated fecundity
+est_fecundity_model <- lmer(log(est_fecundity + 1) ~ (1 | Recipient) + (1 | Donor), data = HR_22_23_fit)
+
+# Extract residuals from the model
+residuals <- resid(est_fecundity_model)
+
+# Q-Q plot for normality
+qqnorm(residuals) #good enough
+
+
+# Histogram for normality
+hist(residuals, breaks = 20, main = "Histogram of Residuals", xlab = "Residuals") #normal-ish
+
+```
+```{r}
+# Create the mixed model for mean seed mass, log transformed mean seed mass
+msm_model <- lmer(log(msm_all + 1) ~ (1 | Recipient) + (1 | Donor), data = HR_22_23_fit)
+
+# Extract residuals from the model
+residuals <- resid(msm_model)
+
+# Q-Q plot for normality
+qqnorm(residuals) #good enough
+
+
+# Histogram for normality
+hist(residuals, breaks = 20, main = "Histogram of Residuals", xlab = "Residuals") #normal-ish
+
+```
+
+```{r}
+# Create the mixed model for SLA, log transformed SLA
+SLA_model <- lmer(log(SLA_SEG) ~ (1 | Recipient) + (1 | Donor), data = HR_22_23_fit)
+
+# Extract residuals from the model
+residuals <- resid(SLA_model)
+
+# Q-Q plot for normality
+qqnorm(residuals) #okay.. 
+
+
+# Histogram for normality
+hist(residuals, breaks = 20, main = "Histogram of Residuals", xlab = "Residuals") #definitely a few outliers, but maybe okay?
+
+```
+
+
+```{r}
+# Create the mixed model for mean seed mass, log transformed mean seed mass
+LMA_model <- lmer(LMA_SEG ~ (1 | Recipient) + (1 | Donor), data = HR_22_23_fit)
+
+# Extract residuals from the model
+residuals <- resid(LMA_model)
+
+# Q-Q plot for normality
+qqnorm(residuals) #looks good enough
+
+
+# Histogram for normality
+hist(residuals, breaks = 20, main = "Histogram of Residuals", xlab = "Residuals") #normal-ish
+
+```
+
+
+```{r}
+# Create the mixed model for d13C, log transformed mean seed mass
+d13C_model <- lmer(d13C_SEG ~ (1 | Recipient) + (1 | Donor), data = HR_22_23_fit)
+
+# Extract residuals from the model
+residuals <- resid(msm_model)
+
+# Q-Q plot for normality
+qqnorm(residuals) #good enough
+
+
+# Histogram for normality
+hist(residuals, breaks = 20, main = "Histogram of Residuals", xlab = "Residuals") #normal-ish
+
+```
+
+
+
+```{r}
+# Function to extract variance components and calculate required values
+calculate_variances <- function(model, trait_name) {
+  var_components <- as.data.frame(VarCorr(model))
+  
+  Va_mat <- var_components$vcov[var_components$grp == "Recipient"]
+  Va_pat <- var_components$vcov[var_components$grp == "Donor"]
+  res_var <- var_components$vcov[var_components$grp == "Residual"]
+  
+  # Calculate the standard deviation
+  Vp <- Va_mat + Va_pat + res_var
+  Va_sd_mat <- sqrt(Va_mat)
+  Va_sd_pat <- sqrt(Va_pat)
+  Vp_sd <- sqrt(Vp)
+  
+  # Calculate narrow-sense heritability
+  h2 <- (Va_pat) / Vp  # assumed calculation
+  
+  # Create the dataframe and add the traits column
+  df <- data.frame(traits = trait_name, Va_mat, Va_sd_mat, Va_pat, Va_sd_pat, Vp, Vp_sd, h2)
+  
+  return(df)
+}
+
+# Calculate variances for each model and add trait names
+corolla_variances <- calculate_variances(corolla_model, "corolla_diam_mm")
+skel_variances <- calculate_variances(skel_model, "skel_biomass_mg")
+d13C_variances <- calculate_variances(d13C_model, "delta Carbon 13")
+est_fecundity_variances <- calculate_variances(est_fecundity_model, "estimated fecundity")
+LMA_variances <- calculate_variances(LMA_model, "LMA")
+msm_variances <- calculate_variances(msm_model, "mean seed mass")
+SLA_variances <- calculate_variances(SLA_model, "SLA")
+
+# Combine the results into a single dataframe
+variance_components_HR <- rbind(
+  corolla_variances,
+  skel_variances,
+  d13C_variances,
+  est_fecundity_variances,
+  LMA_variances,
+  msm_variances,
+  SLA_variances
+)
+
+# Print the dataframe
+print(variance_components_HR)
+
+```
+
+
+
+```{r}
+#Save the csv file
+write_csv(variance_components_HR, here::here("data_sheets", "compiled_sheets", "HR_Va_h2.csv"))
+
+```
+
+**Now calculate the selection differential**
+```{r}
+
+###I will only do this for paternal values
+
+##Create a new dataframe with the mean of corolla_diam_mm_SEG for each Recipient
+mean_corolla_diameter <- HR_22_23_fit %>%
+  group_by(Donor) %>%
+  summarize(mean_corolla_diam_mm_SEG = mean(corolla_diam_mm_SEG, na.rm = TRUE))
+
+#Calculate the population mean for corolla area
+population_mean_corolla<- mean(HR_22_23_fit$corolla_diam_mm_SEG, na.rm = TRUE)
+
+# Add the population mean as a new column to the dataframe
+mean_corolla_diameter$population_mean_corolla <- population_mean_corolla
+
+# Calculate the difference and create the new column using base R
+mean_corolla_diameter$selection_diff <- mean_corolla_diameter$mean_corolla_diam_mm_SEG - mean_corolla_diameter$population_mean_corolla
+
+# Find the h2 value for corolla_diam_mm
+h2_corolla <- variance_components_HR$h2[variance_components_HR$trait == "corolla_diam_mm"]
+
+# Create response_to_selection column
+mean_corolla_diameter$response_to_selection <- mean_corolla_diameter$selection_diff * h2_corolla
+
+```
+
+```{r}
+
+##Create a new dataframe with the mean for each Recipient
+mean_skel<- HR_22_23_fit %>%
+  group_by(Donor) %>%
+  summarize(mean_skel_dryweight_mg_SEG = mean(skel_dryweights_mg_SEG, na.rm = TRUE))
+
+#Calculate the population mean for corolla area
+population_mean_skel<- mean(HR_22_23_fit$skel_dryweights_mg_SEG, na.rm = TRUE)
+
+# Add the population mean as a new column to the dataframe
+mean_skel$population_mean_skel <- population_mean_skel
+
+# Calculate the difference and create the new column using base R
+mean_skel$selection_diff <- mean_skel$mean_skel_dryweight_mg_SEG - mean_skel$population_mean_skel
+
+# Find the h2 value for corolla_diam_mm
+h2_skel<- variance_components_HR$h2[variance_components_HR$trait == "skel_biomass_mg"]
+
+# Create response_to_selection column
+mean_skel$response_to_selection <- mean_skel$selection_diff * h2_skel
+
+```
+
+
+```{r}
+
+##Create a new dataframe with the mean for each Recipient
+mean_d13C <- HR_22_23_fit %>%
+  group_by(Donor) %>%
+  summarize(mean_d13C_SEG = mean(d13C_SEG, na.rm = TRUE))
+
+#Calculate the population mean for corolla area
+population_mean_d13C<- mean(HR_22_23_fit$d13C_SEG, na.rm = TRUE)
+
+# Add the population mean as a new column to the dataframe
+mean_d13C$population_mean_d13C <- population_mean_d13C
+
+# Calculate the difference and create the new column using base R
+mean_d13C$selection_diff <- mean_d13C$mean_d13C_SEG - mean_d13C$population_mean_d13C
+
+# Find the h2 value for corolla_diam_mm
+h2_d13C<- variance_components_HR$h2[variance_components_HR$trait == "delta Carbon 13"]
+
+# Create response_to_selection column
+mean_d13C$response_to_selection <- mean_d13C$selection_diff * h2_d13C
+
+```
+
+
+```{r}
+
+##Create a new dataframe with the mean for each Recipient
+mean_est_fecundity <- HR_22_23_fit %>%
+  group_by(Donor) %>%
+  summarize(mean_est_fecundity = mean(est_fecundity, na.rm = TRUE))
+
+#Calculate the population mean for corolla area
+population_mean_est_fecundity <- mean(HR_22_23_fit$est_fecundity, na.rm = TRUE)
+
+# Add the population mean as a new column to the dataframe
+mean_est_fecundity$population_mean_est_fecundity <- population_mean_est_fecundity
+
+# Calculate the difference and create the new column using base R
+mean_est_fecundity$selection_diff <- mean_est_fecundity$mean_est_fecundity - mean_est_fecundity$population_mean_est_fecundity
+
+# Find the h2 value for corolla_diam_mm
+h2_est_fecundity<- variance_components_HR$h2[variance_components_HR$trait == "estimated fecundity"]
+
+# Create response_to_selection column
+mean_est_fecundity$response_to_selection <- mean_est_fecundity$selection_diff * h2_est_fecundity
+
+```
+
+```{r}
+
+##Create a new dataframe with the mean for each Recipient
+mean_msm <- HR_22_23_fit %>%
+  group_by(Donor) %>%
+  summarize(mean_msm = mean(msm_all, na.rm = TRUE))
+
+#Calculate the population mean for corolla area
+population_mean_msm <- mean(HR_22_23_fit$msm_all, na.rm = TRUE)
+
+# Add the population mean as a new column to the dataframe
+mean_msm$population_mean_msm <- population_mean_msm
+
+# Calculate the difference and create the new column using base R
+mean_msm$selection_diff <- mean_msm$mean_msm - mean_msm$population_mean_msm
+
+# Find the h2 value for corolla_diam_mm
+h2_msm<- variance_components_HR$h2[variance_components_HR$trait == "mean seed mass"]
+
+# Create response_to_selection column
+mean_msm$response_to_selection <- mean_msm$selection_diff * h2_msm
+
+```
+
+
+```{r}
+
+##Create a new dataframe with the mean for each Recipient
+mean_sla <- HR_22_23_fit %>%
+  group_by(Donor) %>%
+  summarize(mean_sla = mean(SLA_SEG, na.rm = TRUE))
+
+#Calculate the population mean for corolla area
+population_mean_sla <- mean(HR_22_23_fit$SLA_SEG, na.rm = TRUE)
+
+# Add the population mean as a new column to the dataframe
+mean_sla$population_mean_sla <- population_mean_sla
+
+# Calculate the difference and create the new column using base R
+mean_sla$selection_diff <- mean_sla$mean_sla - mean_sla$population_mean_sla
+
+# Find the h2 value for corolla_diam_mm
+h2_sla<- variance_components_HR$h2[variance_components_HR$trait == "SLA"]
+
+# Create response_to_selection column
+mean_sla$response_to_selection <- mean_sla$selection_diff * h2_sla
+
+```
