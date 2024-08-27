@@ -1,0 +1,90 @@
+---
+title: "AC_22_23_merge"
+author: "Helen Payne"
+date: "2024-06-05"
+output:
+  pdf_document: default
+  html_document: default
+  word_document: default
+---
+
+```{r message = FALSE, warning = FALSE}
+#Load Packages
+library(tidyverse)
+library(janitor)
+library(here)
+library(lubridate)
+library(reshape2)
+library(stringr)
+
+```
+
+Loading AC data from 2022 and 2023
+```{r}
+AC_2022_full <- read_csv(here::here("data_sheets", "compiled_sheets", "AC_mastersheet_full_2022.csv")) %>%
+  mutate(Transect = as.numeric(Transect))
+
+AC_2022_fit <- read_csv(here::here("data_sheets", "compiled_sheets", "AC_mastersheet_Fitness-mains_2022.csv"))
+  
+
+AC_2023_full <- read_csv(here::here("data_sheets", "compiled_sheets", "AC_mastersheet_full_2023.csv"))
+
+AC_2023_fit <- read_csv(here::here("data_sheets", "compiled_sheets", "AC_mastersheet_Fitness-mains_2023.csv"))
+
+```
+Merging them into one large dataset
+Full:
+```{r}
+AC_22_23_full <- full_join(AC_2023_full, AC_2022_full, by = c("Year", "Gen", "Transect", "Sequence", "Donor", "Recipient", "Plant_ID", "F_plant", "Sow_Date", "Plant_Date", "FFD", "days_sow2flower", "days_plant2flower", "LFD", "fl_duration", "skel_dryweight_mg", "skel_dryweight_mg_SEG", "closed_fruits", "open_fruits", "filled_seeds", "total_fruits", "mean_seeds_per_fruit", "est_fecundity", "msm_all", "corolla_diam_mm", "corolla_diam_mm_SEG", "leaf_area_mm2", "leaf_dryweight_mg", "leaf_area_mm2_SEG", "leaf_dryweight_mg_SEG", "SLA_SEG", "SLA", "LMA_SEG", "LMA", "d13C", "surv_to_flower", "surv_to_fruitprod", "prod_closed_fruits", "prod_filled_seeds", "sample_weight_mg", "d13C_SEG"))
+```
+
+Fitness plants only:
+```{r}
+AC_22_23_fit <- full_join(AC_2023_fit, AC_2022_fit, by = c("Year", "Gen", "Transect", "Sequence", "Donor", "Recipient", "Plant_ID", "F_plant", "Sow_Date", "Plant_Date", "FFD", "days_sow2flower", "days_plant2flower", "LFD", "fl_duration", "skel_dryweight_mg", "skel_dryweight_mg_SEG", "closed_fruits", "open_fruits", "filled_seeds", "total_fruits", "mean_seeds_per_fruit", "est_fecundity", "msm_all", "corolla_diam_mm", "corolla_diam_mm_SEG", "leaf_area_mm2", "leaf_dryweight_mg", "leaf_area_mm2_SEG", "leaf_dryweight_mg_SEG", "SLA_SEG", "SLA", "LMA_SEG", "LMA", "d13C", "surv_to_flower", "surv_to_fruitprod", "prod_closed_fruits", "prod_filled_seeds", "sample_weight_mg", "d13C_SEG"))
+```
+
+Fix a few minor issues:
+```{r}
+
+# Fill missing values in skel_dryweight_mg_SEG with values from skel_dryweight_mg for the year 2022
+AC_22_23_fit <- AC_22_23_fit %>%
+  mutate(skel_dryweight_mg_SEG = if_else(
+    is.na(skel_dryweight_mg_SEG), 
+    skel_dryweight_mg, 
+    skel_dryweight_mg_SEG))
+
+# Replace the value 895.47 with NA in skel_dryweight_mg and skel_dryweight_mg_SEG
+AC_22_23_fit <- AC_22_23_fit %>%
+  mutate(skel_dryweight_mg = if_else(skel_dryweight_mg == 895.47, NA_real_, skel_dryweight_mg),
+         skel_dryweight_mg_SEG = if_else(skel_dryweight_mg_SEG == 895.47, NA_real_, skel_dryweight_mg_SEG))
+
+AC_22_23_fit <- AC_22_23_fit %>%
+  rename (skel_dryweight_mg_SEG = 22)
+
+```
+
+
+```{r}
+##Do the same thing with the full dataset
+# Fill missing values in skel_dryweight_mg_SEG with values from skel_dryweight_mg for the year 2022
+AC_22_23_full <- AC_22_23_full %>%
+  mutate(skel_dryweight_mg_SEG = if_else(
+    is.na(skel_dryweight_mg_SEG), 
+    skel_dryweight_mg, 
+    skel_dryweight_mg_SEG))
+
+# Replace the value 895.47 with NA in skel_dryweight_mg and skel_dryweight_mg_SEG
+AC_22_23_full <- AC_22_23_full %>%
+  mutate(skel_dryweight_mg = if_else(skel_dryweight_mg == 895.47, NA_real_, skel_dryweight_mg),
+         skel_dryweight_mg_SEG = if_else(skel_dryweight_mg_SEG == 895.47, NA_real_, skel_dryweight_mg_SEG))
+
+```
+
+
+Save these files
+```{r}
+write_csv(AC_22_23_fit, here::here("data_sheets", "compiled_sheets", "AC_22_23_fit.csv"))
+
+write_csv(AC_22_23_full, here::here("data_sheets", "compiled_sheets", "AC_22_23_full.csv"))
+```
+
