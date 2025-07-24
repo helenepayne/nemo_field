@@ -1,0 +1,328 @@
+---
+title: "Aster_Figures"
+author: "Helen Payne"
+date: "2024-08-27"
+output: html_document
+---
+
+
+#Figure 1: Study site climate normals 
+```{r}
+options(repos = c(CRAN = "https://cran.rstudio.com/"))
+
+library(tidyverse)
+library(raster)
+#library(rgdal) #old package no longer available
+library(ggplot2)
+library(sp)
+library(rgeos)
+library(gridExtra)
+library(ggspatial)
+library(sf)
+# Install devtools if you don't have it already
+#install.packages("devtools")
+
+# Load the devtools package
+library(devtools)
+
+# Install the rnaturalearthhires package from GitHub
+#devtools::install_github("ropensci/rnaturalearthhires")
+
+library(rnaturalearth)
+
+# Load the temperature raster
+temprast <- raster("PRISM_tmean_30yr_normal.tif")
+
+# Get the USA shapefile from rnaturalearth package
+usa_sf <- ne_states(country = "united states of america", returnclass = "sf")
+
+# Transform CRS to a recent format (e.g., EPSG:4326)
+usa_sf <- st_transform(usa_sf, crs = 4326)
+
+# Select the states of interest for the tristate area
+tristate_sf <- usa_sf[usa_sf$name %in% ("California"),]
+
+# Crop the raster to the tristate area
+temprast_tristate <- crop(temprast, extent(tristate_sf))
+
+# Convert raster to data frame
+df <- as.data.frame(temprast_tristate, xy = TRUE)
+
+# Data for the points and labels
+labels_data <- data.frame(
+  x = c(-123.65261752533642, -123.07109117331942, -121.73678882741571, -121.5627953728642),
+  y = c(39.70791443219262,38.31820208912606, 37.38236329564739, 36.3793508087087),
+  label = c("AC", "BB", "BO", "HR")
+)
+# To add a line break within the label, you can use "\n" in the label text:
+labels_data$label[labels_data$label == "ML(home site)"] <- "ML\n(home site)"
+
+plot1 <- ggplot() +
+  geom_raster(data = df, aes(x = x, y = y, fill = PRISM_tmean_30yr_normal)) +
+  scale_fill_gradientn(colours = hcl.colors(8, "YlOrRd", rev = TRUE), na.value = "white") +
+  geom_sf(data = tristate_sf, fill = NA, color = "black") +
+  geom_point(data = labels_data, aes(x = x, y = y), shape = 16, size = 3, color = "black") +  # White points
+  geom_text(data = labels_data, aes(x = x, y = y, label = label),
+            nudge_y = c(-0.06, 0.05, 0.05, 0.05),  # Adjust vertical position for each label
+            vjust = c(-0.3, -0.35, -0.3, -0.3),   # Four values to match the four labels
+            size = 5, color = "black") +  # Larger and white text labels
+  labs(x = "Longitude", y = "Latitude", fill = expression(~Degree~C)) +
+  coord_sf(crs = 4326) +
+  theme(panel.background = element_rect(fill = "white"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        axis.text = element_text(colour = "black", size = 14),
+        axis.ticks = element_line(colour = "black", linewidth = 0.5),
+        axis.title = element_text(size = 16, face = "bold"),
+        panel.border = element_rect(fill = NA, colour = "black"))
+
+# Plot plot1
+print(plot1)
+
+
+# Load the precipitation raster
+preciprast <- raster("PRISM_ppt_30yr_normal.tif")
+
+# Crop the raster to the tristate area
+preciprast_tristate <- crop(preciprast, extent(tristate_sf))
+
+# Convert raster to data frame
+df_precip <- as.data.frame(preciprast_tristate, xy = TRUE)
+
+# Rename the columns
+names(df_precip) <- c("x", "y", "precip")
+
+# Plot the data
+plot2 <- ggplot() +
+  geom_raster(data = df_precip, aes(x = x, y = y, fill = precip), interpolate = TRUE) +
+  scale_fill_gradientn(colours = hcl.colors(8, "Blues", rev = TRUE), na.value = "white") +
+  geom_sf(data = tristate_sf, fill = NA, color = "black") +
+  geom_point(data = labels_data, aes(x = x, y = y), shape = 16, size = 3, color = "black") +  # Black points
+  geom_text(data = labels_data, aes(x = x, y = y, label = label),
+            nudge_y = c(-0.06, 0.05, 0.05, 0.05),  # Adjust vertical position for each label
+            vjust = c(-0.3, -0.35, -0.3, -0.3),   # Four values to match the four labels
+            size = 5, color = "black") +  # Larger and black text labels
+  labs(x = "Longitude", y = "Latitude", fill = "mm") +
+  coord_sf(crs = 4326) +
+  theme(panel.background = element_rect(fill = "white"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        axis.text = element_text(colour = "black", size = 14),
+        axis.ticks = element_line(colour = "black", linewidth = 0.5),
+        axis.title = element_text(size = 16, face = "bold"),
+        panel.border = element_rect(fill = NA, colour = "black"))
+
+# Combine plots into a single page using gridExtra
+grid.arrange(plot1, plot2, nrow = 2)
+
+
+# Save to a .png file
+ggsave("combined_plots.jpg", arrangeGrob(plot1, plot2, nrow = 2), dpi = 1200, width = 9, height = 10)
+```
+
+
+#Figure 2: predicted and realized fitness
+```{r}
+library(tidyverse)
+library(ggplot2)
+
+#load data
+fitness<-read.csv("w_bothyears.csv")
+
+#make year a factor
+fitness$Year<-as.factor(fitness$Year)
+
+fitness_new <- fitness %>%
+  mutate(fitness_var = paste(Generation, Year)) %>%
+  mutate(Site = fct_relevel(Site, "Angelo Coast (AC)", "Bodega Bay (BB)", "Blue Oak (BO)", "Hastings Ranch (HR)"),
+         fitness_var = fct_relevel(fitness_var, "Parental estimate 2022", "FTNS prediction for progeny 2022", "Parental estimate 2023", "Progeny estimate 2023"))
+
+my.labels <- c("G1 Year 1", 
+               "G2 FTNS prediction",
+               "G1 Year 2", 
+               "G2 Year 2")
+#plot
+ggplot(fitness_new, aes(x = fitness_var, y = Fitness)) +
+  geom_point(size=3) +
+  geom_errorbar(aes(ymin = Fitness - SE, ymax = Fitness + SE), width = 0.1) +
+  scale_x_discrete(position = "top", labels = my.labels) +
+  labs(x = "") +
+  geom_hline(yintercept=1, lty=2) +
+  ylab('Mean lifetime fitness')+
+  facet_wrap(~Site, nrow = 3, scales = "free_y")+
+   theme(panel.grid.major = element_blank(), 
+         panel.grid.minor = element_blank(), 
+         panel.background = element_blank(),
+         panel.border = element_rect(fill=NA),
+         axis.line.y = element_line(colour = "black"),
+         strip.text = element_text(face = "bold", size = 14),
+         axis.text.x = element_text(size=7),
+         axis.text.y = element_text(size=13),
+         axis.title.y = element_text(face="bold",size=13))
+
+#this is code to save the figure        
+ggsave("yr1_yr2_fitness_prediction.jpg", device = "png", dpi = 1200)
+```
+
+
+#Figure S1: Probability density distribution of parental breeding values
+```{r}
+library(ggplot2)
+library(patchwork)
+
+#load data
+AC_BV<-read.csv("/Users/Helen/Desktop/nemo_field/NSF_Nemophila/Aster/BV/AC_BV.csv")
+
+#density Angelo Coast 2022
+density_AC_1<-ggplot(AC_BV, aes(x=BV_AC22))+
+  geom_density()+
+  theme(panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(), 
+        panel.background = element_blank(), 
+        axis.line = element_line(colour = "black"),
+        legend.key = element_rect(fill="white",color = NA), 
+        axis.text.x = element_text(face="bold",size=12),
+        axis.title.x = element_text(face="bold", size=12),
+        axis.text.y = element_text(face="bold", size=12),
+        axis.title.y = element_text(face="bold", size=14),
+        legend.title=element_text(face="bold", size=14)) +
+        labs(y= "Probability density", x="AC 2022")+ 
+        scale_x_continuous(limits=c(0,6))
+density_AC_1
+
+#density Angelo Coast 2022
+density_AC_2<-ggplot(AC_BV, aes(x=BV_AC23))+
+  geom_density()+
+  theme(panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(), 
+        panel.background = element_blank(), 
+        axis.line = element_line(colour = "black"),
+        legend.key = element_rect(fill="white",color = NA), 
+        axis.text.x = element_text(face="bold",size=12),
+        axis.title.x = element_text(face="bold", size=12),
+        axis.text.y = element_text(face="bold", size=12),
+        axis.title.y = element_text(face="bold", size=14),
+        legend.title=element_text(face="bold", size=14)) +
+        labs(y= "Probability density", x="AC 2023")+ 
+        scale_x_continuous(limits=c(0,6))
+density_AC_2
+
+
+#load data
+BB_BV<-read.csv("/Users/Helen/Desktop/nemo_field/NSF_Nemophila/Aster/BV/BB_BV.csv")
+
+#density Bodega Bay 2022
+density_BB_1<-ggplot(BB_BV, aes(x=BV_BB22))+
+  geom_density()+
+  theme(panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(), 
+        panel.background = element_blank(), 
+        axis.line = element_line(colour = "black"),
+        legend.key = element_rect(fill="white",color = NA), 
+        axis.text.x = element_text(face="bold",size=12),
+        axis.title.x = element_text(face="bold", size=12),
+        axis.text.y = element_text(face="bold", size=12),
+        axis.title.y = element_text(face="bold", size=14),
+        legend.title=element_text(face="bold", size=14)) +
+        labs(y= "Probability density", x="BB 2022")+ 
+        scale_x_continuous(limits=c(0,6))
+density_BB_1
+
+#density Bodega Bay 2023
+density_BB_2<-ggplot(BB_BV, aes(x=BV_BB23))+
+  geom_density()+
+  theme(panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(), 
+        panel.background = element_blank(), 
+        axis.line = element_line(colour = "black"),
+        legend.key = element_rect(fill="white",color = NA), 
+        axis.text.x = element_text(face="bold",size=12),
+        axis.title.x = element_text(face="bold", size=12),
+        axis.text.y = element_text(face="bold", size=12),
+        axis.title.y = element_text(face="bold", size=14),
+        legend.title=element_text(face="bold", size=14)) +
+        labs(y= "Probability density", x="BB 2023")+ 
+        scale_x_continuous(limits=c(0,30))
+density_BB_2
+
+
+#load data
+BO_BV<-read.csv("/Users/Helen/Desktop/nemo_field/NSF_Nemophila/Aster/BV/BO_BV.csv")
+
+#density Blue Oak 2022
+density_BO_1<-ggplot(BO_BV, aes(x=BV_BO22))+
+  geom_density()+
+  theme(panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(), 
+        panel.background = element_blank(), 
+        axis.line = element_line(colour = "black"),
+        legend.key = element_rect(fill="white",color = NA), 
+        axis.text.x = element_text(face="bold",size=12),
+        axis.title.x = element_text(face="bold", size=12),
+        axis.text.y = element_text(face="bold", size=12),
+        axis.title.y = element_text(face="bold", size=14),
+        legend.title=element_text(face="bold", size=14)) +
+        labs(y= "Probability density", x="BO 2022")+ 
+        scale_x_continuous(limits=c(0,6))
+density_BO_1
+
+#density Blue Oak 2023
+density_BO_2<-ggplot(BO_BV, aes(x=BV_BO23))+
+  geom_density()+
+  theme(panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(), 
+        panel.background = element_blank(), 
+        axis.line = element_line(colour = "black"),
+        legend.key = element_rect(fill="white",color = NA), 
+        axis.text.x = element_text(face="bold",size=12),
+        axis.title.x = element_text(face="bold", size=12),
+        axis.text.y = element_text(face="bold", size=12),
+        axis.title.y = element_text(face="bold", size=14),
+        legend.title=element_text(face="bold", size=14)) +
+        labs(y= "Probability density", x="BO 2023")+ 
+        scale_x_continuous(limits=c(0,6))
+density_BO_2
+
+#load data
+HR_BV<-read.csv("/Users/Helen/Desktop/nemo_field/NSF_Nemophila/Aster/BV/HR_BV.csv")
+
+#density Hastings Ranch 2022
+density_HR_1<-ggplot(HR_BV, aes(x=BV_HR22))+
+  geom_density()+
+  theme(panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(), 
+        panel.background = element_blank(), 
+        axis.line = element_line(colour = "black"),
+        legend.key = element_rect(fill="white",color = NA), 
+        axis.text.x = element_text(face="bold",size=12),
+        axis.title.x = element_text(face="bold", size=12),
+        axis.text.y = element_text(face="bold", size=12),
+        axis.title.y = element_text(face="bold", size=14),
+        legend.title=element_text(face="bold", size=14)) +
+        labs(y= "Probability density", x="HR 2022")+ 
+        scale_x_continuous(limits=c(0,6))
+density_HR_1
+
+density_HR_2<-ggplot(HR_BV, aes(x=BV_HR22))+
+  geom_density()+
+  theme(panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(), 
+        panel.background = element_blank(), 
+        axis.line = element_line(colour = "black"),
+        legend.key = element_rect(fill="white",color = NA), 
+        axis.text.x = element_text(face="bold",size=12),
+        axis.title.x = element_text(face="bold", size=12),
+        axis.text.y = element_text(face="bold", size=12),
+        axis.title.y = element_text(face="bold", size=14),
+        legend.title=element_text(face="bold", size=14)) +
+        labs(y= "Probability density", x="HR 2023")+ 
+        scale_x_continuous(limits=c(0,6))
+density_HR_2
+
+
+#combine plots using patchwork
+patchwork<-(density_AC_1/density_AC_2|density_BB_1/density_BB_2|density_BO_1/density_BO_2|density_HR_1/density_HR_2)
+
+#code to save plot
+ggsave('prob_density_BV.jpg', patchwork, device="jpg", dpi=1200)
+```
