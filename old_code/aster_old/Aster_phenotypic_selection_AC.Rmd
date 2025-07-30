@@ -1,0 +1,276 @@
+---
+title: "Aster_phenotypic_selection_AC"
+author: "Helen Payne"
+date: "2024-09-17"
+output: html_document
+---
+
+#ANGELO RANCH
+##Generation 1 2022
+```{r}
+library(tidyverse)
+library(readr)
+library(dplyr)
+library(stringr)
+library(here)
+
+#read in the data and change the name to #surv_to_fruitpod from surv_to_fruitprods
+AC_22 <- read_csv(here::here("data_sheets", "compiled_sheets", "AC_mastersheet_full_2022.csv")) %>%
+  rename_at(vars(55), ~"surv_to_fruitpod") %>%
+  mutate(
+    # Construct sample_ID conditionally
+    sample_ID = str_c(Year, Recipient, Gen, str_pad(Transect, width = 3, pad = "0"), Plant_ID, sep = "-"),
+    # Replace leading underscores in sample_ID with hyphens
+    sample_ID = str_replace(sample_ID, "^([^_]*)_", "\\1-")
+  ) %>%
+  dplyr::select("Transect", "Donor", "Recipient", "sample_ID", "surv_to_flower", "F_plant", "total_fruits", "closed_fruits", "filled_seeds", "skel_dryweight_mg_SEG", "d13C_SEG", "SLA_SEG", "corolla_diam_mm_SEG", "fl_duration", "msm_all") %>%
+  mutate(any_FitP = ifelse(F_plant == TRUE, 1, 0))%>%
+  filter(!(Transect %in% c("W1", "W2"))) %>%
+  mutate(surv_to_flower = ifelse(total_fruits > 0 & surv_to_flower == 0, 1, surv_to_flower)) %>%
+  mutate(F_plant = ifelse(surv_to_flower == 0, 0, F_plant))
+
+AC_22$filled_seeds <- dplyr::case_when(
+  AC_22$filled_seeds > 0 & AC_22$filled_seeds < 1 ~ 1,
+  AC_22$filled_seeds >= 1 ~ round(AC_22$filled_seeds),
+  TRUE ~ AC_22$filled_seeds
+)
+
+
+AC_22 <- AC_22 %>%
+  # Create a grouping variable for every 10 rows
+  mutate(group = ceiling(row_number() / 10)) %>%
+  # Calculate the sum of 'surv_to_flower' within each group
+  group_by(group) %>%
+  mutate(total_surv_to_flower = sum(surv_to_flower, na.rm = TRUE)) %>%
+  ungroup() %>% # Ungroup to avoid grouped data frame
+  # Remove the temporary 'group' column using dplyr::select
+  dplyr::select(-group)
+
+AC_22[AC_22$total_surv_to_flower == 0, ]
+
+
+AC_22_filtered <- AC_22 %>%
+  filter(F_plant == 1 | total_surv_to_flower == 0) #all segments had at least one surviving plant
+
+
+AC_22_rearranged <- AC_22_filtered %>%
+  dplyr::select(Transect, Donor, Recipient, sample_ID, total_surv_to_flower, F_plant, total_fruits, closed_fruits, filled_seeds, skel_dryweight_mg_SEG, d13C_SEG, SLA_SEG, corolla_diam_mm_SEG, fl_duration, msm_all)
+
+
+AC_22_rearranged <- AC_22_rearranged %>%
+  rename(surv_to_flower = total_surv_to_flower)
+
+ AC_22 <- AC_22_rearranged
+
+# Remove rows with NAs in specified columns
+AC_22 <- AC_22 %>%
+  dplyr::filter(
+    !is.na(skel_dryweight_mg_SEG),
+    !is.na(d13C_SEG),
+    !is.na(SLA_SEG),
+    !is.na(corolla_diam_mm_SEG),
+    !is.na(fl_duration),
+    !is.na(msm_all)
+  )
+
+```
+
+
+
+
+
+```{r}
+#make NAs for other life history stages zero
+AC_22$surv_to_flower[is.na(AC_22$surv_to_flower)] <- 0
+AC_22$total_fruits[is.na(AC_22$total_fruits)]<-0
+AC_22$closed_fruits[is.na(AC_22$closed_fruits)]<-0
+AC_22$filled_seeds[is.na(AC_22$filled_seeds)]<-0
+
+# Define the update_zeros function
+## Determines survival info
+update_zeros <- function(df) {
+  for (i in 1:nrow(df)) {
+    if (df$surv_to_flower[i] == 0) {
+      df$total_fruits[i] <- 0
+      df$closed_fruits[i] <- 0
+      df$filled_seeds[i] <- 0
+    }
+    if (df$total_fruits[i] == 0) {
+      df$closed_fruits[i] <- 0
+      df$filled_seeds[i] <- 0
+    }
+    if (df$closed_fruits[i] == 0) {
+      df$filled_seeds[i] <- 0
+    }
+  return(df)
+  }}
+
+# Apply the function to the dataset
+AC_22 <- update_zeros(AC_22)
+```
+
+```{r}
+#check for nonsense data
+subset(AC_22, filled_seeds > 0 & surv_to_flower == 0)
+subset(AC_22, filled_seeds > 0 & total_fruits == 0)
+subset(AC_22, filled_seeds > 0 & closed_fruits == 0)
+
+#Make  Donors and Recipients factors
+AC_22$Donor <- as.factor(AC_22$Donor)
+AC_22$Recipient <- as.factor(AC_22$Recipient)
+
+#number that germinated from table 1
+AC_22 %>%
+  mutate(surv_to_flower = as.factor(surv_to_flower)) %>% 
+  group_by(surv_to_flower) %>% 
+  count()
+
+#distinct number of Recipients
+AC_22 %>%
+  distinct(Recipient) %>%
+  count()
+#95
+
+#distinct # Donors
+AC_22  %>%
+  distinct(Donor) %>%
+  count()
+#40
+
+#number of sires, and number of individuals for each recipient
+NDS<-AC_22 %>%
+  group_by(Recipient, Donor) %>% 
+  count()
+
+```
+
+```{r}
+#Check the distribution of zeros in your model
+
+# Determine how many rows are equal to 0 for the column "surv_to_flower"
+surv_to_flower_zero <- sum(AC_22$surv_to_flower == 0)
+cat("Number of rows where surv_to_flower is 0:", surv_to_flower_zero, "\n")
+#0
+
+# Determine how many rows are equal to 0 for the column "total_fruits"
+total_fruits_zero <- sum(AC_22$total_fruits == 0)
+cat("Number of rows where total_fruits is 0:", total_fruits_zero, "\n")
+#11
+
+# Determine how many rows are equal to 0 for the column "closed_fruits"
+closed_fruits_zero <- sum(AC_22$closed_fruits == 0)
+cat("Number of rows where closed_fruits is 0:", closed_fruits_zero, "\n")
+#23
+
+# Determine how many rows are equal to 0 for the column "filled_seeds"
+filled_seeds_zero <- sum(AC_22$filled_seeds == 0)
+cat("Number of rows where filled_seeds is 0:", filled_seeds_zero, "\n")
+#36
+```
+
+
+###Set up aster 
+```{r}
+library(aster)
+library(reshape2)
+
+#the "vars" are the nodes in the aster graphical model.   
+vars<-c("surv_to_flower", "F_plant", "total_fruits", "closed_fruits", "filled_seeds")
+
+#convert to a dataframe for reshape to work
+AC_22 <- as.data.frame(AC_22)
+
+#Reshape AC to longform. "varying" notes the set of variables that will be converted to longform and named in "timevar" under one column of varb. "Times" says to use vars for the newly created column varb 
+AC22_aster <- reshape(AC_22 ,varying = list(vars), direction = "long", timevar = "varb",times = as.factor(vars), v.names = "resp")
+
+#####Check that the reshape worked 
+#If it did the number of rows will be the same 
+nrow(AC22_aster)
+nrow(AC_22)*length(vars)
+
+#####Designate fitness variable, "filled_seeds", which is the final node 
+#grep1 is like a search function
+fit<-grepl("filled_seeds", as.character(AC22_aster$varb))
+fit<-as.numeric(fit)
+AC22_aster$fit <- fit
+
+#####Check "filled_seeds", is designated as the fitness variable 
+with(AC22_aster, sort(unique(as.character(varb)[fit==0])))
+with(AC22_aster, sort(unique(as.character(varb)[fit==1])))
+
+#####Add "root" to AC22_aster files where value is 1 
+AC22_aster <- data.frame(AC22_aster, root=10)
+
+#####Set graphical node and distribution for fitness nodes(preds) 
+names(AC22_aster)
+
+#pred is nodes. There are 5 nodes, so five preds.
+pred <- c(0,1,2,3,4)
+
+#fam assigns a distribution to each node. 1= bernoulli, 2= poission. The subsampling nodes (node #2 and #4 in pred) are binomial so Bernouli (always). Bernouli is a specific type of binomial so the assignment for family distribution is the same
+fam<-c(1,1,2,1,2)
+```
+
+
+
+```{r}
+library(MASS)
+
+#check distribution of non-Bernoulli nodes
+#Evaluate distribution of total pods
+#first subset for those that survived to flowering 
+AC22_flwr<-subset(AC_22, surv_to_flower>0)
+
+#evaluate the distribution of total_fruits 
+hist(AC22_flwr$filled_seeds)
+
+#get parameters for a negative binomial distribution
+AC22.param <- fitdistr(AC22_flwr$filled_seeds, "negative binomial") 
+
+
+#get a random distribution with the parameters from you data and plot a histogram. Do that for poisson and negative bionoimal and compare against the histogram for total pods to see which fits the best 
+#nbinomial??
+hist(rnbinom(319, size = 0.719, mu=19.326))
+hist(rpois(319, lambda=19.326))
+
+#evaluate filled seeds node. Proceed as outlined above 
+#poisson is better
+AC22_total_fruit<-subset(AC_22, total_fruits>0)
+hist(AC22_total_fruit$filled_seeds)
+AC22.param2 <- fitdistr(AC22_total_fruit$filled_seeds, "negative binomial") 
+
+hist(rnbinom(308, size = 0.814, mu=20.016))
+hist(rpois(308, lambda=20.016))
+
+
+#evaluate filled seeds node. Proceed as outlined above 
+#poisson is better
+AC22_closed_fruit<-subset(AC_22, closed_fruits>0)
+hist(AC22_closed_fruit$filled_seeds)
+AC22.param3 <- fitdistr(AC22_closed_fruit$filled_seeds, "negative binomial") 
+
+hist(rnbinom(296, size = 0.947, mu=20.828))
+hist(rpois(296, lambda=20.828))
+```
+
+```{r}
+library(aster)
+
+# Run the aster model
+AC22_model <- aster(
+    resp ~ skel_dryweight_mg_SEG + d13C_SEG + SLA_SEG + corolla_diam_mm_SEG + 
+           fl_duration + msm_all, 
+    pred = pred, 
+    fam = fam, 
+    varvar = "var_name",   # Replace with your response variable name
+    idvar = "id", 
+    root = "root", 
+    data = AC22_aster
+)
+
+# Model summary
+summary(AC22_model)
+
+
+```
+

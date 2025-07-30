@@ -1,0 +1,572 @@
+---
+title: "Calculating R = B x G matrix"
+author: "Helen Payne"
+date: "2025-07-01"
+output: html_document
+---
+
+CALCULATING R FOR AC 2022 G1
+```{r}
+# Load the lme4 package
+library(lme4)
+library(dplyr)
+library(tidyverse)
+
+
+AC_fit_22 <- read_csv(here::here("data_sheets", "compiled_sheets", "AC_fit_22.csv"))
+```
+```{r}
+# Remove rows with NA values in specified columns
+AC_fit_22_clean <- AC_fit_22 %>%
+  filter(
+    !is.na(SLA_SEG),
+    !is.na(msm_all),
+    !is.na(fl_duration),
+    !is.na(d13C_SEG),
+    !is.na(corolla_diam_mm_SEG),
+    !is.na(est_fitness),
+    !is.na(g0_msm)
+  )
+
+AC_fit_22_clean <- AC_fit_22_clean %>%
+  mutate(
+    SLA_SEG = scale(SLA_SEG),
+    msm_all = scale(msm_all),
+    fl_duration = scale(fl_duration),
+    d13C_SEG = scale(d13C_SEG),
+    corolla_diam_mm_SEG = scale(corolla_diam_mm_SEG),
+    g0_msm = scale(g0_msm)
+  )
+
+# determine relative fitness
+##for the selection gradient, we are going to use estimated fecundity as our fitness metric (not taking survival into account)
+AC_fit_22_clean$relW <- AC_fit_22_clean$est_fecundity / mean(AC_fit_22_clean$est_fecundity)
+
+```
+
+Next we will try to get the Selection Gradient (β)
+```{r}
+# Fit linear model to get β
+fit <- lm(relW ~ corolla_diam_mm_SEG + SLA_SEG + d13C_SEG, data = AC_fit_22_clean)
+summary(fit)$coefficients
+```
+
+```{r}
+# Additive genetic variance–covariance matrix G
+G <- matrix(c(
+  0.131697, 0.524666, 0.116426, 0.149282,
+  0.524666, 2.746826, 1.372900, -0.099728,
+  0.116426, 1.372900, 0.984794, -0.368836,
+  0.149282, -0.099728, -0.368836, 0.279142
+), nrow = 4, byrow = TRUE)
+colnames(G) <- rownames(G) <- c("est_fit", "corolla_diam", "SLA", "dC13")
+
+# Vector of selection gradients (β)
+beta <- c(est_fit = NA,  # typically fitness itself isn’t included in G×β
+          corolla_diam = 0.0305307,
+          SLA = -0.1145035,
+          dC13 = 0.2456894)
+
+# If fitness is included in the G matrix but β is NA, drop that trait:
+G2 <- G[-1, -1]  
+beta2 <- beta[-1]
+```
+
+```{r}
+R <- G2 %*% beta2
+R
+```
+CALCULATING R FOR BO 2022 G1
+```{r}
+BO_fit_22 <- read_csv(here::here("data_sheets", "compiled_sheets", "BO_fit_22.csv"))
+```
+
+```{r}
+# Remove rows with NA values in specified columns
+BO_fit_22_clean <- BO_fit_22 %>%
+  filter(
+    !is.na(SLA_SEG),
+    !is.na(msm_all),
+    !is.na(fl_duration),
+    !is.na(d13C_SEG),
+    !is.na(corolla_diam_mm_SEG),
+    !is.na(est_fitness),
+    !is.na(g0_msm)
+  )
+
+BO_fit_22_clean <- BO_fit_22_clean %>%
+  mutate(
+    SLA_SEG = scale(SLA_SEG),
+    msm_all = scale(msm_all),
+    fl_duration = scale(fl_duration),
+    d13C_SEG = scale(d13C_SEG),
+    corolla_diam_mm_SEG = scale(corolla_diam_mm_SEG),
+    g0_msm = scale(g0_msm)
+  )
+
+# determine relative fitness
+##for the selection gradient, we are going to use estimated fecundity as our fitness metric (not taking survival into account)
+BO_fit_22_clean$relW <- BO_fit_22_clean$est_fecundity / mean(BO_fit_22_clean$est_fecundity)
+
+```
+
+Next we will try to get the Selection Gradient (β)
+```{r}
+# Fit linear model to get β
+fit <- lm(relW ~ corolla_diam_mm_SEG + SLA_SEG + d13C_SEG, data = BO_fit_22_clean)
+summary(fit)$coefficients
+```
+
+```{r}
+# Additive genetic variance–covariance matrix G
+G <- matrix(c(
+0.223227,	0.215233,	-0.378342,	0.090262,
+0.215233,	0.263006,	-0.554653,	0.045736,
+-0.378342,	-0.554653,	0.917938,	-0.042886,
+0.090262,	0.045736,	-0.042886,	0.056658
+), nrow = 4, byrow = TRUE)
+colnames(G) <- rownames(G) <- c("est_fit", "corolla_diam", "SLA", "dC13")
+
+# Vector of selection gradients (β)
+beta <- c(est_fit = NA,  # typically fitness itself isn’t included in G×β
+          corolla_diam = 0.2920485,
+          SLA = 0.2952753,
+          dC13 = -0.0652687)
+
+# If fitness is included in the G matrix but β is NA, drop that trait:
+G2 <- G[-1, -1]  
+beta2 <- beta[-1]
+```
+
+```{r}
+R <- G2 %*% beta2
+R
+```
+
+
+
+CALCULATING R FOR HR 2022 G1
+```{r}
+HR_fit_22 <- read_csv(here::here("data_sheets", "compiled_sheets", "HR_fit_22.csv"))
+```
+
+```{r}
+# Remove rows with NA values in specified columns
+HR_fit_22_clean <- HR_fit_22 %>%
+  filter(
+    !is.na(SLA_SEG),
+    !is.na(msm_all),
+    !is.na(fl_duration),
+    !is.na(d13C_SEG),
+    !is.na(corolla_diam_mm_SEG),
+    !is.na(est_fitness),
+    !is.na(g0_msm)
+  )
+
+HR_fit_22_clean <- HR_fit_22_clean %>%
+  mutate(
+    SLA_SEG = scale(SLA_SEG),
+    msm_all = scale(msm_all),
+    fl_duration = scale(fl_duration),
+    d13C_SEG = scale(d13C_SEG),
+    corolla_diam_mm_SEG = scale(corolla_diam_mm_SEG),
+    g0_msm = scale(g0_msm)
+  )
+
+# determine relative fitness
+##for the selection gradient, we are going to use estimated fecundity as our fitness metric (not taking survival into account)
+HR_fit_22_clean$relW <- HR_fit_22_clean$est_fecundity / mean(HR_fit_22_clean$est_fecundity)
+
+```
+
+Next we will try to get the Selection Gradient (β)
+```{r}
+# Fit linear model to get β
+fit <- lm(relW ~ corolla_diam_mm_SEG + SLA_SEG + d13C_SEG, data = HR_fit_22_clean)
+summary(fit)$coefficients
+```
+
+```{r}
+# Additive genetic variance–covariance matrix G
+G <- matrix(c(
+0.38378,	0.254689,	0.091528,	0.026433,
+0.254689,	1.16788,	0.76193,	-0.062271,
+0.091528,	0.76193,	0.573503,	-0.181855,
+0.026433,	-0.062271,	-0.181855,	0.210162
+), nrow = 4, byrow = TRUE)
+colnames(G) <- rownames(G) <- c("est_fit", "corolla_diam", "SLA", "dC13")
+
+# Vector of selection gradients (β)
+beta <- c(est_fit = NA,  # typically fitness itself isn’t included in G×β
+          corolla_diam = 0.097537452,
+          SLA = -0.006385583,
+          dC13 = 0.123575974)
+
+# If fitness is included in the G matrix but β is NA, drop that trait:
+G2 <- G[-1, -1]  
+beta2 <- beta[-1]
+```
+
+```{r}
+R <- G2 %*% beta2
+R
+```
+###############################################################################################################
+CALCULATING R FOR AC 2023 G1
+```{r}
+# Load the lme4 package
+library(lme4)
+library(dplyr)
+library(tidyverse)
+
+
+AC_fit_23_G1 <- read_csv(here::here("data_sheets", "compiled_sheets", "AC_fit_23_G1.csv"))
+```
+
+```{r}
+# Remove rows with NA values in specified columns
+AC_fit_23_G1_clean <- AC_fit_23_G1 %>%
+  filter(
+    !is.na(SLA_SEG),
+    !is.na(msm_all),
+    !is.na(fl_duration),
+    !is.na(d13C_SEG),
+    !is.na(corolla_diam_mm_SEG),
+    !is.na(est_fitness),
+    !is.na(g0_msm)
+  )
+
+AC_fit_23_G1_clean <- AC_fit_23_G1_clean %>%
+  mutate(
+    SLA_SEG = scale(SLA_SEG),
+    msm_all = scale(msm_all),
+    fl_duration = scale(fl_duration),
+    d13C_SEG = scale(d13C_SEG),
+    corolla_diam_mm_SEG = scale(corolla_diam_mm_SEG),
+    g0_msm = scale(g0_msm)
+  )
+
+# determine relative fitness
+##for the selection gradient, we are going to use estimated fecundity as our fitness metric (not taking survival into account)
+AC_fit_23_G1_clean$relW <- AC_fit_23_G1_clean$est_fecundity / mean(AC_fit_23_G1_clean$est_fecundity)
+
+```
+
+Next we will try to get the Selection Gradient (β)
+```{r}
+# Fit linear model to get β
+fit <- lm(relW ~ corolla_diam_mm_SEG + SLA_SEG + d13C_SEG, data = AC_fit_23_G1_clean)
+summary(fit)$coefficients
+```
+
+```{r}
+# Additive genetic variance–covariance matrix G
+G <- matrix(c(
+0.105878,	-0.004728,	-0.271532,	0.130555,
+-0.004728,	1.149509,	-0.815132,	-0.282904,
+-0.271532,	-0.815132,	2.233676,	0.076933,
+0.130555,	-0.282904,	0.076933,	0.068308
+), nrow = 4, byrow = TRUE)
+colnames(G) <- rownames(G) <- c("est_fit", "corolla_diam", "SLA", "dC13")
+
+# Vector of selection gradients (β)
+beta <- c(est_fit = NA,  # typically fitness itself isn’t included in G×β
+          corolla_diam = 0.10167644,
+          SLA = -0.02348062,
+          dC13 = 0.02445674)
+
+# If fitness is included in the G matrix but β is NA, drop that trait:
+G2 <- G[-1, -1]  
+beta2 <- beta[-1]
+```
+
+```{r}
+R <- G2 %*% beta2
+R
+```
+
+CALCULATING R FOR BB 2023 G1
+```{r}
+# Load the lme4 package
+library(lme4)
+library(dplyr)
+library(tidyverse)
+
+
+BB_fit_23_G1 <- read_csv(here::here("data_sheets", "compiled_sheets", "BB_fit_23_G1.csv"))
+```
+
+```{r}
+# Remove rows with NA values in specified columns
+BB_fit_23_G1_clean <- BB_fit_23_G1 %>%
+  filter(
+    !is.na(SLA_SEG),
+    !is.na(msm_all),
+    !is.na(fl_duration),
+    !is.na(d13C_SEG),
+    !is.na(corolla_diam_mm_SEG),
+    !is.na(est_fitness),
+    !is.na(g0_msm)
+  )
+
+BB_fit_23_G1_clean <- BB_fit_23_G1_clean %>%
+  mutate(
+    SLA_SEG = scale(SLA_SEG),
+    msm_all = scale(msm_all),
+    fl_duration = scale(fl_duration),
+    d13C_SEG = scale(d13C_SEG),
+    corolla_diam_mm_SEG = scale(corolla_diam_mm_SEG),
+    g0_msm = scale(g0_msm)
+  )
+
+# determine relative fitness
+##for the selection gradient, we are going to use estimated fecundity as our fitness metric (not taking survival into account)
+BB_fit_23_G1_clean$relW <- BB_fit_23_G1_clean$est_fecundity / mean(BB_fit_23_G1_clean$est_fecundity)
+
+```
+
+Next we will try to get the Selection Gradient (β)
+```{r}
+# Fit linear model to get β
+fit <- lm(relW ~ corolla_diam_mm_SEG + SLA_SEG + d13C_SEG, data = BB_fit_23_G1_clean)
+summary(fit)$coefficients
+```
+
+```{r}
+# Additive genetic variance–covariance matrix G
+G <- matrix(c(
+0.304093,	-0.549113,	0.979071,	0.027094,
+-0.549113,	0.989002,	-1.753477,	-0.0581,
+0.979071,	-1.753477,	3.400838,	-0.146351,
+0.027094,	-0.0581,	-0.146351,	0.212429
+), nrow = 4, byrow = TRUE)
+colnames(G) <- rownames(G) <- c("est_fit", "corolla_diam", "SLA", "dC13")
+
+# Vector of selection gradients (β)
+beta <- c(est_fit = NA,  # typically fitness itself isn’t included in G×β
+          corolla_diam = -0.12298284,
+          SLA = -0.08418657,
+          dC13 = -0.13217920)
+
+# If fitness is included in the G matrix but β is NA, drop that trait:
+G2 <- G[-1, -1]  
+beta2 <- beta[-1]
+```
+
+```{r}
+R <- G2 %*% beta2
+R
+```
+
+CALCULATING R FOR HR 2023 G1
+```{r}
+# Load the lme4 package
+library(lme4)
+library(dplyr)
+library(tidyverse)
+
+
+HR_fit_23_G1 <- read_csv(here::here("data_sheets", "compiled_sheets", "HR_fit_23_G1.csv"))
+```
+
+```{r}
+# Remove rows with NA values in specified columns
+HR_fit_23_G1_clean <- HR_fit_23_G1 %>%
+  filter(
+    !is.na(SLA_SEG),
+    !is.na(msm_all),
+    !is.na(fl_duration),
+    !is.na(d13C_SEG),
+    !is.na(corolla_diam_mm_SEG),
+    !is.na(est_fitness),
+    !is.na(g0_msm)
+  )
+
+HR_fit_23_G1_clean <- HR_fit_23_G1_clean %>%
+  mutate(
+    SLA_SEG = scale(SLA_SEG),
+    msm_all = scale(msm_all),
+    fl_duration = scale(fl_duration),
+    d13C_SEG = scale(d13C_SEG),
+    corolla_diam_mm_SEG = scale(corolla_diam_mm_SEG),
+    g0_msm = scale(g0_msm)
+  )
+
+# determine relative fitness
+##for the selection gradient, we are going to use estimated fecundity as our fitness metric (not taking survival into account)
+HR_fit_23_G1_clean$relW <- HR_fit_23_G1_clean$est_fecundity / mean(HR_fit_23_G1_clean$est_fecundity)
+
+```
+
+Next we will try to get the Selection Gradient (β)
+```{r}
+# Fit linear model to get β
+fit <- lm(relW ~ corolla_diam_mm_SEG + SLA_SEG + d13C_SEG, data = HR_fit_23_G1_clean)
+summary(fit)$coefficients
+```
+
+```{r}
+# Additive genetic variance–covariance matrix G
+G <- matrix(c(
+0.015428,	-0.08561,	-0.063939,	0.012812,
+-0.08561,	0.481039,	0.431808,	-0.034636,
+-0.063939,	0.431808,	1.024607,	0.293926,
+0.012812,	-0.034636,	0.293926,	0.168179
+), nrow = 4, byrow = TRUE)
+colnames(G) <- rownames(G) <- c("est_fit", "corolla_diam", "SLA", "dC13")
+
+# Vector of selection gradients (β)
+beta <- c(est_fit = NA,  # typically fitness itself isn’t included in G×β
+          corolla_diam = 0.07627898,
+          SLA = -0.15513856,
+          dC13 = 0.20671778)
+
+# If fitness is included in the G matrix but β is NA, drop that trait:
+G2 <- G[-1, -1]  
+beta2 <- beta[-1]
+```
+
+```{r}
+R <- G2 %*% beta2
+R
+```
+
+#################################################################################
+CALCULATING R FOR HR 2023 G2
+```{r}
+
+AC_fit_23_G2 <- read_csv(here::here("data_sheets", "compiled_sheets", "AC_fit_23_G2.csv"))
+
+```
+
+```{r}
+# Remove rows with NA values in specified columns
+AC_fit_23_G2_clean <- AC_fit_23_G2 %>%
+  filter(
+    !is.na(SLA_SEG),
+    !is.na(msm_all),
+    !is.na(fl_duration),
+    !is.na(d13C_SEG),
+    !is.na(corolla_diam_mm_SEG),
+    !is.na(est_fitness),
+    !is.na(g0_msm)
+  )
+
+AC_fit_23_G2_clean <- AC_fit_23_G2_clean %>%
+  mutate(
+    SLA_SEG = scale(SLA_SEG),
+    msm_all = scale(msm_all),
+    fl_duration = scale(fl_duration),
+    d13C_SEG = scale(d13C_SEG),
+    corolla_diam_mm_SEG = scale(corolla_diam_mm_SEG),
+    g0_msm = scale(g0_msm)
+  )
+
+# determine relative fitness
+##for the selection gradient, we are going to use estimated fecundity as our fitness metric (not taking survival into account)
+AC_fit_23_G2_clean$relW <- AC_fit_23_G2_clean$est_fecundity / mean(AC_fit_23_G2_clean$est_fecundity)
+
+```
+
+Next we will try to get the Selection Gradient (β)
+```{r}
+# Fit linear model to get β
+fit <- lm(relW ~ corolla_diam_mm_SEG + SLA_SEG + d13C_SEG, data = AC_fit_23_G2_clean)
+summary(fit)$coefficients
+```
+
+```{r}
+# Additive genetic variance–covariance matrix G
+G <- matrix(c(
+-0.000581,	0.061222,	0.094252,	0.007866,
+0.061222,	1.182923,	1.542839,	0.050093,
+0.094252,	1.542839,	2.089858,	0.116499,
+0.007866,	0.050093,	0.116499,	0.013715
+), nrow = 4, byrow = TRUE)
+colnames(G) <- rownames(G) <- c("est_fit", "corolla_diam", "SLA", "dC13")
+
+# Vector of selection gradients (β)
+beta <- c(est_fit = NA,  # typically fitness itself isn’t included in G×β
+          corolla_diam = 0.15257168,
+          SLA = 0.04427556,
+          dC13 = -0.01712568)
+
+# If fitness is included in the G matrix but β is NA, drop that trait:
+G2 <- G[-1, -1]  
+beta2 <- beta[-1]
+```
+
+```{r}
+R <- G2 %*% beta2
+R
+```
+
+
+CALCULATING R FOR HR 2023 G2
+```{r}
+
+HR_fit_23_G2 <- read_csv(here::here("data_sheets", "compiled_sheets", "HR_fit_23_G2.csv"))
+
+```
+
+```{r}
+# Remove rows with NA values in specified columns
+HR_fit_23_G2_clean <- HR_fit_23_G2 %>%
+  filter(
+    !is.na(SLA_SEG),
+    !is.na(msm_all),
+    !is.na(fl_duration),
+    !is.na(d13C_SEG),
+    !is.na(corolla_diam_mm_SEG),
+    !is.na(est_fitness),
+    !is.na(g0_msm)
+  )
+
+HR_fit_23_G2_clean <- HR_fit_23_G2_clean %>%
+  mutate(
+    SLA_SEG = scale(SLA_SEG),
+    msm_all = scale(msm_all),
+    fl_duration = scale(fl_duration),
+    d13C_SEG = scale(d13C_SEG),
+    corolla_diam_mm_SEG = scale(corolla_diam_mm_SEG),
+    g0_msm = scale(g0_msm)
+  )
+
+# determine relative fitness
+##for the selection gradient, we are going to use estimated fecundity as our fitness metric (not taking survival into account)
+HR_fit_23_G2_clean$relW <- HR_fit_23_G2_clean$est_fecundity / mean(HR_fit_23_G2_clean$est_fecundity)
+
+```
+
+Next we will try to get the Selection Gradient (β)
+```{r}
+# Fit linear model to get β
+fit <- lm(relW ~ corolla_diam_mm_SEG + SLA_SEG + d13C_SEG, data = HR_fit_23_G2_clean)
+summary(fit)$coefficients
+```
+
+```{r}
+# Additive genetic variance–covariance matrix G
+G <- matrix(c(
+0.004561,	0.058509,	0.032854,	0.012731,
+0.058509,	0.982795,	1.245087,	0.099934,
+0.032854,	0.058509,	2.864377,	-0.080313,
+0.012731,	0.099934,	0.099934,	0.043121
+), nrow = 4, byrow = TRUE)
+colnames(G) <- rownames(G) <- c("est_fit", "corolla_diam", "SLA", "dC13")
+
+# Vector of selection gradients (β)
+beta <- c(est_fit = NA,  # typically fitness itself isn’t included in G×β
+          corolla_diam = 0.29127374,
+          SLA = -0.04956615,
+          dC13 = 0.09361173)
+
+# If fitness is included in the G matrix but β is NA, drop that trait:
+G2 <- G[-1, -1]  
+beta2 <- beta[-1]
+```
+
+```{r}
+R <- G2 %*% beta2
+R
+```

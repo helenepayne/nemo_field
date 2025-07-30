@@ -3,3 +3,8 @@
 .RData
 .Ruserdata
 .*
+
+data_sheets/
+NSF_Nemophila/
+organizing_code/
+plots/

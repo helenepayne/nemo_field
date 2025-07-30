@@ -1,0 +1,1241 @@
+---
+title: "Fitness_correlations_years&gen"
+author: "Helen Payne"
+date: "2025-02-07"
+output: html_document
+---
+
+Load in libraries and the datasets, plus a bit of tidying
+```{r}
+# Load the lme4 package
+library(lme4)
+library(dplyr)
+library(tidyverse)
+
+
+### Load and preprocess data
+## Data for fitness plants only
+# Read the CSV file and create 'sample_ID' column
+AC_fit <- read_csv(here::here("data_sheets", "compiled_sheets", "AC_22_23_fit.csv")) %>%
+  rename_at(vars(48), ~"surv_to_fruitpod") %>% #rename this column which was miss spelled
+  mutate(
+    # Construct sample_ID conditionally
+    sample_ID = case_when(
+      is.na(SegPos) ~ paste(Year, Recipient, Gen, str_pad(Transect, width = 3, pad = "0"), Plant_ID, sep = "-"),
+      TRUE ~ paste(Year, Recipient, Gen, str_pad(Transect, width = 3, pad = "0"), SegPos, Plant_ID, sep = "-")
+    ),
+    # Replace leading underscores in sample_ID with hyphens
+    sample_ID = str_replace(sample_ID, "^([^_]*)_", "\\1-")
+  )
+
+# Read in data from non-fitness plants- this is to get survival data from
+AC_22_23_full <- read_csv(here::here("data_sheets", "compiled_sheets", "AC_22_23_full.csv"))
+
+#create the variable "prop_surv_to_flower"
+AC_22_23_full <- AC_22_23_full %>%
+  group_by(Year, Gen, Transect, Sequence, Donor, Recipient, SegPos) %>%
+  mutate(prop_surv_to_flower = mean(surv_to_flower, na.rm = TRUE)) %>%
+  ungroup()  # Remove grouping
+
+#select for certain columns
+AC_prop_sample <- AC_22_23_full %>%
+  dplyr::select(c(Year, Gen, Transect, Sequence, Donor, Recipient, SegPos, prop_surv_to_flower))  %>%
+    distinct()
+
+#add "prop_surv_to_flower" based on the columns listed
+AC_fit <- AC_fit %>%
+  left_join(AC_prop_sample %>% dplyr::select(Year, Gen, Transect, Sequence, Donor, Recipient, SegPos, prop_surv_to_flower),
+            by = c("Year", "Gen", "Transect", "Sequence", "Donor", "Recipient", "SegPos"))
+
+# Create the new column for "est_fitness" and rename "prop_surv_to_flower" to "survival"
+AC_fit <- AC_fit %>%
+  mutate(est_fitness = prop_surv_to_flower * est_fecundity) %>%
+  mutate(est_fitness = replace_na(est_fitness, 0)) %>%
+  rename(survival = prop_surv_to_flower)
+
+#isolate AC 2022
+AC_fit_22 <- AC_fit %>%
+  filter(Year == "2022")
+
+#isolate AC 2023 G1
+AC_fit_23_G1 <- AC_fit %>%
+  filter(Year == "2023", Gen == "G1")
+
+#isolate AC 2023 G2
+AC_fit_23_G2 <- AC_fit %>%
+  filter(Year == "2023", Gen == "G2")
+
+#isolate all G1 together
+AC_fit_G1 <- AC_fit %>%
+  filter(Gen == "G1")
+
+#isolate by year
+AC_fit_23 <- AC_fit %>%
+  filter(Year == "2023")
+
+```
+
+
+Average based on paternal donor mean trait values
+```{r}
+##Obtain paternal genotypic values - this is what we are interested in
+# Aggregate data by donor
+AC_mean_donor_traits_22 <- AC_fit_22%>%
+  group_by(Donor) %>%             # Group by donor
+  summarise(
+    closed_fruits = mean(closed_fruits, na.rm = TRUE),
+    total_fruits = mean(total_fruits, na.rm = TRUE),
+    filled_seeds = mean(filled_seeds, na.rm = TRUE),
+    mean_seeds_per_fruit = mean(mean_seeds_per_fruit, na.rm = TRUE),
+    fl_duration = mean(fl_duration, na.rm = TRUE),
+    skel_dryweight_mg = mean(skel_dryweight_mg, na.rm = TRUE),
+    msm_all = mean(msm_all, na.rm = TRUE),
+    corolla_diam_mm_SEG = mean(corolla_diam_mm_SEG, na.rm = TRUE),
+    SLA_SEG = mean(SLA_SEG, na.rm = TRUE),
+    d13C_SEG = mean(d13C_SEG, na.rm = TRUE),
+    est_fecundity = mean(est_fecundity, na.rm = TRUE),
+    survival = mean(survival, na.rm = TRUE),
+    est_fitness = mean(est_fitness, na.rm = TRUE),
+        count = n() 
+  )
+
+AC_mean_donor_traits_23_G1 <- AC_fit_23_G1%>%
+  group_by(Donor) %>%             # Group by donor
+  summarise(
+    closed_fruits = mean(closed_fruits, na.rm = TRUE),
+    total_fruits = mean(total_fruits, na.rm = TRUE),
+    filled_seeds = mean(filled_seeds, na.rm = TRUE),
+    mean_seeds_per_fruit = mean(mean_seeds_per_fruit, na.rm = TRUE),
+    fl_duration = mean(fl_duration, na.rm = TRUE),
+    skel_dryweight_mg = mean(skel_dryweight_mg, na.rm = TRUE),
+    msm_all = mean(msm_all, na.rm = TRUE),
+    corolla_diam_mm_SEG = mean(corolla_diam_mm_SEG, na.rm = TRUE),
+    SLA_SEG = mean(SLA_SEG, na.rm = TRUE),
+    d13C_SEG = mean(d13C_SEG, na.rm = TRUE),
+    est_fecundity = mean(est_fecundity, na.rm = TRUE),
+    survival = mean(survival, na.rm = TRUE),
+    est_fitness = mean(est_fitness, na.rm = TRUE),
+        count = n() 
+  )
+
+AC_mean_donor_traits_23_G2 <- AC_fit_23_G2%>%
+  group_by(Donor) %>%             # Group by donor
+  summarise(
+    closed_fruits = mean(closed_fruits, na.rm = TRUE),
+    total_fruits = mean(total_fruits, na.rm = TRUE),
+    filled_seeds = mean(filled_seeds, na.rm = TRUE),
+    mean_seeds_per_fruit = mean(mean_seeds_per_fruit, na.rm = TRUE),
+    fl_duration = mean(fl_duration, na.rm = TRUE),
+    skel_dryweight_mg = mean(skel_dryweight_mg, na.rm = TRUE),
+    msm_all = mean(msm_all, na.rm = TRUE),
+    corolla_diam_mm_SEG = mean(corolla_diam_mm_SEG, na.rm = TRUE),
+    SLA_SEG = mean(SLA_SEG, na.rm = TRUE),
+    d13C_SEG = mean(d13C_SEG, na.rm = TRUE),
+    est_fecundity = mean(est_fecundity, na.rm = TRUE),
+    survival = mean(survival, na.rm = TRUE),
+    est_fitness = mean(est_fitness, na.rm = TRUE),
+        count = n() 
+  )
+```
+
+```{r}
+#LOAD IN DATA
+AC_mean_donor_traits_22 <- read_csv(here::here("data_sheets", "compiled_sheets", "AC_mean_donor_traits_22.csv"))
+
+BB_mean_donor_traits_22 <- read_csv(here::here("data_sheets", "compiled_sheets", "BB_mean_donor_traits_22.csv"))
+
+BO_mean_donor_traits_22 <- read_csv(here::here("data_sheets", "compiled_sheets", "BO_mean_donor_traits_22.csv"))
+
+HR_mean_donor_traits_22 <- read_csv(here::here("data_sheets", "compiled_sheets", "HR_mean_donor_traits_22.csv"))
+
+AC_mean_donor_traits_23_G1 <- read_csv(here::here("data_sheets", "compiled_sheets", "AC_mean_donor_traits_23_G1.csv"))
+
+BB_mean_donor_traits_23_G1 <- read_csv(here::here("data_sheets", "compiled_sheets", "BB_mean_donor_traits_23_G1.csv"))
+
+BO_mean_donor_traits_23_G1 <- read_csv(here::here("data_sheets", "compiled_sheets", "BO_mean_donor_traits_23_G1.csv"))
+
+HR_mean_donor_traits_23_G1 <- read_csv(here::here("data_sheets", "compiled_sheets", "HR_mean_donor_traits_23_G1.csv"))
+
+AC_mean_donor_traits_23_G2 <- read_csv(here::here("data_sheets", "compiled_sheets", "AC_mean_donor_traits_23_G2.csv"))
+
+BB_mean_donor_traits_23_G2 <- read_csv(here::here("data_sheets", "compiled_sheets", "BB_mean_donor_traits_23_G2.csv"))
+
+BO_mean_donor_traits_23_G2 <- read_csv(here::here("data_sheets", "compiled_sheets", "BO_mean_donor_traits_23_G2.csv"))
+
+HR_mean_donor_traits_23_G2 <- read_csv(here::here("data_sheets", "compiled_sheets", "HR_mean_donor_traits_23_G2.csv"))
+
+```
+
+
+Remove NAs
+```{r}
+# Remove rows with NA values in specified columns
+AC_mean_donor_traits_22 <- AC_mean_donor_traits_22 %>%
+  filter(
+    !is.na(SLA_SEG),
+    !is.na(msm_all),
+    !is.na(fl_duration),
+    !is.na(d13C_SEG),
+    !is.na(corolla_diam_mm_SEG),
+    !is.na(est_fecundity),
+    !is.na(survival),
+    !is.na(est_fitness),
+    !is.na(g0_msm)
+    
+  )
+
+AC_mean_donor_traits_23_G1 <- AC_mean_donor_traits_23_G1 %>%
+  filter(
+    !is.na(SLA_SEG),
+    !is.na(msm_all),
+    !is.na(fl_duration),
+    !is.na(d13C_SEG),
+    !is.na(corolla_diam_mm_SEG),
+    !is.na(est_fecundity),
+    !is.na(survival),
+    !is.na(est_fitness),
+    !is.na(g0_msm)
+    
+  )
+
+AC_mean_donor_traits_23_G2 <- AC_mean_donor_traits_23_G2 %>%
+  filter(
+    !is.na(SLA_SEG),
+    !is.na(msm_all),
+    !is.na(fl_duration),
+    !is.na(d13C_SEG),
+    !is.na(corolla_diam_mm_SEG),
+    !is.na(est_fecundity),
+    !is.na(survival),
+    !is.na(est_fitness),
+    !is.na(g0_msm)
+    
+  )
+
+```
+
+
+```{r}
+# Merge the datasets by Donor
+merged_donor <- merge(
+  AC_mean_donor_traits_22 %>% select(Donor, survival_22 = survival, fecundity_22 = est_fecundity, fitness_22 = est_fitness),
+  AC_mean_donor_traits_23_G1 %>% select(Donor, survival_23_G1 = survival, fecundity_23_G1 = est_fecundity, fitness_23_G1 = est_fitness),
+  by = "Donor"
+)
+
+merged_donor <- merge(
+  merged_donor,
+  AC_mean_donor_traits_23_G2 %>% select(Donor, survival_23_G2 = survival, fecundity_23_G2 = est_fecundity, fitness_23_G2 = est_fitness),
+  by = "Donor"
+)
+
+```
+
+
+SURVIVAL
+```{r}
+# Compute correlation
+correlation <- cor(merged_donor$survival_22, merged_donor$survival_23_G1, use = "complete.obs")
+print(correlation) #slight positive correlation, fitness is pretty context specific
+
+
+correlation <- cor(merged_donor$survival_22, merged_donor$survival_23_G2, use = "complete.obs")
+print(correlation)#slight negative correlation, fitness is pretty context specific
+
+
+correlation <- cor(merged_donor$survival_23_G1, merged_donor$survival_23_G2, use = "complete.obs")
+print(correlation)#slight positive correlation, fitness is pretty context specific
+```
+
+FECUNDITY
+```{r}
+# Compute correlation
+correlation <- cor(merged_donor$fecundity_22, merged_donor$fecundity_23_G1, use = "complete.obs")
+print(correlation) #slight positive correlation, fitness is pretty context specific
+
+
+correlation <- cor(merged_donor$fecundity_22, merged_donor$fecundity_23_G2, use = "complete.obs")
+print(correlation)#slight negative correlation, fitness is pretty context specific
+
+
+correlation <- cor(merged_donor$fecundity_23_G1, merged_donor$fecundity_23_G2, use = "complete.obs")
+print(correlation)#slight positive correlation, fitness is pretty context specific
+```
+
+
+ESTIMATED FITNESS
+```{r}
+# Compute correlation
+correlation <- cor(merged_donor$fitness_22, merged_donor$fitness_23_G1, use = "complete.obs")
+print(correlation) #slight positive correlation, fitness is pretty context specific
+
+
+correlation <- cor(merged_donor$fitness_22, merged_donor$fitness_23_G2, use = "complete.obs")
+print(correlation)#slight negative correlation, fitness is pretty context specific
+
+
+correlation <- cor(merged_donor$fitness_23_G1, merged_donor$fitness_23_G2, use = "complete.obs")
+print(correlation)#slight positive correlation, fitness is pretty context specific
+```
+
+```{r}
+library(ggplot2)
+library(patchwork) # For arranging ggplots
+
+# Function to create scatterplots with correlation labels
+create_scatterplot <- function(x, y, x_label, y_label, data) {
+  corr_value <- cor(data[[x]], data[[y]], use = "complete.obs")
+  ggplot(data, aes_string(x = x, y = y)) +
+    geom_point(alpha = 0.7, color = "blue") +
+    geom_smooth(method = "lm", color = "red", se = FALSE) +
+    labs(
+      x = x_label,
+      y = y_label,
+      title = paste0("Correlation: ", round(corr_value, 2))
+    ) +
+    theme_minimal()
+}
+
+# Survival
+plot_survival_1 <- create_scatterplot("survival_22", "survival_23_G1", "Survival (2022)", "Survival (2023 G1)", merged_donor)
+plot_survival_2 <- create_scatterplot("survival_22", "survival_23_G2", "Survival (2022)", "Survival (2023 G2)", merged_donor)
+plot_survival_3 <- create_scatterplot("survival_23_G1", "survival_23_G2", "Survival (2023 G1)", "Survival (2023 G2)", merged_donor)
+
+# Fecundity
+plot_fecundity_1 <- create_scatterplot("fecundity_22", "fecundity_23_G1", "Fecundity (2022)", "Fecundity (2023 G1)", merged_donor)
+plot_fecundity_2 <- create_scatterplot("fecundity_22", "fecundity_23_G2", "Fecundity (2022)", "Fecundity (2023 G2)", merged_donor)
+plot_fecundity_3 <- create_scatterplot("fecundity_23_G1", "fecundity_23_G2", "Fecundity (2023 G1)", "Fecundity (2023 G2)", merged_donor)
+
+# Estimated Fitness
+plot_fitness_1 <- create_scatterplot("fitness_22", "fitness_23_G1", "Fitness (2022)", "Fitness (2023 G1)", merged_donor)
+plot_fitness_2 <- create_scatterplot("fitness_22", "fitness_23_G2", "Fitness (2022)", "Fitness (2023 G2)", merged_donor)
+plot_fitness_3 <- create_scatterplot("fitness_23_G1", "fitness_23_G2", "Fitness (2023 G1)", "Fitness (2023 G2)", merged_donor)
+
+# Combine plots into matrices
+survival_matrix <- (plot_survival_1 | plot_survival_2) / plot_survival_3
+fecundity_matrix <- (plot_fecundity_1 | plot_fecundity_2) / plot_fecundity_3
+fitness_matrix <- (plot_fitness_1 | plot_fitness_2) / plot_fitness_3
+
+# Display the matrices
+survival_matrix
+fecundity_matrix
+fitness_matrix
+
+# Save the plots
+ggsave("AC_survival_matrix.png", plot = survival_matrix, width = 10, height = 8, dpi = 300)
+ggsave("AC_fecundity_matrix.png", plot = fecundity_matrix, width = 10, height = 8, dpi = 300)
+ggsave("AC_fitness_matrix.png", plot = fitness_matrix, width = 10, height = 8, dpi = 300)
+
+```
+
+###BB###
+
+
+```{r}
+### Load and preprocess data
+## Data for fitness plants only
+# Read the CSV file and create 'sample_ID' column
+BB_fit <- read_csv(here::here("data_sheets", "compiled_sheets", "BB_22_23_fit.csv")) %>%
+  mutate(
+    # Construct sample_ID conditionally
+    sample_ID = case_when(
+      is.na(SegPos) ~ paste(Year, Recipient, Gen, str_pad(Location, width = 3, pad = "0"), Plant_ID, sep = "-"),
+      TRUE ~ paste(Year, Recipient, Gen, str_pad(Location, width = 3, pad = "0"), SegPos, Plant_ID, sep = "-")
+    ),
+    # Replace leading underscores in sample_ID with hyphens
+    sample_ID = str_replace(sample_ID, "^([^_]*)_", "\\1-")
+  )
+
+# Read in data from non-fitness plants- this is to get survival data from
+BB_22_23_full <- read_csv(here::here("data_sheets", "compiled_sheets", "BB_22_23_full.csv"))
+
+#create the variable "prop_surv_to_flower"
+BB_22_23_full <- BB_22_23_full %>%
+  group_by(Year, Gen, Location, Sequence, Donor, Recipient, SegPos) %>%
+  mutate(prop_surv_to_flower = mean(surv_to_flower, na.rm = TRUE)) %>%
+  ungroup()  # Remove grouping
+
+#select for certain columns
+BB_prop_sample <- BB_22_23_full %>%
+  dplyr::select(c(Year, Gen, Location, Sequence, Donor, Recipient, SegPos, prop_surv_to_flower))  %>%
+    distinct()
+
+#add "prop_surv_to_flower" based on the columns listed
+BB_fit <- BB_fit %>%
+  left_join(BB_prop_sample %>% dplyr::select(Year, Gen, Location, Sequence, Donor, Recipient, SegPos, prop_surv_to_flower),
+            by = c("Year", "Gen", "Location", "Sequence", "Donor", "Recipient", "SegPos"))
+
+# Create the new column for "est_fitness" and rename "prop_surv_to_flower" to "survival"
+BB_fit <- BB_fit %>%
+  mutate(est_fitness = prop_surv_to_flower * est_fecundity) %>%
+  mutate(est_fitness = replace_na(est_fitness, 0)) %>%
+  rename(survival = prop_surv_to_flower)
+
+#isolate BB 2022
+BB_fit_22 <- BB_fit %>%
+  filter(Year == "2022")
+
+#isolate BB 2023 G1
+BB_fit_23_G1 <- BB_fit %>%
+  filter(Year == "2023", Gen == "G1")
+
+#isolate BB 2023 G2
+BB_fit_23_G2 <- BB_fit %>%
+  filter(Year == "2023", Gen == "G2")
+
+#isolate all G1 together
+BB_fit_G1 <- BB_fit %>%
+  filter(Gen == "G1")
+
+#isolate by year
+BB_fit_23 <- BB_fit %>%
+  filter(Year == "2023")
+
+```
+
+
+Average based on paternal donor mean trait values
+```{r}
+##Obtain paternal genotypic values - this is what we are interested in
+# Aggregate data by donor
+BB_mean_donor_traits_22 <- BB_fit_22%>%
+  group_by(Donor) %>%             # Group by donor
+  summarise(
+    closed_fruits = mean(closed_fruits, na.rm = TRUE),
+    total_fruits = mean(total_fruits, na.rm = TRUE),
+    filled_seeds = mean(filled_seeds, na.rm = TRUE),
+    mean_seeds_per_fruit = mean(mean_seeds_per_fruit, na.rm = TRUE),
+    fl_duration = mean(fl_duration, na.rm = TRUE),
+    skel_dryweight_mg = mean(skel_dryweight_mg, na.rm = TRUE),
+    msm_all = mean(msm_all, na.rm = TRUE),
+    corolla_diam_mm_SEG = mean(corolla_diam_mm_SEG, na.rm = TRUE),
+    SLA_SEG = mean(SLA_SEG, na.rm = TRUE),
+    d13C_SEG = mean(d13C_SEG, na.rm = TRUE),
+    est_fecundity = mean(est_fecundity, na.rm = TRUE),
+    survival = mean(survival, na.rm = TRUE),
+    est_fitness = mean(est_fitness, na.rm = TRUE),
+        count = n() 
+  )
+
+BB_mean_donor_traits_23_G1 <- BB_fit_23_G1%>%
+  group_by(Donor) %>%             # Group by donor
+  summarise(
+    closed_fruits = mean(closed_fruits, na.rm = TRUE),
+    total_fruits = mean(total_fruits, na.rm = TRUE),
+    filled_seeds = mean(filled_seeds, na.rm = TRUE),
+    mean_seeds_per_fruit = mean(mean_seeds_per_fruit, na.rm = TRUE),
+    fl_duration = mean(fl_duration, na.rm = TRUE),
+    skel_dryweight_mg = mean(skel_dryweight_mg, na.rm = TRUE),
+    msm_all = mean(msm_all, na.rm = TRUE),
+    corolla_diam_mm_SEG = mean(corolla_diam_mm_SEG, na.rm = TRUE),
+    SLA_SEG = mean(SLA_SEG, na.rm = TRUE),
+    d13C_SEG = mean(d13C_SEG, na.rm = TRUE),
+    est_fecundity = mean(est_fecundity, na.rm = TRUE),
+    survival = mean(survival, na.rm = TRUE),
+    est_fitness = mean(est_fitness, na.rm = TRUE),
+        count = n() 
+  )
+
+BB_mean_donor_traits_23_G2 <- BB_fit_23_G2%>%
+  group_by(Donor) %>%             # Group by donor
+  summarise(
+    closed_fruits = mean(closed_fruits, na.rm = TRUE),
+    total_fruits = mean(total_fruits, na.rm = TRUE),
+    filled_seeds = mean(filled_seeds, na.rm = TRUE),
+    mean_seeds_per_fruit = mean(mean_seeds_per_fruit, na.rm = TRUE),
+    fl_duration = mean(fl_duration, na.rm = TRUE),
+    skel_dryweight_mg = mean(skel_dryweight_mg, na.rm = TRUE),
+    msm_all = mean(msm_all, na.rm = TRUE),
+    corolla_diam_mm_SEG = mean(corolla_diam_mm_SEG, na.rm = TRUE),
+    SLA_SEG = mean(SLA_SEG, na.rm = TRUE),
+    d13C_SEG = mean(d13C_SEG, na.rm = TRUE),
+    est_fecundity = mean(est_fecundity, na.rm = TRUE),
+    survival = mean(survival, na.rm = TRUE),
+    est_fitness = mean(est_fitness, na.rm = TRUE),
+        count = n() 
+  )
+```
+
+Remove NAs
+```{r}
+# Remove rows with NA values in specified columns
+BB_mean_donor_traits_22 <- BB_mean_donor_traits_22 %>%
+  filter(
+    !is.na(SLA_SEG),
+    !is.na(msm_all),
+    !is.na(fl_duration),
+    !is.na(d13C_SEG),
+    !is.na(corolla_diam_mm_SEG),
+    !is.na(est_fecundity),
+    !is.na(survival),
+    !is.na(est_fitness),
+    
+  )
+
+BB_mean_donor_traits_23_G1 <- BB_mean_donor_traits_23_G1 %>%
+  filter(
+    !is.na(SLA_SEG),
+    !is.na(msm_all),
+    !is.na(fl_duration),
+    !is.na(d13C_SEG),
+    !is.na(corolla_diam_mm_SEG),
+    !is.na(est_fecundity),
+    !is.na(survival),
+    !is.na(est_fitness),
+    
+  )
+
+BB_mean_donor_traits_23_G2 <- BB_mean_donor_traits_23_G2 %>%
+  filter(
+    !is.na(SLA_SEG),
+    !is.na(msm_all),
+    !is.na(fl_duration),
+    !is.na(d13C_SEG),
+    !is.na(corolla_diam_mm_SEG),
+    !is.na(est_fecundity),
+    !is.na(survival),
+    !is.na(est_fitness),
+    
+  )
+
+```
+
+
+```{r}
+# Merge the datasets by Donor
+merged_donor <- merge(
+  BB_mean_donor_traits_22 %>% select(Donor, survival_22 = survival, fecundity_22 = est_fecundity, fitness_22 = est_fitness),
+  BB_mean_donor_traits_23_G1 %>% select(Donor, survival_23_G1 = survival, fecundity_23_G1 = est_fecundity, fitness_23_G1 = est_fitness),
+  by = "Donor"
+)
+
+merged_donor <- merge(
+  merged_donor,
+  BB_mean_donor_traits_23_G2 %>% select(Donor, survival_23_G2 = survival, fecundity_23_G2 = est_fecundity, fitness_23_G2 = est_fitness),
+  by = "Donor"
+)
+
+```
+
+
+SURVIVAL
+```{r}
+# Compute correlation
+correlation <- cor(merged_donor$survival_22, merged_donor$survival_23_G1, use = "complete.obs")
+print(correlation) #slight positive correlation, fitness is pretty context specific
+#-0.2660751
+
+correlation <- cor(merged_donor$survival_22, merged_donor$survival_23_G2, use = "complete.obs")
+print(correlation)#slight negative correlation, fitness is pretty context specific
+#-0.2660751
+
+correlation <- cor(merged_donor$survival_23_G1, merged_donor$survival_23_G2, use = "complete.obs")
+print(correlation)#slight positive correlation, fitness is pretty context specific
+#0.2254221
+```
+
+FECUNDITY
+```{r}
+# Compute correlation
+correlation <- cor(merged_donor$fecundity_22, merged_donor$fecundity_23_G1, use = "complete.obs")
+print(correlation) #slight positive correlation, fitness is pretty context specific
+
+
+correlation <- cor(merged_donor$fecundity_22, merged_donor$fecundity_23_G2, use = "complete.obs")
+print(correlation)#slight negative correlation, fitness is pretty context specific
+
+
+correlation <- cor(merged_donor$fecundity_23_G1, merged_donor$fecundity_23_G2, use = "complete.obs")
+print(correlation)#slight positive correlation, fitness is pretty context specific
+```
+
+
+ESTIMATED FITNESS
+```{r}
+# Compute correlation
+correlation <- cor(merged_donor$fitness_22, merged_donor$fitness_23_G1, use = "complete.obs")
+print(correlation) #slight positive correlation, fitness is pretty context specific
+
+
+correlation <- cor(merged_donor$fitness_22, merged_donor$fitness_23_G2, use = "complete.obs")
+print(correlation)#slight negative correlation, fitness is pretty context specific
+
+
+correlation <- cor(merged_donor$fitness_23_G1, merged_donor$fitness_23_G2, use = "complete.obs")
+print(correlation)#slight positive correlation, fitness is pretty context specific
+```
+
+```{r}
+library(ggplot2)
+library(patchwork) # For arranging ggplots
+
+# Function to create scatterplots with correlation labels
+create_scatterplot <- function(x, y, x_label, y_label, data) {
+  corr_value <- cor(data[[x]], data[[y]], use = "complete.obs")
+  ggplot(data, aes_string(x = x, y = y)) +
+    geom_point(alpha = 0.7, color = "blue") +
+    geom_smooth(method = "lm", color = "red", se = FALSE) +
+    labs(
+      x = x_label,
+      y = y_label,
+      title = paste0("Correlation: ", round(corr_value, 2))
+    ) +
+    theme_minimal()
+}
+
+# Survival
+plot_survival_1 <- create_scatterplot("survival_22", "survival_23_G1", "Survival (2022)", "Survival (2023 G1)", merged_donor)
+plot_survival_2 <- create_scatterplot("survival_22", "survival_23_G2", "Survival (2022)", "Survival (2023 G2)", merged_donor)
+plot_survival_3 <- create_scatterplot("survival_23_G1", "survival_23_G2", "Survival (2023 G1)", "Survival (2023 G2)", merged_donor)
+
+# Fecundity
+plot_fecundity_1 <- create_scatterplot("fecundity_22", "fecundity_23_G1", "Fecundity (2022)", "Fecundity (2023 G1)", merged_donor)
+plot_fecundity_2 <- create_scatterplot("fecundity_22", "fecundity_23_G2", "Fecundity (2022)", "Fecundity (2023 G2)", merged_donor)
+plot_fecundity_3 <- create_scatterplot("fecundity_23_G1", "fecundity_23_G2", "Fecundity (2023 G1)", "Fecundity (2023 G2)", merged_donor)
+
+# Estimated Fitness
+plot_fitness_1 <- create_scatterplot("fitness_22", "fitness_23_G1", "Fitness (2022)", "Fitness (2023 G1)", merged_donor)
+plot_fitness_2 <- create_scatterplot("fitness_22", "fitness_23_G2", "Fitness (2022)", "Fitness (2023 G2)", merged_donor)
+plot_fitness_3 <- create_scatterplot("fitness_23_G1", "fitness_23_G2", "Fitness (2023 G1)", "Fitness (2023 G2)", merged_donor)
+
+# Combine plots into matrices
+survival_matrix <- (plot_survival_1 | plot_survival_2) / plot_survival_3
+fecundity_matrix <- (plot_fecundity_1 | plot_fecundity_2) / plot_fecundity_3
+fitness_matrix <- (plot_fitness_1 | plot_fitness_2) / plot_fitness_3
+
+# Display the matrices
+survival_matrix
+fecundity_matrix
+fitness_matrix
+
+# Save the plots
+ggsave("BB_survival_matrix.png", plot = survival_matrix, width = 10, height = 8, dpi = 300)
+ggsave("BB_fecundity_matrix.png", plot = fecundity_matrix, width = 10, height = 8, dpi = 300)
+ggsave("BB_fitness_matrix.png", plot = fitness_matrix, width = 10, height = 8, dpi = 300)
+
+```
+
+###BO###
+
+```{r}
+# Load the lme4 package
+library(lme4)
+library(dplyr)
+library(tidyverse)
+
+
+### Load and preprocess data
+## Data for fitness plants only
+# Read the CSV file and create 'sample_ID' column
+BO_fit <- read_csv(here::here("data_sheets", "compiled_sheets", "BO_22_23_fit.csv")) %>%
+  rename_at(vars(49), ~"surv_to_fruitpod") %>% #rename this column which was miss spelled
+  mutate(
+    # Construct sample_ID conditionally
+    sample_ID = case_when(
+      is.na(SegPos) ~ paste(Year, Recipient, Gen, str_pad(Transect, width = 3, pad = "0"), Plant_ID, sep = "-"),
+      TRUE ~ paste(Year, Recipient, Gen, str_pad(Transect, width = 3, pad = "0"), SegPos, Plant_ID, sep = "-")
+    ),
+    # Replace leading underscores in sample_ID with hyphens
+    sample_ID = str_replace(sample_ID, "^([^_]*)_", "\\1-")
+  )
+
+# Read in data from non-fitness plants- this is to get survival data from
+BO_22_23_full <- read_csv(here::here("data_sheets", "compiled_sheets", "BO_22_23_full.csv"))
+
+#create the variable "prop_surv_to_flower"
+BO_22_23_full <- BO_22_23_full %>%
+  group_by(Year, Gen, Transect, Sequence, Donor, Recipient, SegPos) %>%
+  mutate(prop_surv_to_flower = mean(surv_to_flower, na.rm = TRUE)) %>%
+  ungroup()  # Remove grouping
+
+#select for certain columns
+BO_prop_sample <- BO_22_23_full %>%
+  dplyr::select(c(Year, Gen, Transect, Sequence, Donor, Recipient, SegPos, prop_surv_to_flower))  %>%
+    distinct()
+
+#add "prop_surv_to_flower" based on the columns listed
+BO_fit <- BO_fit %>%
+  left_join(BO_prop_sample %>% dplyr::select(Year, Gen, Transect, Sequence, Donor, Recipient, SegPos, prop_surv_to_flower),
+            by = c("Year", "Gen", "Transect", "Sequence", "Donor", "Recipient", "SegPos"))
+
+# Create the new column for "est_fitness" and rename "prop_surv_to_flower" to "survival"
+BO_fit <- BO_fit %>%
+  mutate(est_fitness = prop_surv_to_flower * est_fecundity) %>%
+  mutate(est_fitness = replace_na(est_fitness, 0)) %>%
+  rename(survival = prop_surv_to_flower)
+
+#isolate BO 2022
+BO_fit_22 <- BO_fit %>%
+  filter(Year == "2022")
+
+#isolate BO 2023 G1
+BO_fit_23_G1 <- BO_fit %>%
+  filter(Year == "2023", Gen == "G1")
+
+#isolate BO 2023 G2
+BO_fit_23_G2 <- BO_fit %>%
+  filter(Year == "2023", Gen == "G2")
+
+#isolate all G1 together
+BO_fit_G1 <- BO_fit %>%
+  filter(Gen == "G1")
+
+#isolate by year
+BO_fit_23 <- BO_fit %>%
+  filter(Year == "2023")
+
+```
+
+
+
+Average based on paternal donor mean trait values
+```{r}
+##Obtain paternal genotypic values - this is what we are interested in
+# Aggregate data by donor
+BO_mean_donor_traits_22 <- BO_fit_22%>%
+  group_by(Donor) %>%             # Group by donor
+  summarise(
+    closed_fruits = mean(closed_fruits, na.rm = TRUE),
+    total_fruits = mean(total_fruits, na.rm = TRUE),
+    filled_seeds = mean(filled_seeds, na.rm = TRUE),
+    mean_seeds_per_fruit = mean(mean_seeds_per_fruit, na.rm = TRUE),
+    fl_duration = mean(fl_duration, na.rm = TRUE),
+    skel_dryweight_mg = mean(skel_dryweight_mg, na.rm = TRUE),
+    msm_all = mean(msm_all, na.rm = TRUE),
+    corolla_diam_mm_SEG = mean(corolla_diam_mm_SEG, na.rm = TRUE),
+    SLA_SEG = mean(SLA_SEG, na.rm = TRUE),
+    d13C_SEG = mean(d13C_SEG, na.rm = TRUE),
+    est_fecundity = mean(est_fecundity, na.rm = TRUE),
+    survival = mean(survival, na.rm = TRUE),
+    est_fitness = mean(est_fitness, na.rm = TRUE),
+        count = n() 
+  )
+
+BO_mean_donor_traits_23_G1 <- BO_fit_23_G1%>%
+  group_by(Donor) %>%             # Group by donor
+  summarise(
+    closed_fruits = mean(closed_fruits, na.rm = TRUE),
+    total_fruits = mean(total_fruits, na.rm = TRUE),
+    filled_seeds = mean(filled_seeds, na.rm = TRUE),
+    mean_seeds_per_fruit = mean(mean_seeds_per_fruit, na.rm = TRUE),
+    fl_duration = mean(fl_duration, na.rm = TRUE),
+    skel_dryweight_mg = mean(skel_dryweight_mg, na.rm = TRUE),
+    msm_all = mean(msm_all, na.rm = TRUE),
+    corolla_diam_mm_SEG = mean(corolla_diam_mm_SEG, na.rm = TRUE),
+    SLA_SEG = mean(SLA_SEG, na.rm = TRUE),
+    d13C_SEG = mean(d13C_SEG, na.rm = TRUE),
+    est_fecundity = mean(est_fecundity, na.rm = TRUE),
+    survival = mean(survival, na.rm = TRUE),
+    est_fitness = mean(est_fitness, na.rm = TRUE),
+        count = n() 
+  )
+
+BO_mean_donor_traits_23_G2 <- BO_fit_23_G2%>%
+  group_by(Donor) %>%             # Group by donor
+  summarise(
+    closed_fruits = mean(closed_fruits, na.rm = TRUE),
+    total_fruits = mean(total_fruits, na.rm = TRUE),
+    filled_seeds = mean(filled_seeds, na.rm = TRUE),
+    mean_seeds_per_fruit = mean(mean_seeds_per_fruit, na.rm = TRUE),
+    fl_duration = mean(fl_duration, na.rm = TRUE),
+    skel_dryweight_mg = mean(skel_dryweight_mg, na.rm = TRUE),
+    msm_all = mean(msm_all, na.rm = TRUE),
+    corolla_diam_mm_SEG = mean(corolla_diam_mm_SEG, na.rm = TRUE),
+    SLA_SEG = mean(SLA_SEG, na.rm = TRUE),
+    d13C_SEG = mean(d13C_SEG, na.rm = TRUE),
+    est_fecundity = mean(est_fecundity, na.rm = TRUE),
+    survival = mean(survival, na.rm = TRUE),
+    est_fitness = mean(est_fitness, na.rm = TRUE),
+        count = n() 
+  )
+```
+
+Remove NAs
+```{r}
+# Remove rows with NA values in specified columns
+BO_mean_donor_traits_22 <- BO_mean_donor_traits_22 %>%
+  filter(
+    !is.na(SLA_SEG),
+    !is.na(msm_all),
+    !is.na(fl_duration),
+    !is.na(d13C_SEG),
+    !is.na(corolla_diam_mm_SEG),
+    !is.na(est_fecundity),
+    !is.na(survival),
+    !is.na(est_fitness),
+    
+  )
+
+BO_mean_donor_traits_23_G1 <- BO_mean_donor_traits_23_G1 %>%
+  filter(
+    !is.na(SLA_SEG),
+    !is.na(msm_all),
+    !is.na(fl_duration),
+    !is.na(d13C_SEG),
+    !is.na(corolla_diam_mm_SEG),
+    !is.na(est_fecundity),
+    !is.na(survival),
+    !is.na(est_fitness),
+    
+  )
+
+BO_mean_donor_traits_23_G2 <- BO_mean_donor_traits_23_G2 %>%
+  filter(
+    !is.na(SLA_SEG),
+    !is.na(msm_all),
+    !is.na(fl_duration),
+    !is.na(d13C_SEG),
+    !is.na(corolla_diam_mm_SEG),
+    !is.na(est_fecundity),
+    !is.na(survival),
+    !is.na(est_fitness),
+    
+  )
+
+```
+
+
+```{r}
+# Merge the datasets by Donor
+merged_donor <- merge(
+  BO_mean_donor_traits_22 %>% select(Donor, survival_22 = survival, fecundity_22 = est_fecundity, fitness_22 = est_fitness),
+  BO_mean_donor_traits_23_G1 %>% select(Donor, survival_23_G1 = survival, fecundity_23_G1 = est_fecundity, fitness_23_G1 = est_fitness),
+  by = "Donor"
+)
+
+merged_donor <- merge(
+  merged_donor,
+  BO_mean_donor_traits_23_G2 %>% select(Donor, survival_23_G2 = survival, fecundity_23_G2 = est_fecundity, fitness_23_G2 = est_fitness),
+  by = "Donor"
+)
+
+```
+
+
+SURVIVAL
+```{r}
+# Compute correlation
+correlation <- cor(merged_donor$survival_22, merged_donor$survival_23_G1, use = "complete.obs")
+print(correlation) #slight positive correlation, fitness is pretty context specific
+#-0.2660751
+
+correlation <- cor(merged_donor$survival_22, merged_donor$survival_23_G2, use = "complete.obs")
+print(correlation)#slight negative correlation, fitness is pretty context specific
+#-0.2660751
+
+correlation <- cor(merged_donor$survival_23_G1, merged_donor$survival_23_G2, use = "complete.obs")
+print(correlation)#slight positive correlation, fitness is pretty context specific
+#0.2254221
+```
+
+FECUNDITY
+```{r}
+# Compute correlation
+correlation <- cor(merged_donor$fecundity_22, merged_donor$fecundity_23_G1, use = "complete.obs")
+print(correlation) #slight positive correlation, fitness is pretty context specific
+
+
+correlation <- cor(merged_donor$fecundity_22, merged_donor$fecundity_23_G2, use = "complete.obs")
+print(correlation)#slight negative correlation, fitness is pretty context specific
+
+
+correlation <- cor(merged_donor$fecundity_23_G1, merged_donor$fecundity_23_G2, use = "complete.obs")
+print(correlation)#slight positive correlation, fitness is pretty context specific
+```
+
+
+ESTIMATED FITNESS
+```{r}
+# Compute correlation
+correlation <- cor(merged_donor$fitness_22, merged_donor$fitness_23_G1, use = "complete.obs")
+print(correlation) #slight positive correlation, fitness is pretty context specific
+
+
+correlation <- cor(merged_donor$fitness_22, merged_donor$fitness_23_G2, use = "complete.obs")
+print(correlation)#slight negative correlation, fitness is pretty context specific
+
+
+correlation <- cor(merged_donor$fitness_23_G1, merged_donor$fitness_23_G2, use = "complete.obs")
+print(correlation)#slight positive correlation, fitness is pretty context specific
+```
+
+```{r}
+library(ggplot2)
+library(patchwork) # For arranging ggplots
+
+# Function to create scatterplots with correlation labels
+create_scatterplot <- function(x, y, x_label, y_label, data) {
+  corr_value <- cor(data[[x]], data[[y]], use = "complete.obs")
+  ggplot(data, aes_string(x = x, y = y)) +
+    geom_point(alpha = 0.7, color = "blue") +
+    geom_smooth(method = "lm", color = "red", se = FALSE) +
+    labs(
+      x = x_label,
+      y = y_label,
+      title = paste0("Correlation: ", round(corr_value, 2))
+    ) +
+    theme_minimal()
+}
+
+# Survival
+plot_survival_1 <- create_scatterplot("survival_22", "survival_23_G1", "Survival (2022)", "Survival (2023 G1)", merged_donor)
+plot_survival_2 <- create_scatterplot("survival_22", "survival_23_G2", "Survival (2022)", "Survival (2023 G2)", merged_donor)
+plot_survival_3 <- create_scatterplot("survival_23_G1", "survival_23_G2", "Survival (2023 G1)", "Survival (2023 G2)", merged_donor)
+
+# Fecundity
+plot_fecundity_1 <- create_scatterplot("fecundity_22", "fecundity_23_G1", "Fecundity (2022)", "Fecundity (2023 G1)", merged_donor)
+plot_fecundity_2 <- create_scatterplot("fecundity_22", "fecundity_23_G2", "Fecundity (2022)", "Fecundity (2023 G2)", merged_donor)
+plot_fecundity_3 <- create_scatterplot("fecundity_23_G1", "fecundity_23_G2", "Fecundity (2023 G1)", "Fecundity (2023 G2)", merged_donor)
+
+# Estimated Fitness
+plot_fitness_1 <- create_scatterplot("fitness_22", "fitness_23_G1", "Fitness (2022)", "Fitness (2023 G1)", merged_donor)
+plot_fitness_2 <- create_scatterplot("fitness_22", "fitness_23_G2", "Fitness (2022)", "Fitness (2023 G2)", merged_donor)
+plot_fitness_3 <- create_scatterplot("fitness_23_G1", "fitness_23_G2", "Fitness (2023 G1)", "Fitness (2023 G2)", merged_donor)
+
+# Combine plots into matrices
+survival_matrix <- (plot_survival_1 | plot_survival_2) / plot_survival_3
+fecundity_matrix <- (plot_fecundity_1 | plot_fecundity_2) / plot_fecundity_3
+fitness_matrix <- (plot_fitness_1 | plot_fitness_2) / plot_fitness_3
+
+# Display the matrices
+survival_matrix
+fecundity_matrix
+fitness_matrix
+
+# Save the plots
+ggsave("BO_survival_matrix.png", plot = survival_matrix, width = 10, height = 8, dpi = 300)
+ggsave("BO_fecundity_matrix.png", plot = fecundity_matrix, width = 10, height = 8, dpi = 300)
+ggsave("BO_fitness_matrix.png", plot = fitness_matrix, width = 10, height = 8, dpi = 300)
+
+```
+###HR###
+```{r}
+# Load the lme4 pHRkage
+library(lme4)
+library(dplyr)
+library(tidyverse)
+
+
+### Load and preprocess data
+## Data for fitness plants only
+# Read the CSV file and create 'sample_ID' column
+HR_fit <- read_csv(here::here("data_sheets", "compiled_sheets", "HR_22_23_fit.csv")) %>%
+  mutate(
+    # Construct sample_ID conditionally
+    sample_ID = case_when(
+      is.na(SegPos) ~ paste(Year, Recipient, Gen, str_pad(Transect, width = 3, pad = "0"), Plant_ID, sep = "-"),
+      TRUE ~ paste(Year, Recipient, Gen, str_pad(Transect, width = 3, pad = "0"), SegPos, Plant_ID, sep = "-")
+    ),
+    # Replace leading underscores in sample_ID with hyphens
+    sample_ID = str_replace(sample_ID, "^([^_]*)_", "\\1-")
+  )
+
+# Read in data from non-fitness plants- this is to get survival data from
+HR_22_23_full <- read_csv(here::here("data_sheets", "compiled_sheets", "HR_22_23_full.csv"))
+
+#create the variable "prop_surv_to_flower"
+HR_22_23_full <- HR_22_23_full %>%
+  group_by(Year, Gen, Transect, Sequence, Donor, Recipient, SegPos) %>%
+  mutate(prop_surv_to_flower = mean(surv_to_flower, na.rm = TRUE)) %>%
+  ungroup()  # Remove grouping
+
+#select for certain columns
+HR_prop_sample <- HR_22_23_full %>%
+  dplyr::select(c(Year, Gen, Transect, Sequence, Donor, Recipient, SegPos, prop_surv_to_flower))  %>%
+    distinct()
+
+#add "prop_surv_to_flower" based on the columns listed
+HR_fit <- HR_fit %>%
+  left_join(HR_prop_sample %>% dplyr::select(Year, Gen, Transect, Sequence, Donor, Recipient, SegPos, prop_surv_to_flower),
+            by = c("Year", "Gen", "Transect", "Sequence", "Donor", "Recipient", "SegPos"))
+
+# Create the new column for "est_fitness" and rename "prop_surv_to_flower" to "survival"
+HR_fit <- HR_fit %>%
+  mutate(est_fitness = prop_surv_to_flower * est_fecundity) %>%
+  mutate(est_fitness = replace_na(est_fitness, 0)) %>%
+  rename(survival = prop_surv_to_flower)
+
+#isolate HR 2022
+HR_fit_22 <- HR_fit %>%
+  filter(Year == "2022")
+
+#isolate HR 2023 G1
+HR_fit_23_G1 <- HR_fit %>%
+  filter(Year == "2023", Gen == "G1")
+
+#isolate HR 2023 G2
+HR_fit_23_G2 <- HR_fit %>%
+  filter(Year == "2023", Gen == "G2")
+
+#isolate all G1 together
+HR_fit_G1 <- HR_fit %>%
+  filter(Gen == "G1")
+
+#isolate by year
+HR_fit_23 <- HR_fit %>%
+  filter(Year == "2023")
+
+```
+
+
+
+Average based on paternal donor mean trait values
+```{r}
+##Obtain paternal genotypic values - this is what we are interested in
+# Aggregate data by donor
+HR_mean_donor_traits_22 <- HR_fit_22%>%
+  group_by(Donor) %>%             # Group by donor
+  summarise(
+    closed_fruits = mean(closed_fruits, na.rm = TRUE),
+    total_fruits = mean(total_fruits, na.rm = TRUE),
+    filled_seeds = mean(filled_seeds, na.rm = TRUE),
+    mean_seeds_per_fruit = mean(mean_seeds_per_fruit, na.rm = TRUE),
+    fl_duration = mean(fl_duration, na.rm = TRUE),
+    skel_dryweight_mg = mean(skel_dryweight_mg, na.rm = TRUE),
+    msm_all = mean(msm_all, na.rm = TRUE),
+    corolla_diam_mm_SEG = mean(corolla_diam_mm_SEG, na.rm = TRUE),
+    SLA_SEG = mean(SLA_SEG, na.rm = TRUE),
+    d13C_SEG = mean(d13C_SEG, na.rm = TRUE),
+    est_fecundity = mean(est_fecundity, na.rm = TRUE),
+    survival = mean(survival, na.rm = TRUE),
+    est_fitness = mean(est_fitness, na.rm = TRUE),
+        count = n() 
+  )
+
+HR_mean_donor_traits_23_G1 <- HR_fit_23_G1%>%
+  group_by(Donor) %>%             # Group by donor
+  summarise(
+    closed_fruits = mean(closed_fruits, na.rm = TRUE),
+    total_fruits = mean(total_fruits, na.rm = TRUE),
+    filled_seeds = mean(filled_seeds, na.rm = TRUE),
+    mean_seeds_per_fruit = mean(mean_seeds_per_fruit, na.rm = TRUE),
+    fl_duration = mean(fl_duration, na.rm = TRUE),
+    skel_dryweight_mg = mean(skel_dryweight_mg, na.rm = TRUE),
+    msm_all = mean(msm_all, na.rm = TRUE),
+    corolla_diam_mm_SEG = mean(corolla_diam_mm_SEG, na.rm = TRUE),
+    SLA_SEG = mean(SLA_SEG, na.rm = TRUE),
+    d13C_SEG = mean(d13C_SEG, na.rm = TRUE),
+    est_fecundity = mean(est_fecundity, na.rm = TRUE),
+    survival = mean(survival, na.rm = TRUE),
+    est_fitness = mean(est_fitness, na.rm = TRUE),
+        count = n() 
+  )
+
+HR_mean_donor_traits_23_G2 <- HR_fit_23_G2%>%
+  group_by(Donor) %>%             # Group by donor
+  summarise(
+    closed_fruits = mean(closed_fruits, na.rm = TRUE),
+    total_fruits = mean(total_fruits, na.rm = TRUE),
+    filled_seeds = mean(filled_seeds, na.rm = TRUE),
+    mean_seeds_per_fruit = mean(mean_seeds_per_fruit, na.rm = TRUE),
+    fl_duration = mean(fl_duration, na.rm = TRUE),
+    skel_dryweight_mg = mean(skel_dryweight_mg, na.rm = TRUE),
+    msm_all = mean(msm_all, na.rm = TRUE),
+    corolla_diam_mm_SEG = mean(corolla_diam_mm_SEG, na.rm = TRUE),
+    SLA_SEG = mean(SLA_SEG, na.rm = TRUE),
+    d13C_SEG = mean(d13C_SEG, na.rm = TRUE),
+    est_fecundity = mean(est_fecundity, na.rm = TRUE),
+    survival = mean(survival, na.rm = TRUE),
+    est_fitness = mean(est_fitness, na.rm = TRUE),
+        count = n() 
+  )
+```
+
+Remove NAs
+```{r}
+# Remove rows with NA values in specified columns
+HR_mean_donor_traits_22 <- HR_mean_donor_traits_22 %>%
+  filter(
+    !is.na(SLA_SEG),
+    !is.na(msm_all),
+    !is.na(fl_duration),
+    !is.na(d13C_SEG),
+    !is.na(corolla_diam_mm_SEG),
+    !is.na(est_fecundity),
+    !is.na(survival),
+    !is.na(est_fitness),
+    
+  )
+
+HR_mean_donor_traits_23_G1 <- HR_mean_donor_traits_23_G1 %>%
+  filter(
+    !is.na(SLA_SEG),
+    !is.na(msm_all),
+    !is.na(fl_duration),
+    !is.na(d13C_SEG),
+    !is.na(corolla_diam_mm_SEG),
+    !is.na(est_fecundity),
+    !is.na(survival),
+    !is.na(est_fitness),
+    
+  )
+
+HR_mean_donor_traits_23_G2 <- HR_mean_donor_traits_23_G2 %>%
+  filter(
+    !is.na(SLA_SEG),
+    !is.na(msm_all),
+    !is.na(fl_duration),
+    !is.na(d13C_SEG),
+    !is.na(corolla_diam_mm_SEG),
+    !is.na(est_fecundity),
+    !is.na(survival),
+    !is.na(est_fitness),
+    
+  )
+
+```
+
+
+```{r}
+# Merge the datasets by Donor
+merged_donor <- merge(
+  HR_mean_donor_traits_22 %>% select(Donor, survival_22 = survival, fecundity_22 = est_fecundity, fitness_22 = est_fitness),
+  HR_mean_donor_traits_23_G1 %>% select(Donor, survival_23_G1 = survival, fecundity_23_G1 = est_fecundity, fitness_23_G1 = est_fitness),
+  by = "Donor"
+)
+
+merged_donor <- merge(
+  merged_donor,
+  HR_mean_donor_traits_23_G2 %>% select(Donor, survival_23_G2 = survival, fecundity_23_G2 = est_fecundity, fitness_23_G2 = est_fitness),
+  by = "Donor"
+)
+
+```
+
+
+SURVIVAL
+```{r}
+# Compute correlation
+correlation <- cor(merged_donor$survival_22, merged_donor$survival_23_G1, use = "complete.obs")
+print(correlation) #slight positive correlation, fitness is pretty context specific
+#-0.2660751
+
+correlation <- cor(merged_donor$survival_22, merged_donor$survival_23_G2, use = "complete.obs")
+print(correlation)#slight negative correlation, fitness is pretty context specific
+#-0.2660751
+
+correlation <- cor(merged_donor$survival_23_G1, merged_donor$survival_23_G2, use = "complete.obs")
+print(correlation)#slight positive correlation, fitness is pretty context specific
+#0.2254221
+```
+
+FECUNDITY
+```{r}
+# Compute correlation
+correlation <- cor(merged_donor$fecundity_22, merged_donor$fecundity_23_G1, use = "complete.obs")
+print(correlation) #slight positive correlation, fitness is pretty context specific
+
+
+correlation <- cor(merged_donor$fecundity_22, merged_donor$fecundity_23_G2, use = "complete.obs")
+print(correlation)#slight negative correlation, fitness is pretty context specific
+
+
+correlation <- cor(merged_donor$fecundity_23_G1, merged_donor$fecundity_23_G2, use = "complete.obs")
+print(correlation)#slight positive correlation, fitness is pretty context specific
+```
+
+
+ESTIMATED FITNESS
+```{r}
+# Compute correlation
+correlation <- cor(merged_donor$fitness_22, merged_donor$fitness_23_G1, use = "complete.obs")
+print(correlation) #slight positive correlation, fitness is pretty context specific
+
+
+correlation <- cor(merged_donor$fitness_22, merged_donor$fitness_23_G2, use = "complete.obs")
+print(correlation)#slight negative correlation, fitness is pretty context specific
+
+
+correlation <- cor(merged_donor$fitness_23_G1, merged_donor$fitness_23_G2, use = "complete.obs")
+print(correlation)#slight positive correlation, fitness is pretty context specific
+```
+
+```{r}
+library(ggplot2)
+library(patchwork) # For arranging ggplots
+
+# Function to create scatterplots with correlation labels
+create_scatterplot <- function(x, y, x_label, y_label, data) {
+  corr_value <- cor(data[[x]], data[[y]], use = "complete.obs")
+  ggplot(data, aes_string(x = x, y = y)) +
+    geom_point(alpha = 0.7, color = "blue") +
+    geom_smooth(method = "lm", color = "red", se = FALSE) +
+    labs(
+      x = x_label,
+      y = y_label,
+      title = paste0("Correlation: ", round(corr_value, 2))
+    ) +
+    theme_minimal()
+}
+
+# Survival
+plot_survival_1 <- create_scatterplot("survival_22", "survival_23_G1", "Survival (2022)", "Survival (2023 G1)", merged_donor)
+plot_survival_2 <- create_scatterplot("survival_22", "survival_23_G2", "Survival (2022)", "Survival (2023 G2)", merged_donor)
+plot_survival_3 <- create_scatterplot("survival_23_G1", "survival_23_G2", "Survival (2023 G1)", "Survival (2023 G2)", merged_donor)
+
+# Fecundity
+plot_fecundity_1 <- create_scatterplot("fecundity_22", "fecundity_23_G1", "Fecundity (2022)", "Fecundity (2023 G1)", merged_donor)
+plot_fecundity_2 <- create_scatterplot("fecundity_22", "fecundity_23_G2", "Fecundity (2022)", "Fecundity (2023 G2)", merged_donor)
+plot_fecundity_3 <- create_scatterplot("fecundity_23_G1", "fecundity_23_G2", "Fecundity (2023 G1)", "Fecundity (2023 G2)", merged_donor)
+
+# Estimated Fitness
+plot_fitness_1 <- create_scatterplot("fitness_22", "fitness_23_G1", "Fitness (2022)", "Fitness (2023 G1)", merged_donor)
+plot_fitness_2 <- create_scatterplot("fitness_22", "fitness_23_G2", "Fitness (2022)", "Fitness (2023 G2)", merged_donor)
+plot_fitness_3 <- create_scatterplot("fitness_23_G1", "fitness_23_G2", "Fitness (2023 G1)", "Fitness (2023 G2)", merged_donor)
+
+# Combine plots into matrices
+survival_matrix <- (plot_survival_1 | plot_survival_2) / plot_survival_3
+fecundity_matrix <- (plot_fecundity_1 | plot_fecundity_2) / plot_fecundity_3
+fitness_matrix <- (plot_fitness_1 | plot_fitness_2) / plot_fitness_3
+
+# Display the matrices
+survival_matrix
+fecundity_matrix
+fitness_matrix
+
+# Save the plots
+ggsave("HR_survival_matrix.png", plot = survival_matrix, width = 10, height = 8, dpi = 300)
+ggsave("HR_fecundity_matrix.png", plot = fecundity_matrix, width = 10, height = 8, dpi = 300)
+ggsave("HR_fitness_matrix.png", plot = fitness_matrix, width = 10, height = 8, dpi = 300)
+
+```
+
+```{r}
+df<- read_csv(here::here("data_sheets", "compiled_sheets", "fitness_correlations.csv")) 
+
+# Load required libraries
+library(ggplot2)
+library(dplyr)
+library(readr)
+library(tidyr)
+
+
+# Rename columns for clarity (Check actual column names first!)
+colnames(df) <- c("Base_Year", "Population", "Comparison_Year_Fitness", "Fitness_Metric", "Correlation")
+
+# Remove any rows with missing values
+df <- df %>% drop_na()
+
+# Create a new column combining Population and Base Year for y-axis labels
+df$Pop_Year <- paste(df$Population, df$Base_Year, sep = "-")
+
+# Create a new column for x-axis: combining Comparison Year and Fitness Metric
+df$Comparison_Label <- paste(df$Comparison_Year_Fitness, df$Fitness_Metric, sep = "-")
+
+# Create the heatmap
+fitness_matrix_all <- ggplot(df, aes(x = Comparison_Label, y = Pop_Year, fill = Correlation)) +
+  geom_tile(color = "white") +  # Add borders around tiles
+  geom_text(aes(label = round(Correlation, 2)), color = "black", size = 4) +  # Show correlation values
+  scale_fill_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0, 
+                       limits = c(-0.6, 0.6), name = "Correlation (R²)") +  # Set color scale
+  labs(title = "Fitness Metric Correlations Across Years and Generations",
+       x = "Comparison Year and Fitness Metric",
+       y = "Population and Base Year") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),  # Rotate x-axis labels
+        axis.text.y = element_text(size = 10))  # Adjust y-axis label size
+
+ggsave("fitness_matrix_all.png", plot = fitness_matrix_all, width = 10, height = 8, dpi = 300)
+
+```
+

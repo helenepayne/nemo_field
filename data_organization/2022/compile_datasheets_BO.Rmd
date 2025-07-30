@@ -1,0 +1,868 @@
+---
+title: "compile_datasheets_BO"
+author: "Devin Gamble"
+date: "2022-08-01"
+output:
+  pdf_document:
+    latex_engine: xelatex
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r message = FALSE, warning = FALSE}
+#Load Packages
+library(tidyverse)
+library(janitor)
+library(here)
+library(lubridate)
+library(reshape2)
+library(stringr)
+
+```
+
+
+
+## Load and Clean Data   
+
+NOTE: All date data should be standardized prior to importing into R. In Excel, set format to YYYY-MM-DD for consistency. 
+
+NOTE 2: All paths are relative using the 'here' package.   
+
+
+**Germination Data**  
+- Add 'Date Sown' column and data in as well.
+
+```{r message = FALSE}
+#Load csv
+
+#Skip first nonsense row (the second row is the header)
+BO_germ_df1 <- read_csv(here::here("data_sheets", "germination_checks_2021-2022", "BO_germ_data.csv"), skip = 1) %>%
+  rename(Block = 'Block (1-3)', Transect = 'Transect (1-12)', Sequence = 'Sequence (1-396)', Donor = "Pollen Donor ID", Recipient = "Maternal Sibship", Stage = 'mm/dd') %>% 
+  filter(!Stage == "Flow Date") %>%   #Remove empty flowering date rows
+  select(-c(`9`:`Notes 12/28-29`)) %>% 
+  mutate(`4` = as_date(`4`),
+         `5` = as_date(`5`)) #set as date to allow for pivot_longer 
+#ignore parse fail warning - one entry 'P' coerced to NA
+  
+  
+#Reshape data sheet to 'long' format
+BO_germ_df2 <- BO_germ_df1 %>% 
+  pivot_longer(cols = c('1':'8'),
+               names_to = 'Plant_ID',
+               values_to = 'Germ_Date') 
+
+
+##Fix typos in date values
+##Excel auto-populated year as 2022 when in fact the year should be 2021
+unique(BO_germ_df2$Germ_Date)
+
+BO_germ_df3 <- BO_germ_df2 %>% 
+  mutate(
+    Germ_Date = case_when(
+    Germ_Date == "2022-12-06" ~ "2021-12-06",
+    Germ_Date == "2022-12-15" ~ "2021-12-15",
+    Germ_Date == "2022-12-21" ~ "2021-12-21",
+    Germ_Date == "2022-12-28" ~ "2021-12-28",
+    Germ_Date == "2022-12-29" ~ "2021-12-29"))
+
+#check again
+unique(BO_germ_df3$Germ_Date)
+#Use sum(is.na(BO_germ_df2$Germ_Date)) to compare change in number of NA values
+
+#
+#Adjust Donor and Recipient names for easy sorting - three digits (leading zeros)
+#Specify Germ_Date as 'date' class variable
+BO_germ_df4 <- BO_germ_df3 %>% 
+  mutate(Recipient_num = sprintf("%03d", (parse_number(Recipient)))) %>% 
+  mutate(Recipient = as.character(str_c("BO_", Recipient_num))) %>% 
+  mutate(Donor_num = sprintf("%03d", (parse_number(Donor)))) %>% 
+  mutate(Donor = as.character(str_c("BO_", Donor_num))) %>%
+  mutate(Germ_Date = as_date(Germ_Date)) %>% #set variable to class = date
+  select(Block, Transect, Sequence, Donor, Donor_num, Recipient, Recipient_num, Plant_ID, everything()) %>% 
+  select(-c(Stage, Donor_num, Recipient_num))
+
+#
+##Add in Sow Date  
+BO_germ_df5 <- BO_germ_df4 %>% 
+  mutate(Sow_Date = as_date("2021-11-11")) %>% #lab sowing date 11/11 - 11/12
+  mutate(Plant_Date = as_date("2021-11-17")) %>% #field planting date
+  arrange(Block, Transect, Sequence, Donor, Recipient, Plant_ID) #Arrange by Transect, Recipient, Plant_ID
+#Plugs planted in ground from November 17-18 ,2021
+
+
+```
+
+
+Add in watered transect germination data
+```{r message = FALSE}
+
+## Add in watered transects
+
+BO_germ_W1 <- read_csv(here::here("data_sheets", "germination_checks_2021-2022", "watered_BO_germ.csv"), skip = 1) %>%
+  rename(Sequence = 'Seq (1-42)', Donor = "Donor_ID", Recipient = "Recipient_ID", Stage = 'Date (mm/dd)') %>% 
+  filter(!Stage == "Flow") %>%  #Remove empty flowering date rows
+  select(-c(Co., `Notes - 12/6`:`Notes 12/28-29`))
+
+#
+#Reshape data sheet to 'long' format
+BO_germ_W2 <- BO_germ_W1 %>% 
+  pivot_longer(cols = c('1':'8'),
+               names_to = 'Plant_ID',
+               values_to = 'Germ_Date') %>% 
+  mutate(Sequence = (Sequence + 396)) #Sequence continues following main transects
+
+
+##Fix typos in date values
+unique(BO_germ_W2$Germ_Date)
+
+BO_germ_W3 <- BO_germ_W2 %>% 
+  mutate(Germ_Date = case_when(
+    Germ_Date == "2022-12-06" ~ "2021-12-06",
+    Germ_Date == "2022-12-15" ~ "2021-12-15",
+    Germ_Date == "2022-12-21" ~ "2021-12-21",
+    Germ_Date == "2022-12-30" ~ "2021-12-30",
+    ))
+
+
+#Adjust Donor and Recipient names for easy sorting - three digits (leading zeros)
+#Specify Germ_Date as 'date' class variable
+BO_germ_W4 <- BO_germ_W3 %>% 
+  mutate(Recipient_num = sprintf("%03d", (parse_number(Recipient)))) %>% 
+  mutate(Recipient = as.character(str_c("BO_", Recipient_num))) %>% 
+  mutate(Donor_num = sprintf("%03d", (parse_number(Donor)))) %>% 
+  mutate(Donor = as.character(str_c("BO_", Donor_num))) %>%
+  mutate(Germ_Date = as_date(Germ_Date)) %>% #set variable to class = date
+  mutate(Plant_ID = as.numeric(Plant_ID)) %>% #set Plant ID to numeric for sorting purposes
+  select(-c(Stage, Donor_num, Recipient_num))
+
+#
+##Add in Sow Date & add block ('W')
+BO_germ_W5 <- BO_germ_W4 %>% 
+  mutate(Sow_Date = as_date("2021-11-11")) %>% #lab sowing date 11/11 - 11/12
+  mutate(Plant_Date = as_date("2021-11-17")) %>% #field planting date
+  mutate(Block = "W") %>% 
+  select(Block, Transect, Donor, Recipient, Plant_ID, everything()) %>% 
+  arrange(Transect, Recipient, Plant_ID) #Arrange by Transect, Recipient, Plant_ID
+
+#
+## Combine watered and main experiment germination data
+BO_germ_full <- rbind(BO_germ_df5, BO_germ_W5) %>% 
+    mutate(Plant_ID = as.numeric(Plant_ID))
+
+#write_csv(BO_germ_full, here::here("data_sheets", "compiled_sheets", "BO_germination_full_2021-2022.csv"))
+
+```
+
+
+
+**Flower Check sheets**  
+-- Organize flowering data
+
+*Important Step!!*  
+In the csv file, select all data with dates (visit dates, leaf sampling, and flower photos). Right click --> format cells. Select the date category --> YYYY-MM-DD. Save the csv and close it. This will standardize all dates to the same format and make working with them in R much easier!  
+
+```{r}
+
+BOflr_df <- read_csv(file = here::here( "data_sheets", "season_end_flowerchecks_2022",  "BO_flowercheck_2022_05_15.csv"), na = c("", "NA", "G", "G?")) %>% 
+  mutate(across(c(5:19, 23:37), as_date)) #specify date columns
+##Ignore 'F' plants - more up-to-date fitness plant data is matched in below 
+#parse failures due to character strings (7 obs total) entered in date columns - coerced to NA
+  
+#split groups
+f1_BOlong <- BOflr_df[c(1:19)] # Group 1: plants 1-4
+f2_BOlong <- BOflr_df[c(1, 20:37)] # Group 2: plants 5-8
+
+#Revise names
+colnames(f1_BOlong) <- c("Transect", "Recipient", "Plant_ID", "F.", "Fl_3.11", "Fl_3.17", "Fl_3.25", "Fl_4.1", "Fl_4.8", "Fl_4.13", "Fl_4.21", "Fl_4.28", "Fl_5.5", "Fl_5.12", "Fl_5.20", "Fl_5.25", "RMV", "LEAF", "flr_P")
+colnames(f2_BOlong) <- c("Transect", "Recipient", "Plant_ID", "F.",  "Fl_3.11", "Fl_3.17", "Fl_3.25", "Fl_4.1", "Fl_4.8", "Fl_4.13", "Fl_4.21", "Fl_4.28", "Fl_5.5", "Fl_5.12", "Fl_5.20", "Fl_5.25", "RMV", "LEAF", "flr_P")
+
+#rbind, tidy up and remove unnecessary columns
+f_BOlong <- rbind(f1_BOlong, f2_BOlong) %>% arrange(Transect, Recipient, Plant_ID) %>% select(-c(F., RMV)) 
+
+
+#Format recipient IDs for easier sorting - three digits (includes leading zeros)
+f_BOlong_2 <- f_BOlong %>% 
+  mutate(Recipient_num = sprintf("%03d", (parse_number(Recipient)))) %>% 
+  mutate(Recipient = as.character(str_c("BO_", Recipient_num))) %>% 
+  select(Transect, Recipient, Recipient_num, Plant_ID, everything()) %>% 
+  select(-Recipient_num)
+
+
+#### Fix Dates
+#Individually check each column (e.g., Fl_3.3) for the correct date format (unique(df$col)). Include LEAF and flr_p. Multiple dates are okay.
+
+f_BOlong_3 <- f_BOlong_2 %>% 
+  mutate(Fl_4.21 = case_when(Fl_4.13 == "2022-04-21" ~ "2022-04-21",
+                             Fl_4.21 == "2022-04-21" ~ "2022-04-21",
+                             Fl_4.21 == "2022-04-20" ~ "2022-04-20",
+                             TRUE ~ as.character(NA))) %>% 
+  mutate(Fl_4.13 = case_when(Fl_4.13 == "2022-04-13" ~ "2022-04-13",
+                             TRUE ~ as.character(NA))) %>% 
+  mutate(Fl_5.25 = case_when(Fl_5.25 == "2022-05-25" ~ "2022-05-25",
+                             Fl_5.25 == "2022-05-26" ~ "2022-05-26",
+                             TRUE ~ as.character(NA)))
+
+```
+
+
+Combine Germination and Flowering data frames
+```{r}
+#Merge by Recipient, Transect, and Plant ID
+BO_GermFlow_1 <- left_join(BO_germ_full, f_BOlong_3, by = c("Transect", "Recipient", "Plant_ID")) #
+
+```
+
+
+<br>  
+
+
+#### Fitness Plant data  
+- Indicate which plants were fitness plants, including those replicated in the watering experiment 
+
+```{r message = FALSE}
+BO_Fplants <- read_csv(here::here("data_sheets", "fitness_plants_7-21-2022", "BO_F_plants.csv"), col_types = cols(`ALL Fitness Plants` = col_character())) %>% #retain commas for column with multiple fitness plants
+  rename(F_plant = `SINGLE Fitness Plant`, F_multi = `ALL Fitness Plants`, F_plant_notes = NOTES) %>% 
+  select(Transect:F_plant_notes)
+
+#Adjust Recipient names to match three-digit format
+BO_Fplants2 <- BO_Fplants %>% 
+  mutate(Recipient_num = sprintf("%03d", (parse_number(Recipient)))) %>% 
+  mutate(Recipient = as.character(str_c("BO_", Recipient_num))) %>% 
+  select(-Recipient_num) %>% 
+  rename(Replicated = `Replicated?`) %>% 
+  mutate(Replicated = case_when(Replicated == "R" ~ "R",
+                                is.na(Replicated) ~ "n")) #change NAs to 'n' (no) for non-rep'd Recipient IDs
+
+```
+
+
+Index fitness plants & Replicated (y/n) in germination and flowering data
+```{r message = FALSE}
+# Merge the two dataframes 
+# Create new row (Plant ID) specific variables for main and replicated fitness plants
+BO_GermFlow_2 <- merge(BO_GermFlow_1, BO_Fplants2) %>% 
+  mutate(FitP = case_when(F_plant == Plant_ID ~ TRUE,
+                           F_plant != Plant_ID ~ FALSE)) %>% 
+  mutate(Rep_FitP = case_when(Replicated == "R" & Plant_ID == as.numeric(str_match(F_multi, as.character(Plant_ID))) ~ TRUE,   
+                              TRUE ~ FALSE)) %>%  #if else, set value to FALSE
+  mutate(any_FitP = case_when(FitP == TRUE | Rep_FitP == TRUE ~ TRUE, #plant is any form of fitness plant
+                              TRUE ~ FALSE))
+
+#Tidy up
+BO_GermFlow_3 <- BO_GermFlow_2 %>% 
+  select(Block, Transect, Sequence, Donor, Recipient, Replicated, Plant_ID, FitP, Rep_FitP, any_FitP, F_plant, F_multi, everything()) %>%
+  arrange(Block, Transect, Sequence, Recipient, Plant_ID)
+## Fit_P has NA values for when a fitness plant was never chosen
+
+```
+
+
+**Fruit and Seed counts**  
+Due to the structure of excel data sheets, it seems easiest to upload fruit and seed count data separately since different spreadsheets were used to record each. Info on plants' Block, Transect, sequence, etc. will be pulled from the fruit count sheets. As typos were discovered in fruit and seed counts, corrections were made in batches.
+
+Data on fitness plants will be more accurate in the fruit-count data sheet.
+
+Date added: **Feb 06, 2023**  
+
+*NOTE*: 
+```{r message = FALSE}
+# Fruit count data
+# Data on *when* fruits were collected will be omitted here; only the total fruit counts (closed, open, non-fitness) are retained from the csv
+
+BO_fruitprod_1 <- read_csv(here::here("data_sheets", "fruit_seed_counts_final", "BO-fruit-production_2023-02-15.csv"), skip = 1) %>% 
+  select(1:10) #%>% #omit sow and flower date, seed count, and date-specific fruit counts by column index
+
+BO_fruitprod_2 <- BO_fruitprod_1 %>% 
+  select(-c(Recipient, Sequence)) %>% # Sequence in this data set is incorrect
+  rename(Recipient = `Recipient for sorting`, Plant_ID = `Plant number of fitness plant (when chosen)`, closed_fruits_F = `total_closed_fruits`, open_fruits_F = `total_open_fruits`, damaged_fruits_F = `eaten_damaged_fruits`, total_fruits_F = `total_fruits (open and closed)`, nonfitness_fruits = `nonfitness_fruits`) 
+
+#Note: total fruits do not include eaten/damaged fruit
+
+
+# Seed count data (viable seeds)
+# only seed count data are retained from this spreadsheet to minimize errors
+BO_seedct_1 <- read_csv(here::here("data_sheets", "fruit_seed_counts_final", "BO-seed-count_2023-02-15.csv"), skip = 1) %>% 
+  select(-c(1, 3, 7:33)) %>% 
+  rename(Recipient = `Recipient for sorting`, Plant_ID = `Plant number of fitness plant (when chosen)`, seed_ct = `viable_seeds`) %>% 
+  mutate(Plant_ID = as.numeric(Plant_ID)) #three 'NF' entries coerced to NA - ignore parse warning
+  
+
+#merge data
+BO_fruitseed_ct1 <- left_join(BO_fruitprod_2, BO_seedct_1, by = c("Transect", "Recipient", "Plant_ID"))
+#Sequence data in fruit count sheets is unreliable for these data sheets
+#Rows without matches in fruit_prod data sheet are not included
+
+
+# summary variables, tidying up
+BO_fruitseed_ct2 <- BO_fruitseed_ct1 %>% 
+  select(Transect, Recipient, Plant_ID, closed_fruits_F, open_fruits_F, damaged_fruits_F, total_fruits_F, nonfitness_fruits, everything()) %>% 
+  arrange(Transect, Recipient)
+
+```
+
+
+
+**Seed Weights**  
+
+```{r}
+# Read in only # seeds weighed and total weight
+# Calculate mean weight per seed
+BO_seedmass_1 <- read_csv(here::here("data_sheets", "seed_mass", "BO_Seed_Mass_2023-02-05.csv"), skip = 1) %>%   select(-Donor) %>% slice(1:339)
+  
+colnames(BO_seedmass_1) <- c("Transect", "Sequence", "Block", "Recipient", "Plant_ID", "closed_fruits_d1", "viable_seeds_d1", "seeds_weighed_d1", "seed_mass_mg_d1", "closed_fruits_d2", "viable_seeds_d2", "seeds_weighed_d2", "seed_mass_mg_d2", "closed_fruits_d3", "viable_seeds_d3", "seeds_weighed_d3", "seed_mass_mg_d3", "closed_fruits_d4", "viable_seeds_d4", "seeds_weighed_d4", "seed_mass_mg_d4", "closed_fruits_d5", "viable_seeds_d5", "seeds_weighed_d5", "seed_mass_mg_d5", "closed_fruits_d6", "viable_seeds_d6", "seeds_weighed_d6", "seed_mass_mg_d6", 
+                             "closed_fruits_d7", "viable_seeds_d7", "seeds_weighed_d7", "seed_mass_mg_d7",
+                             "closed_fruits_d8", "viable_seeds_d8", "seeds_weighed_d8", "seed_mass_mg_d8", 
+                             "closed_fruits_d9", "viable_seeds_d9", "seeds_weighed_d9", "seed_mass_mg_d9")
+
+
+BO_seedmass_2 <- BO_seedmass_1 %>% 
+  select(-c(42:48)) %>% 
+  select(-starts_with(c("closed_fruits_", "viable_seeds_"))) %>% 
+  mutate(msm_d1 = seed_mass_mg_d1/seeds_weighed_d1,
+         msm_d2 = seed_mass_mg_d2/seeds_weighed_d2,
+         msm_d3 = seed_mass_mg_d3/seeds_weighed_d3,
+         msm_d4 = seed_mass_mg_d4/seeds_weighed_d4,
+         msm_d5 = seed_mass_mg_d5/seeds_weighed_d5,
+         msm_d6 = seed_mass_mg_d6/seeds_weighed_d6,
+         msm_d7 = seed_mass_mg_d7/seeds_weighed_d7,
+         msm_d8 = seed_mass_mg_d8/seeds_weighed_d8,
+         msm_d9 = seed_mass_mg_d9/seeds_weighed_d9)
+         
+
+BO_seedmass_3 <- BO_seedmass_2 %>%
+  mutate(msm_all = rowMeans(select(BO_seedmass_2, starts_with("msm_")), na.rm = TRUE)) %>% 
+  rowwise() %>% 
+  mutate(sd_msm_all = sd(c_across(c(msm_d1:msm_d9)), na.rm = TRUE)) %>% 
+  select(-c(Block, Sequence))
+         
+  
+##Merge with fruit/seed count data frame
+BO_fruitseed_ct3 <- merge(BO_fruitseed_ct2, BO_seedmass_3, by = c("Transect", "Recipient", "Plant_ID"), all.x = TRUE)
+#all.x means that any fitness plant x ID combos that don't match up won't be included.
+
+```
+
+
+Merge everything together:  
+```{r}
+BO_merged_df1 <- merge(BO_GermFlow_3, BO_fruitseed_ct3, by = c("Transect", "Recipient", "Plant_ID"), all.x = TRUE) %>% 
+  select(Block, Transect, Sequence, Donor, Recipient, Replicated, Plant_ID, FitP, Rep_FitP, any_FitP, everything()) %>%
+  arrange(Block, Transect, Sequence, Recipient, Plant_ID) %>% 
+  mutate(closed_fruits_F = as.numeric(closed_fruits_F),
+         total_fruits_F = as.numeric(total_fruits_F)) #correct counts to numeric values
+
+
+#Correct FruitNAs to 0s in cases where no fruit data was entered (fitness and non-fitness plants):
+BO_merged_df2 <- BO_merged_df1 %>% 
+  mutate(closed_fruits_F = replace_na(closed_fruits_F, 0),
+         total_fruits_F = replace_na(total_fruits_F, 0),
+         seed_ct = replace_na(seed_ct, 0))
+
+#Calculate mean seeds per fruit, total_est_seed prod
+#variables renamed later
+BO_merged_df3 <- BO_merged_df2 %>% 
+  mutate(mean_seeds_per_fruit = seed_ct/closed_fruits_F,
+         total_est_seed_production = mean_seeds_per_fruit*total_fruits_F) #%>% 
+
+#mean seeds per fruit and total est fruit production have NAs/NaNs for when there were no closed fruits/seeds (fitness plants only)
+
+
+#Correct formatting issues
+BO_merged_df4 <- BO_merged_df3 %>% 
+  mutate(Fl_4.13 = as_date(Fl_4.13),
+         Fl_4.21 = as_date(Fl_4.21),
+         Fl_5.25 = as_date(Fl_5.25))
+
+```
+
+
+**Skeleton Weights & Corolla area and diameter**  
+Load and merge-in these data sheets
+
+Skeletons:
+```{r}
+##
+skel_weights_BO <- read_csv(here::here("data_sheets", "skeleton_and_stem_data", "skeleton_weights_BO_2023_03_01.csv")) %>% select(-Units, -7) %>% 
+  filter(!grepl("EXCLUDE.", Notes)) %>% ## Filter out notes with "Exclude"
+  rename(AG_biomass_mg = `Skeleton Weights`)
+
+#Watered points
+skel_weights_BO_W <- read_csv(here::here("data_sheets", "skeleton_and_stem_data", "skeletons_watered_BO_2023_02_08.csv")) %>% 
+  select(-`Units`) %>% 
+  rename(Plant_ID = `Plant ID`, AG_biomass_mg = `Skeleton Weights`)
+#3 observations :(
+
+#Combine
+skel_weights_all <- rbind(skel_weights_BO, skel_weights_BO_W) %>% 
+  select(-Notes) %>% 
+  filter(!is.na(AG_biomass_mg))
+
+#Weed out duplicates
+which(duplicated(select(skel_weights_all, c(Transect, Recipient, Plant_ID))))
+
+skel_BO_duped <- skel_weights_all %>% 
+  mutate(duped1 = duplicated(select(skel_weights_all, c(Transect, Recipient, Plant_ID))),
+         duped2 = duplicated(select(skel_weights_all, c(Transect, Recipient, Plant_ID)), fromLast = TRUE),
+         duped = case_when(duped1|duped2 == TRUE ~ TRUE,
+                           TRUE ~ FALSE)) %>% #highlight all duplicates
+  select(-c(duped1, duped2)) %>% 
+  filter(duped == TRUE)#All dupes appear as true duplicates (exact row copes): N = 10
+
+#Remove duplicates - 210 skel weights total
+skel_weights_all2 <- distinct(skel_weights_all)
+
+
+#Merge with full data set
+BO_merged_df5 <- merge(BO_merged_df4, skel_weights_all2, by = c("Transect", "Recipient", "Plant_ID"), all.x = TRUE)
+#obs == 3504
+
+BO_skel_check <- BO_merged_df5 %>% 
+  filter(!is.na(AG_biomass_mg))
+#210 vs 209, one skel missing, This skeleton came from a plant that never flowered or fruited, so would not be included in the data anyways.
+
+#how to check what maternal ID didn't match up
+BO_skel_check_2 <- anti_join(skel_weights_all2, BO_skel_check, by = c("Transect", "Recipient", "AG_biomass_mg")) %>% 
+  select(AG_biomass_mg, Transect, Recipient)
+```
+
+
+Corolla Area & Diameter:
+```{r}
+
+corollas_BO <- read_csv(here::here("data_sheets", "corolla_measures", "corollameasures_BO_2023-02-28.csv")) %>% select(1, 3, 4, 6, 8, 9, 10) %>% #ignore parse warnings - columns 7 & 14 not retained
+  rename(Plant_ID = 3, photo_date = 4, corolla_diam_mm = 6, corolla_area_mm2 = 5, notes_corolla = 7) %>% 
+  filter(!grepl("REMOVE", notes_corolla)) ## Filter out notes with "REMOVE"
+
+corollas_BO2 <- corollas_BO %>% 
+  filter(!is.na(corolla_diam_mm)) %>% 
+  mutate(photo_date = as_date(photo_date)) %>% #correct missing dates manually
+  mutate(Recipient_num = sprintf("%03d", (parse_number(Recipient)))) %>% #Fix Recipient names
+  mutate(Recipient = as.character(str_c("BO_", Recipient_num))) %>% 
+  select(-Recipient_num) %>% 
+  arrange(Transect, Recipient, Plant_ID, photo_date) %>% 
+  distinct(Transect, Recipient, Plant_ID, .keep_all = TRUE) #Keep only the earliest photo date data for duplicates
+
+
+## Merge with main data 
+BO_merged_df6 <- merge(BO_merged_df5, corollas_BO2, by = c("Transect", "Recipient", "Plant_ID"), all.x = TRUE)
+
+#double-check they were all merged
+BO_corolla_check <- BO_merged_df6 %>% 
+  filter(!is.na(corolla_diam_mm)) #507 obs
+
+```
+
+
+
+**Leaf Area & Weight**  
+
+```{r}
+leaves_BO <- read_csv(here::here("data_sheets", "leaf_data", "BO_SLA_data_20230522.csv")) %>% 
+  rename(leaf_area_mm2 = 5, leafarea_notes = 6, leaf_dryweight_mg = 7, leafweight_notes = 8) %>% 
+  filter(!grepl("EXCLUDE", leafarea_notes)) %>% ## Filter out notes with "EXCLUDE"
+  filter(!is.na(leaf_area_mm2)) #exlcude NA leaf areas
+
+#Eliminate Duplicates
+#Randomly select one leaf to be analyzed per transect x maternal ID combo
+leaves_BO_duped <- leaves_BO %>% 
+  mutate(duped1 = duplicated(select(leaves_BO, c(Block, Transect, Recipient))),
+         duped2 = duplicated(select(leaves_BO, c(Block, Transect, Recipient)), fromLast = TRUE),
+         duped = case_when(duped1|duped2 == TRUE ~ TRUE,
+                           TRUE ~ FALSE)) %>% #highlight all duplicates
+  select(-c(duped1, duped2))
+# Select dupe rows that have both area and weight!
+
+#This seems to work the best!
+leaves_BO_unique <- leaves_BO_duped %>% 
+  group_by(Block, Transect, Recipient) %>% 
+  slice_sample(n = 1) %>%  #select a random row for each  combo of block, transect, recipient
+  select(-c(duped, Plant_ID)) %>% #Don't need plant ID...these were all non-fitness plants
+  mutate(SLA_SEG = leaf_area_mm2 / leaf_dryweight_mg,
+         LMA_SEG = 1 / SLA_SEG) %>% 
+  rename(leaf_area_mm2_SEG = leaf_area_mm2,
+         leaf_dryweight_mg_SEG = leaf_dryweight_mg)
+
+
+#Merge in to main data 
+BO_merged_df7 <- merge(BO_merged_df6, leaves_BO_unique, by = c("Block", "Transect", "Recipient"), all.x = TRUE) #replicates leaf area & weight for every plant of a transect recipient combo
+
+
+#
+##Include plant-level leaf measurements as well:
+leaves_BO_ind <- leaves_BO %>% 
+  #filter(!is.na(Plant_ID)) %>% #remove obs missing ID (2)
+  select(Block, Transect, Recipient, Plant_ID, leaf_area_mm2, leaf_dryweight_mg) %>% #ignore notes
+  mutate(SLA = leaf_area_mm2 / leaf_dryweight_mg,
+         LMA = 1 / SLA) %>% 
+  distinct(Block, Transect, Recipient, Plant_ID, .keep_all = TRUE) #get rid of dupe from W2 BO_195
+
+
+#Merge - sheet 7b
+BO_merged_df7b <- merge(BO_merged_df7, leaves_BO_ind, by = c("Block", "Transect", "Recipient", "Plant_ID"), all.x = TRUE) #measures of individual plants. Total # obs unchanged
+
+# make sure all measurements merged in
+BO_NFleaves <- BO_merged_df7b %>% 
+  filter(!is.na(leaf_dryweight_mg)) 
+
+#Find mislabeled entry
+#which(duplicated(select(BO_NFleaves, c(Block, Transect, Recipient, Plant_ID)))) #Duplicate of W2 BO_295 plant 8 - fixed above
+
+# make sure all measurements merged in
+BO_NFleaves <- BO_merged_df7b %>% 
+  filter(!is.na(leaf_dryweight_mg)) #499 observations, fewer than 501 obs as 2 entries were mislabeled and cannot be determined- they were not included in merged df
+ 
+#use antijoin to determine which plants they are 
+BO_leaves_check <- anti_join(leaves_BO_ind, BO_NFleaves, by = c("Block", "Transect", "Recipient", "leaf_dryweight_mg")) %>% 
+  select(leaf_dryweight_mg, Block, Transect, Recipient)
+```
+
+Error checks:
+
+```{r eval = FALSE}
+##Check for mismatched (fitness) plants
+
+BO_Echeck1 <- BO_merged_df7b %>% 
+  filter(any_FitP == FALSE & total_fruits_F != 0) #do the same for seed count, using `>` and `!=`
+
+BO_Echeck2 <- BO_merged_df7b %>% 
+  filter(any_FitP == TRUE) %>% 
+  filter(closed_fruits_F == 0 & seed_ct > 0)
+
+##NA/NaN/Info values for mean seeds/est seed prod
+BO_Echeck3 <- BO_merged_df7b %>% 
+  filter(any_FitP == TRUE & is.na(as.numeric(mean_seeds_per_fruit)))
+#262 observations but all are supposed to be NAs bc no closed fruits
+
+BO_Echeck4 <- BO_merged_df7b %>% 
+  filter(any_FitP == TRUE & !is.finite(mean_seeds_per_fruit))
+
+## Check for NA seed counts for fitness plants (when fruit production > 0)
+BO_Echeck5 <- BO_merged_df7b %>% 
+  filter(any_FitP == TRUE & is.na(seed_ct))
+
+
+#Seed mass
+BO_Echeck5 <- BO_merged_df7b %>% 
+  filter(any_FitP == FALSE & !is.na(msm_all))
+
+
+```
+
+<br>  
+
+
+## Trait calculations 
+
+#### Phenology  
+
+```{r}
+BO_merged_df_fl <- BO_merged_df7b %>% 
+  mutate(FFD = do.call(pmin, c(select(., starts_with('Fl_')), na.rm = TRUE)), #First flowering date
+         days_germ2flower = as.numeric(FFD - Germ_Date), #days from germination to flowering
+         days_sow2flower = as.numeric(FFD - Sow_Date), #days from lab sowing to flowering
+         days_plant2flower = as.numeric(FFD - Plant_Date), #days from field planting to flowering
+         LFD = do.call(pmax, c(select(., starts_with('Fl_')), na.rm = TRUE)), #last flowering date
+         fl_duration = as.numeric(LFD - FFD)) #Flowering duration
+```
+
+**Revise Calculations of Fitness Data to match Year 2**
+
+```{r}
+#Updating Fruit count columns
+#All Fitness plants (any kind) should have non-NA values for fruit and seed counts
+
+BO_merged_df_flB <- BO_merged_df_fl %>% 
+  mutate(closed_fruits_F = case_when(any_FitP == TRUE & is.na(closed_fruits_F) ~ 0,
+                                     any_FitP == TRUE & !is.na(closed_fruits_F) ~ closed_fruits_F,
+                                     TRUE ~ closed_fruits_F),
+         open_fruits_F = case_when(any_FitP == TRUE & is.na(open_fruits_F) ~ 0,
+                                   any_FitP == TRUE & !is.na(open_fruits_F) ~ open_fruits_F,
+                                   TRUE ~ open_fruits_F),
+         total_fruits_F = case_when(any_FitP == TRUE & is.na(total_fruits_F) ~ 0,
+                                   any_FitP == TRUE & !is.na(total_fruits_F) ~ total_fruits_F,
+                                   TRUE ~ total_fruits_F))
+
+#Survival measures
+BO_merged_df_flC <- BO_merged_df_flB %>% 
+  mutate(surv_to_germ = case_when(!is.na(Germ_Date) ~ 1, #plants that germinated
+                                  is.na(Germ_Date) ~ 0),
+         surv_to_flower = case_when(!is.na(FFD) ~ 1, #plants that survived to flower
+                                  is.na(FFD) ~ 0),
+         surv_to_fruitprod = case_when(any_FitP == TRUE & total_fruits_F > 0 ~ 1, #plants that survived to produce fruit
+                                       any_FitP == TRUE & total_fruits_F == 0 ~ 0),
+         prod_closed_fruits = case_when(any_FitP == TRUE & closed_fruits_F > 0 ~ 1,
+                                        any_FitP == TRUE & closed_fruits_F == 0 ~ 0),
+         prod_filled_seeds = case_when(any_FitP == TRUE & seed_ct > 0 ~ 1, #plants that survived to produce fruit with viable seeds
+                                       any_FitP == TRUE & seed_ct == 0 ~ 0))  #else = 0 
+
+
+#Calculate Fecundity 
+BO_merged_df_fl2 <- BO_merged_df_flC %>% 
+  rename(est_fecundity = total_est_seed_production) %>% #rename to match Y2
+  mutate(across(c(est_fecundity, mean_seeds_per_fruit), ~ as.numeric(na_if(., NaN)))) %>% #Converts to NA
+  mutate(mean_seeds_per_fruit = case_when(any_FitP == TRUE & closed_fruits_F == 0 ~ NA, #NA when 0 closed fruits
+                                          TRUE ~ mean_seeds_per_fruit)) %>%  #else, original value
+  mutate(est_fecundity = case_when(any_FitP == TRUE & closed_fruits_F == 0 & open_fruits_F == 0 ~ 0,
+                                               any_FitP == TRUE & closed_fruits_F == 0 & open_fruits_F >= 1 ~ NA,
+                                               any_FitP == TRUE & !is.na(est_fecundity) ~  est_fecundity))
+
+
+```
+
+<br>  
+
+### d13C data  
+
+```{r}
+Nemo_d13C <- read_csv(here::here("data_sheets", "isotope_data", "d13C_2022.csv")) %>% 
+  select(1,2,3,5,6,9) %>% 
+  rename(sample_ID = 1, d13C = 2, totalC_ug = 3, sample_weight_mg = 6)
+#Save as UTF-8 file from excel to avoid import error
+
+#filter to BO samples
+Nemo_d13C_BO <- Nemo_d13C %>% 
+  filter(grepl('BO', sample_ID)) %>% 
+  slice(-54) #remove mislabeled entry BO_118 in Tr 5
+
+#unravel sample ID
+Nemo_d13_BO2 <- Nemo_d13C_BO %>% 
+  mutate(Recipient = gsub('-', '_', substr(sample_ID, 1, 6)), 
+         Transect = as.numeric(str_remove(substr(sample_ID, 8, 10), "^0+")),
+         Plant_ID = as.numeric(substr(sample_ID, 12,13))) %>% 
+  select(Transect, Recipient, Plant_ID, d13C, sample_weight_mg)
+
+#Merge
+BO_merged_df_fl3 <- merge(BO_merged_df_fl2, Nemo_d13_BO2, by = c("Recipient", "Transect", "Plant_ID"), all.x = TRUE)
+
+#check that all data made it (196 obs)
+testdf <- BO_merged_df_fl3 %>% 
+  filter(!is.na(d13C))
+
+
+#
+#Create segment-wide estimate of d13C:
+Nemo_d13_BO3 <- Nemo_d13_BO2 %>% 
+  rename(d13C_SEG = d13C) %>% #rename for seg-wide measure
+  select(Transect, Recipient, d13C_SEG) #un-select Plant_ID, dryweight of sample
+
+
+BO_merged_df_fl3b <- merge(BO_merged_df_fl3, Nemo_d13_BO3, by = c("Recipient", "Transect"), all.x = TRUE) 
+#Merge by Recipient and Transect only: segment-wide estimates of d13C since some plants were NF
+
+#Check merge
+d13C_check_BO <- BO_merged_df_fl3b %>% 
+  filter(FitP == TRUE) %>% 
+  filter(!is.na(d13C_SEG)) #196 observations in both df's
+
+```
+
+<br>  
+
+
+##### Segment-wide estimates for skeleton weight, corolla area & diameter  
+
+**Skeleton Weight**  
+```{r}
+#Merge to identify MAIN fitness plants
+skel_weights_seg1 <- merge(BO_GermFlow_3, skel_weights_all2, by = c("Recipient", "Transect", "Plant_ID"), all.x = TRUE) %>% 
+  filter(!is.na(AG_biomass_mg)) %>% 
+  select(Block, Transect, Sequence, Donor, Recipient, Replicated, Plant_ID, FitP, Rep_FitP, any_FitP, AG_biomass_mg)
+
+
+#Highlight ALL DUPES (multiple measures within a segment)
+skel_weights_duped <- skel_weights_seg1 %>% 
+  mutate(duped1 = duplicated(subset(skel_weights_seg1, select = c("Block", "Transect", "Sequence", "Donor", "Recipient"))),
+         duped2 = duplicated(subset(skel_weights_seg1, select = c("Block", "Transect", "Sequence", "Donor", "Recipient")), fromLast = TRUE),
+         duped = case_when(duped1|duped2 == TRUE ~ TRUE,
+                           TRUE ~ FALSE))
+
+#Filter out Replicated Plants when a Main plant is available (non-watered transects only)
+#Note: Non-main FitPs (replicated) retained when only when a single measure taken from a segment, but duplicates (2+) of replicated plants are removed
+skel_weights_unduped1 <- skel_weights_duped %>% 
+  filter(case_when(duped == TRUE & Replicated == "R" & Block != "W" ~ FitP == TRUE,
+                   TRUE ~ any_FitP == TRUE)) %>% #keep all main FitPs when duped+replicated,else keep all
+  filter(Block != "W")
+
+
+#Randomly selected F plants - one measure per available segment
+skel_weights_seg_RAND <- skel_weights_duped %>% 
+  group_by(Block, Transect, Recipient) %>% 
+  slice_sample(n = 1) %>%  #select a random row for each  combo of block, transect, recipient
+  select(-c(duped, Plant_ID))  
+#Confirms # obs = # segments (184)
+
+
+#Anti-join to see missing obs
+skel_weights_unduped_comp <- anti_join(skel_weights_seg_RAND, skel_weights_unduped1, by = c("Block", "Transect", "Sequence", "Donor", "Recipient")) %>% 
+  select(-c(Replicated:any_FitP, duped1, duped2))
+
+#Main plant measures - remove unnecessary columns
+skel_weights_unduped1b <- skel_weights_unduped1 %>% 
+  select(-c(Replicated:any_FitP, duped, duped1, duped2)) #Make sure columns match up
+
+#Combine with missing complement - measurements from replicated/NF plants where no main plant available
+skel_weights_SEG <- rbind(skel_weights_unduped1b, skel_weights_unduped_comp) %>% 
+  rename(AG_biomass_mg_SEG = AG_biomass_mg)
+#End result: One measure per segment (from which a skeleton was collected), with main fitness plants retained where available and NF/Replicated FitPs selected "at random" (using slice_sample(n=1))
+
+
+#Merge with main data sheet
+BO_merged_df_fl4 <- merge(BO_merged_df_fl3b, skel_weights_SEG, by = c("Block", "Transect", "Sequence", "Donor", "Recipient"), all.x = TRUE)
+
+```
+
+
+
+**Corolla Diameter & Area**  
+Use same approach as above
+
+```{r}
+#Merge to identify MAIN fitness plants
+corollas_seg1 <- BO_merged_df6 %>% 
+  filter(!is.na(corolla_diam_mm)) %>% #diameter prioritized - main trait to measure (& fewer NAs)
+  select(Block, Transect, Sequence, Donor, Recipient, Replicated, Plant_ID, FitP, Rep_FitP, any_FitP, corolla_diam_mm, corolla_area_mm2) 
+
+
+#Highlight duplicates
+corollas_duped <- corollas_seg1 %>% 
+  mutate(duped1 = duplicated(subset(corollas_seg1, select = c("Block", "Transect", "Sequence", "Donor", "Recipient"))),
+         duped2 = duplicated(subset(corollas_seg1, select = c("Block", "Transect", "Sequence", "Donor", "Recipient")), fromLast = TRUE),
+         duped = case_when(duped1|duped2 == TRUE ~ TRUE,
+                           TRUE ~ FALSE))
+
+
+#Filter out Replicated Plants when a Main plant is available (non-watered transects only)
+#Note: Duplicates (2+) of replicated plants are removed; merged back in after random selection below
+corollas_unduped1 <- corollas_duped %>% 
+  filter(case_when(duped == TRUE & Replicated == "R" & Block != "W" ~ FitP == TRUE,
+                   TRUE ~ any_FitP == TRUE)) %>% #keep all main FitPs when duped+replicated, else keep all
+  filter(Block != "W") #233 obs
+
+
+#Randomly selected F plants - one measure per available segment
+corollas_seg_RAND <- corollas_duped %>% 
+  group_by(Block, Transect, Recipient) %>% 
+  slice_sample(n = 1) %>%  #select a random row for each  combo of block, transect, recipient
+  select(-c(duped, Plant_ID)) 
+##326 total obs; 293 obs excluding W block - number of segment measurements there should be
+
+
+#Anti-join to get missing obs
+corollas_unduped_comp <- anti_join(corollas_seg_RAND, corollas_unduped1, by = c("Block", "Transect", "Sequence", "Donor", "Recipient")) %>% 
+  select(-c(Replicated:any_FitP, duped1, duped2))
+
+
+#Main plant measures - remove unnecessary columns
+corollas_unduped1b <- corollas_unduped1 %>% 
+  select(-c(Replicated:any_FitP, duped, duped1, duped2)) #Make sure columns match up
+
+#Combine with missing complement - measurements from replicated/NF plants where no main plant available
+corollas_SEG <- rbind(corollas_unduped1b, corollas_unduped_comp) %>% 
+  rename(corolla_diam_mm_SEG = corolla_diam_mm,
+         corolla_area_mm2_SEG = corolla_area_mm2) #rename vars
+#double-check that obs total as expected
+
+
+#Merge
+BO_merged_df_fl5 <- merge(BO_merged_df_fl4, corollas_SEG, by = c("Block", "Transect", "Sequence", "Donor", "Recipient"), all.x = TRUE)
+
+```
+
+
+
+**Duplicate & Final Error Check**  
+
+```{r}
+#All rows
+BO_merged_df_fl5 %>% 
+  select(Recipient:Plant_ID) %>% 
+  get_dupes()
+
+
+#Fitness Plants
+BO_merged_df_fl5 %>% 
+  filter(any_FitP == TRUE) %>% 
+  get_dupes()
+
+
+
+#Main fitness plants
+BO_merged_df_fl5 %>% 
+  filter(FitP == TRUE) %>% 
+  get_dupes()
+
+```
+
+
+## Master sheets (v1)  
+
+
+```{r message = FALSE}
+## Create a Full (long) version with all data - one row per plant 
+
+BO_mastersheet_v1 <- BO_merged_df_fl5 %>% 
+  mutate(Year = 2022, Gen = "G1") %>% 
+  select(Year, Gen, Block, Transect, Sequence, Donor, Recipient, Replicated, Plant_ID, FitP, Rep_FitP, any_FitP, F_plant, F_multi, F_plant_notes, everything()) %>% 
+  arrange(Block, Transect, Sequence, Recipient, Plant_ID)
+
+#Rename and organize variables to match Year 2 data:
+BO_mastersheet_v2 <- BO_mastersheet_v1 %>% 
+  rename(F_plant_ID = F_plant, #number of F plant
+         F_plant = FitP, #T/F is F plant
+         filled_seeds = seed_ct,
+         open_fruits = open_fruits_F,
+         closed_fruits = closed_fruits_F,
+         total_fruits = total_fruits_F,
+         skel_dryweight_mg = AG_biomass_mg,
+         skel_dryweight_mg_SEG = AG_biomass_mg_SEG) %>% 
+  mutate(est_fecundity_int = round(est_fecundity)) #round to nearest whole number
+
+
+#Add Greenhouse cohort info
+BO_tray21 <- read_csv(here::here("data_sheets", "tray_positions_2021_year1", "BO_tray_rand.csv"), skip = 1) %>% 
+  select(Cohort, Donor_ID, Recipient_ID) %>% #Block and Transect not necessary to save here
+  mutate(Recipient_num = sprintf("%03d", (parse_number(Recipient_ID)))) %>% #Fix Recipient/Donor names
+  mutate(Recipient = as.character(str_c("BO_", Recipient_num))) %>% 
+  mutate(Donor_num = sprintf("%03d", (parse_number(Donor_ID)))) %>% 
+  mutate(Donor = as.character(str_c("BO_", Donor_num))) %>%
+  select(-c(Donor_num, Recipient_num, Donor_ID, Recipient_ID)) %>% 
+  distinct()
+
+
+#merge
+BO_mastersheet_v3 <- left_join(BO_mastersheet_v2, BO_tray21, by = c("Donor", "Recipient")) %>% 
+  select(-c(F_plant_notes, Fl_3.11:flr_P, damaged_fruits_F, seeds_weighed_d1:msm_d9, photo_date, notes_corolla, leafarea_notes, leafweight_notes)) %>% #Remove unnecessary columns 
+  select(Year, Sequence, Cohort, Block, Transect, Donor, Recipient, Gen, Replicated, Plant_ID, F_plant:Plant_Date, FFD, LFD, fl_duration, days_germ2flower:days_plant2flower, corolla_diam_mm, corolla_diam_mm_SEG, corolla_area_mm2, corolla_area_mm2_SEG, leaf_area_mm2:LMA, leaf_area_mm2_SEG:LMA_SEG, skel_dryweight_mg, skel_dryweight_mg_SEG, d13C, d13C_SEG, sample_weight_mg, closed_fruits:est_fecundity, est_fecundity_int, everything()) #Reorder columns
+
+```
+
+
+
+**Writing CSVs**  
+
+```{r}
+#Save full (long) version
+write_csv(BO_mastersheet_v3, here::here("data_sheets", "compiled_sheets", "BO_mastersheet_full_2022.csv"))
+
+
+## Fitness Plants Only
+#
+BO_mastersheet_F_mains <-  BO_mastersheet_v3 %>% 
+  filter(F_plant == TRUE) #Only main fitness plants
+
+BO_mastersheet_F_all <- BO_mastersheet_v3 %>% 
+  filter(any_FitP == TRUE) #main and multiple fitness plants (IDs replicated in watering experiment)
+
+
+write_csv(BO_mastersheet_F_mains, here::here("data_sheets", "compiled_sheets", "BO_mastersheet_Fitness-mains_2022.csv"))
+
+write_csv(BO_mastersheet_F_all, here::here("data_sheets", "compiled_sheets", "BO_mastersheet_Fitness-all_2022.csv"))
+
+```
+
+
+

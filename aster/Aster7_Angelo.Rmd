@@ -1,0 +1,57 @@
+---
+title: "Aster7_Angelo"
+author: "Helen Payne"
+date: "2025-07-29"
+output: html_document
+---
+
+#ANGELO RANCH
+##Generation 1 2022
+```{r}
+library(tidyverse)
+library(readr)
+library(dplyr)
+library(stringr)
+library(here)
+
+AC_22 <- read_csv(here::here("Desktop/nemo_field/data_sheets/compiled_sheets/AC_mastersheet_full_2022.csv")) %>%
+  rename_at(vars(55), ~"surv_to_fruitpod") %>%
+  mutate(
+    # Construct sample_ID conditionally
+    sample_ID = str_c(Year, Recipient, Gen, str_pad(Transect, width = 3, pad = "0"), Plant_ID, sep = "-"),
+    # Replace leading underscores in sample_ID with hyphens
+    sample_ID = str_replace(sample_ID, "^([^_]*)_", "\\1-")
+  ) %>%
+  dplyr::select("Transect", "Donor", "Recipient", "sample_ID", "surv_to_flower", "any_FitP", "total_fruits", "closed_fruits", "mean_seeds_per_fruit") %>%
+  mutate(any_FitP = ifelse(any_FitP == TRUE, 1, 0))%>%
+  filter(!(Transect %in% c("W1", "W2"))) %>%
+  mutate(surv_to_flower = ifelse(total_fruits > 0 & surv_to_flower == 0, 1, surv_to_flower)) %>%
+  mutate(any_FitP = ifelse(surv_to_flower == 0, 0, any_FitP))
+
+AC_22$mean_seeds_per_fruit <- round(AC_22$mean_seeds_per_fruit)
+```
+
+```{r}
+library(dplyr)
+
+# Create a new column with the first 19 characters of sample_ID
+AC_22 <- AC_22 %>%
+  mutate(sample_prefix = substr(sample_ID, 1, 19))
+
+# Process each group
+AC_22_updated <- AC_22 %>%
+  group_by(sample_prefix) %>%
+  mutate(
+    # Check if all survival values are 0
+    all_dead = all(surv_to_flower == 0),
+    # Randomly assign any_FitP = 1 to one individual if all are dead
+    any_FitP = if_else(
+      all_dead & row_number() == sample(n(), 1), 
+      1L, 
+      any_FitP
+    )
+  ) #%>%
+  ungroup() %>%
+  select(-sample_prefix, -all_dead)  # Clean up temporary columns
+```
+

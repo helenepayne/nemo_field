@@ -1,0 +1,153 @@
+---
+title: "Nemophila_selection_BRTs"
+author: "Helen Payne"
+date: "2024-10-10"
+output: html_document
+---
+
+```{r}
+# Install packages if not already installed
+# install.packages("gbm")
+# install.packages("dismo")
+
+# Load required libraries
+library(gbm)
+library(dismo)
+library(tidyverse)
+
+```
+
+
+```{r}
+# Read in the dataset and modify column names and sample_ID
+AC_22 <- read_csv(here::here("data_sheets", "compiled_sheets", "AC_mastersheet_Fitness-mains_2022.csv")) %>%
+  rename_at(vars(55), ~"surv_to_fruitpod") %>%  # Rename the 55th column
+  mutate(
+    # Create sample_ID by concatenating Year, Recipient, Gen, Transect, and Plant_ID
+    sample_ID = str_c(Year, Recipient, Gen, str_pad(Transect, width = 3, pad = "0"), Plant_ID, sep = "-"),
+    # Replace leading underscores in sample_ID with hyphens
+    sample_ID = str_replace(sample_ID, "^([^_]*)_", "\\1-")
+  )
+
+```
+
+
+
+```{r}
+# Check for missing values in the response variable 'est_fecundity'
+sum(is.na(AC_22$est_fecundity))
+
+# Remove rows with missing values in 'est_fecundity'
+AC_22 <- AC_22[!is.na(AC_22$est_fecundity), ]
+
+# Round the 'est_fecundity' values
+AC_22$est_fecundity <- round(AC_22$est_fecundity)
+
+# View unique values of 'est_fecundity'
+unique(AC_22$est_fecundity)
+
+# Ensure numeric type for relevant variables
+AC_22$est_fecundity <- as.numeric(AC_22$est_fecundity)
+AC_22$corolla_diam_mm <- as.numeric(AC_22$corolla_diam_mm)
+AC_22$SLA_SEG <- as.numeric(AC_22$SLA_SEG)
+
+# Convert flowering date columns to Date format
+AC_22$FFD <- as.Date(AC_22$FFD, format="%Y-%m-%d")
+AC_22$LFD <- as.Date(AC_22$LFD, format="%Y-%m-%d")
+
+# Extract the day of the year from FFD and LFD
+AC_22$FFD_numeric <- as.numeric(format(AC_22$FFD, "%j"))
+AC_22$LFD_numeric <- as.numeric(format(AC_22$LFD, "%j"))
+
+# View the numeric representation of FFD and LFD
+head(AC_22$FFD_numeric)
+head(AC_22$LFD_numeric)
+
+hist(AC_22$corolla_diam_mm)
+AC_22$SLA_SEG <- log(AC_22$SLA_SEG)
+hist(AC_22$SLA_SEG)
+hist(AC_22$d13C_SEG)
+AC_22$msm_all <- log(AC_22$msm_all)
+hist(AC_22$msm_all)
+hist((AC_22$fl_duration))
+AC_22$skel_dryweight_mg_SEG <- log(AC_22$skel_dryweight_mg_SEG)
+hist(AC_22$skel_dryweight_mg_SEG)
+AC_22$Donor <- as.factor(AC_22$Donor)
+AC_22$Recipient <- as.factor(AC_22$Recipient)
+```
+
+
+```{r}
+# Fit a Gradient Boosting Machine (GBM) model with multiple predictors
+brt_model <- gbm(
+  formula = est_fecundity ~ SLA_SEG + msm_all + fl_duration + 
+                  d13C_SEG + corolla_diam_mm_SEG + skel_dryweight_mg_SEG,
+  data = AC_22,
+  distribution = "gaussian",
+  n.trees = 1000,
+  interaction.depth = 5,
+  shrinkage = 0.01,
+  bag.fraction = 0.75
+)
+
+# Display variable importance summary
+model_summary <- summary(brt_model)
+
+# Map variable names to more descriptive labels
+label_mapping <- c(
+  corolla_diam_mm = "Corolla Diameter (mm)",
+  SLA_SEG = "Specific Leaf Area (SLA)",
+  d13C_SEG = "Carbon Isotope Ratio (d13C)",
+  msm_all = "Mean Seed Mass (mg)",
+  fl_duration = "Flowering Duration (days)",
+  skel_dryweight_mg_SEG = "Dry Weight (mg)",
+  Donor = "Paternal Sibship",
+  Recipient = "Maternal Sibship"
+)
+
+# Replace variable names with descriptive labels in the summary
+model_summary$var <- label_mapping[model_summary$var]
+
+# Display the updated summary
+print(model_summary)
+
+```
+
+
+```{r}
+# Split the dataset into training (80%) and testing (20%) sets
+set.seed(123)  # Set seed for reproducibility
+train_indices <- sample(seq_len(nrow(AC_22)), size = 0.8 * nrow(AC_22))
+train_data <- AC_22[train_indices, ]
+test_data <- AC_22[-train_indices, ]
+
+# Fit the model again using the training data
+brt_model <- gbm(
+  formula = est_fecundity ~  msm_all + skel_dryweight_mg_SEG + Donor + Recipient,
+  data = train_data,
+  distribution = "gaussian",
+  n.trees = 1000,
+  interaction.depth = 5,
+  shrinkage = 0.01,
+  bag.fraction = 0.75
+)
+
+# Predict on the test set using the optimal number of trees (determined via OOB method)
+test_predictions <- predict(brt_model, newdata = test_data, n.trees = gbm.perf(brt_model, method = "OOB"))
+
+# Display the test predictions
+print(test_predictions)
+
+# Calculate Mean Squared Error (MSE) for test set predictions
+mse <- mean((test_predictions - test_data$est_fecundity)^2)
+print(mse)
+
+# Calculate Root Mean Squared Error (RMSE)
+rmse <- sqrt(mse)
+print(rmse)
+
+```
+
+
+`
+

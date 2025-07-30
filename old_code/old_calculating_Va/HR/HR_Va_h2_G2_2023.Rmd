@@ -1,0 +1,304 @@
+---
+title: "HR_Va_h2_G2_2023"
+author: "Helen Payne"
+date: "2024-07-17"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+
+```{r}
+#load packages
+library(lme4)
+library(tidyverse)
+library(lmerTest)
+library(car)
+```
+
+
+###########**2023**##########
+
+Read in the data:
+```{r}
+HR_23 <- read_csv(here::here("data_sheets", "compiled_sheets", "HR_mastersheet_Fitness-mains_2023.csv"))
+
+HR_23_fit <- HR_23 %>% 
+  filter(Gen == "G2")
+
+HR_22_23_full <- read_csv(here::here("data_sheets", "compiled_sheets", "HR_22_23_full.csv"))
+```
+
+```{r}
+# Calculate the mean surv_to_flower for each group in AC_22_23_full and add it as a new column
+HR_22_23_full <- HR_22_23_full %>%
+  group_by(Year, Gen, Transect, Sequence, Donor, Recipient, SegPos) %>%
+  mutate(prop_surv_to_flower = mean(surv_to_flower, na.rm = TRUE)) %>%
+  ungroup()  # Remove grouping
+
+HR_prop_sample <- HR_22_23_full %>%
+  select(c(Year, Gen, Transect, Sequence, Donor, Recipient, SegPos, prop_surv_to_flower))  %>%
+    distinct()
+
+HR_23_fit <- HR_23_fit %>%
+  left_join(HR_prop_sample %>% select(Year, Gen, Transect, Sequence, Donor, Recipient, SegPos, prop_surv_to_flower),
+            by = c("Year", "Gen", "Transect", "Sequence", "Donor", "Recipient"))
+
+# Create the new column
+HR_23_fit <- HR_23_fit %>%
+  mutate(est_fitness = prop_surv_to_flower * est_fecundity)
+```
+
+
+```{r}
+#log transform certain variables
+HR_23_fit$skel_dryweight_mg_SEG <- log(HR_23_fit$skel_dryweight_mg_SEG)
+HR_23_fit$SLA_SEG <- log(HR_23_fit$SLA_SEG)
+HR_23_fit$est_fitness <- sqrt(HR_23_fit$est_fitness)
+
+#mean center the traits of interest
+
+traits <- c("corolla_diam_mm_SEG", "skel_dryweight_mg_SEG", "fl_duration", "est_fecundity", "msm_all", "SLA_SEG", "LMA_SEG", "d13C_SEG", "est_fitness")
+
+# Mean center eHRh trait
+for (trait in traits) {
+  trait_mean <- mean(HR_23_fit[[trait]], na.rm = TRUE)
+  HR_23_fit[[paste0(trait, "_centered")]] <- HR_23_fit[[trait]] - trait_mean
+}
+```
+
+
+```{r}
+# Create the mixed model for corolla area
+
+corolla_model <- lmer(corolla_diam_mm_SEG_centered ~ (1 | Recipient) + (1 | Donor), data = HR_23_fit)
+
+rand(corolla_model)
+
+# Get residuals from the model
+residuals <- resid(corolla_model)
+
+# Q-Q plot for normality
+qqnorm(residuals) #looks good
+
+
+# Histogram for normality
+hist(residuals, breaks = 20, main = "Histogram of Residuals", xlab = "Residuals") #normal
+```
+
+```{r}
+# Create the mixed model for skeleton weight, with skeleton weight log transformed
+skel_model <- lmer((skel_dryweight_mg_SEG_centered) ~ (1 | Transect) + (1 | Recipient) + (1 | Donor), data = HR_23_fit) #Singular
+
+rand(skel_model)
+
+# Get residuals from the model
+residuals <- resid(skel_model)
+
+# Q-Q plot for normality
+qqnorm(residuals) #looks good
+
+
+# Histogram for normality
+hist(residuals, breaks = 20, main = "Histogram of Residuals", xlab = "Residuals") #normal
+
+```
+
+
+```{r}
+# Create the mixed model for flowering duration
+fl_duration_model <- lmer(fl_duration_centered ~ (1 | Recipient) + (1 | Donor), data = HR_23_fit)
+
+# Get residuals from the model
+residuals <- resid(fl_duration_model)
+
+# Q-Q plot for normality
+qqnorm(residuals) #looks good
+
+
+# Histogram for normality
+hist(residuals, breaks = 20, main = "Histogram of Residuals", xlab = "Residuals") #normal
+
+rand(fl_duration_model)
+```
+
+
+```{r}
+# Create the mixed model for estimated fecundity, sqrt transforming estimated fecundity
+#est_fecundity_model <- lmer((est_fecundity_centered) ~ (1 | Recipient) + (1 | Donor), data = HR_23_fit) #Singular
+
+# Create the mixed model for estimated fecundity, sqrt transforming estimated fecundity
+#est_fecundity_model_2 <- lmer((est_fecundity_centered) ~ (1 | Donor), data = HR_23_fit) #singular
+
+```
+
+
+```{r}
+#Fix MSM
+
+# Create the mixed model for mean seed mass, log transformed mean seed mass
+#msm_model <- lmer((msm_all_centered) ~ (1 | Recipient) + (1 | Donor), data = HR_23_fit) #singular
+
+```
+
+```{r}
+# Create the mixed model for SLA
+#SLA_model <- lmer((SLA_SEG_centered) ~ (1 | Recipient) + (1 | Donor), data = HR_23_fit) #Singular
+
+##adding in transect##
+# Create the mixed model for SLA
+SLA_model <- lmer((SLA_SEG_centered) ~ (1 | Transect) + (1 | Donor), data = HR_23_fit)
+
+rand(SLA_model)
+
+# Get residuals from the model
+residuals <- resid(SLA_model)
+
+# Q-Q plot for normality
+qqnorm(residuals) #okay.. 
+
+
+# Histogram for normality
+hist(residuals, breaks = 20, main = "Histogram of Residuals", xlab = "Residuals") #definitely a few outliers, but maybe okay?
+
+```
+
+
+```{r}
+# Create the mixed model for mean seed mass, log transformed mean seed mass
+#LMA_model <- lmer(LMA_SEG_centered ~ (1 | Recipient) + (1 | Donor), data = HR_23_fit) #Singular
+
+LMA_model <- lmer(LMA_SEG_centered ~ (1 | Donor), data = HR_23_fit)
+
+rand(LMA_model)
+
+# Get residuals from the model
+residuals <- resid(LMA_model)
+
+# Q-Q plot for normality
+qqnorm(residuals) #good enough
+
+
+# Histogram for normality
+hist(residuals, breaks = 20, main = "Histogram of Residuals", xlab = "Residuals") #normal-ish
+
+```
+
+```{r}
+# Create the mixed model for d13C, log transformed mean seed mass
+d13C_model <- lmer(d13C_SEG_centered ~ (1 | Recipient) + (1 | Donor), data = HR_23_fit)
+
+rand(d13C_model)
+
+# Get residuals from the model
+residuals <- resid(d13C_model)
+
+# Q-Q plot for normality
+qqnorm(residuals) #good enough
+
+
+# Histogram for normality
+hist(residuals, breaks = 20, main = "Histogram of Residuals", xlab = "Residuals") #normal-ish
+
+```
+
+```{r}
+# Create the mixed model for d13C, log transformed mean seed mass
+#est_fitness_model <- lmer(est_fitness_centered ~ (1 | Donor), data = HR_23_fit) #singular
+```
+
+```{r}
+
+# Function to round values to a specified number of significant digits
+round_df <- function(df, digits) {
+  df[] <- lapply(df, function(x) if(is.numeric(x)) signif(x, digits) else x)
+  return(df)
+}
+
+# Function to extract variance components and calculate required values
+calculate_variances <- function(model, trait_name) {
+  var_components <- as.data.frame(VarCorr(model))
+  
+  # Initialize variables
+  V_mat <- NA
+  V_sd_mat <- NA
+  Va_mat <- NA
+  V_pat <- NA
+  V_sd_pat <- NA
+  Va_pat <- NA
+  res_var <- NA
+  Vp <- NA
+  Vp_sd <- NA
+  h2 <- NA
+  
+  # Check if "Recipient" is included as a random effect
+  if ("Recipient" %in% var_components$grp) {
+    V_mat <- var_components$vcov[var_components$grp == "Recipient"]
+    V_sd_mat <- sqrt(V_mat)
+    Va_mat <- V_mat * 4
+  }
+  
+  # Calculate other variance components
+  if ("Donor" %in% var_components$grp) {
+    V_pat <- var_components$vcov[var_components$grp == "Donor"]
+    V_sd_pat <- sqrt(V_pat)
+    Va_pat <- V_pat * 16
+  }
+  
+  if ("Residual" %in% var_components$grp) {
+    res_var <- var_components$vcov[var_components$grp == "Residual"]
+  }
+  
+  # Calculate total phenotypic variance and narrow-sense heritability if components are available
+  if (!is.na(Va_mat) & !is.na(Va_pat) & !is.na(res_var)) {
+    Vp <- Va_mat + Va_pat + res_var
+    Vp_sd <- sqrt(Vp)
+    h2 <- Va_pat / Vp  # assumed calculation
+  }
+  
+  # Extract the number of observations
+  n_obs <- nobs(model)
+  
+  # Create the dataframe and add the traits column
+  df <- data.frame(traits = trait_name, V_mat, V_sd_mat, Va_mat, V_pat, V_sd_pat, Va_pat, Vp, Vp_sd, h2, n_obs)
+  
+  # Round the dataframe values to four significant digits
+  df <- round_df(df, 4)
+  
+  return(df)
+}
+
+# Calculate variances for eHRh model and add trait names
+corolla_variances <- calculate_variances(corolla_model, 'corolla_diameter')
+skel_variances <- calculate_variances(skel_model, "skel_biomass_mg")
+#est_fecundity_variances <- calculate_variances(est_fecundity_model, "estimated_fecundity")
+#msm_variances <- calculate_variances(msm_model, "mean_seed_mass")
+SLA_variances <- calculate_variances(SLA_model, "SLA")
+LMA_variances <- calculate_variances(LMA_model, "LMA")
+fl_duration_variances <- calculate_variances(fl_duration_model, "flowering duration")
+d13C_variances <- calculate_variances(d13C_model, "delta_C_13")
+
+# Combine the results into a single dataframe
+variance_HR_2023_G2 <- rbind(
+  corolla_variances,
+  skel_variances,
+  fl_duration_variances,
+  LMA_variances,
+  SLA_variances,
+  #msm_variances,
+  #est_fecundity_variances
+  d13C_variances
+)
+
+# Print the dataframe
+print(variance_HR_2023_G2)
+
+```
+
+
+```{r}
+#Save the csv file if you want
+write_csv(x = variance_HR_2023_G2, here::here("data_sheets", "compiled_sheets", "HR_Va_h2_R_2023.csv"))
+
+```
+

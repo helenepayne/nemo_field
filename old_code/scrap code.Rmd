@@ -1,0 +1,2578 @@
+---
+title: "Scrap code"
+author: "Helen Payne"
+date: "2025-01-27"
+output: html_document
+---
+
+Load in libraries and the datasets, plus a bit of tidying
+```{r}
+# Load the lme4 package
+library(lme4)
+library(dplyr)
+library(tidyverse)
+
+
+
+AC_fit_22 <- read_csv(here::here("data_sheets", "compiled_sheets", "AC_fit_22.csv"))
+
+BB_fit_22 <- read_csv(here::here("data_sheets", "compiled_sheets", "BB_fit_22.csv"))
+
+BO_fit_22 <- read_csv(here::here("data_sheets", "compiled_sheets", "BO_fit_22.csv"))
+
+HR_fit_22 <- read_csv(here::here("data_sheets", "compiled_sheets", "HR_fit_22.csv"))
+
+AC_fit_23_G1 <- read_csv(here::here("data_sheets", "compiled_sheets", "AC_fit_23_G1.csv"))
+
+BB_fit_23_G1 <- read_csv(here::here("data_sheets", "compiled_sheets", "BB_fit_23_G1.csv"))
+
+BO_fit_23_G1 <- read_csv(here::here("data_sheets", "compiled_sheets", "BO_fit_23_G1.csv"))
+
+HR_fit_23_G1 <- read_csv(here::here("data_sheets", "compiled_sheets", "HR_fit_23_G1.csv"))
+
+AC_fit_23_G2 <- read_csv(here::here("data_sheets", "compiled_sheets", "AC_fit_23_G2.csv"))
+
+BB_fit_23_G2 <- read_csv(here::here("data_sheets", "compiled_sheets", "BB_fit_23_G2.csv"))
+
+BO_fit_23_G2 <- read_csv(here::here("data_sheets", "compiled_sheets", "BO_fit_23_G2.csv"))
+
+HR_fit_23_G2 <- read_csv(here::here("data_sheets", "compiled_sheets", "HR_fit_23_G2.csv"))
+
+```
+
+```{r}
+AC_mean_donor_traits_22 <- read_csv(here::here("data_sheets", "compiled_sheets", "AC_mean_donor_traits_22.csv"))
+
+BB_mean_donor_traits_22 <- read_csv(here::here("data_sheets", "compiled_sheets", "BB_mean_donor_traits_22.csv"))
+
+BO_mean_donor_traits_22 <- read_csv(here::here("data_sheets", "compiled_sheets", "BO_mean_donor_traits_22.csv"))
+
+HR_mean_donor_traits_22 <- read_csv(here::here("data_sheets", "compiled_sheets", "HR_mean_donor_traits_22.csv"))
+
+AC_mean_donor_traits_23_G1 <- read_csv(here::here("data_sheets", "compiled_sheets", "AC_mean_donor_traits_23_G1.csv"))
+
+BB_mean_donor_traits_23_G1 <- read_csv(here::here("data_sheets", "compiled_sheets", "BB_mean_donor_traits_23_G1.csv"))
+
+BO_mean_donor_traits_23_G1 <- read_csv(here::here("data_sheets", "compiled_sheets", "BO_mean_donor_traits_23_G1.csv"))
+
+HR_mean_donor_traits_23_G1 <- read_csv(here::here("data_sheets", "compiled_sheets", "HR_mean_donor_traits_23_G1.csv"))
+
+AC_mean_donor_traits_23_G2 <- read_csv(here::here("data_sheets", "compiled_sheets", "AC_mean_donor_traits_23_G2.csv"))
+
+BB_mean_donor_traits_23_G2 <- read_csv(here::here("data_sheets", "compiled_sheets", "BB_mean_donor_traits_23_G2.csv"))
+
+BO_mean_donor_traits_23_G2 <- read_csv(here::here("data_sheets", "compiled_sheets", "BO_mean_donor_traits_23_G2.csv"))
+
+HR_mean_donor_traits_23_G2 <- read_csv(here::here("data_sheets", "compiled_sheets", "HR_mean_donor_traits_23_G2.csv"))
+```
+
+
+#########################################################################################################################################################
+
+
+```{r}
+my_data <- combined_traits %>%
+  filter(Year == "2022")
+
+
+# Reshape the data into long format for frequency plots
+data_long <- my_data %>%  # Use your actual dataframe here
+  pivot_longer(cols = c(msm_all, fl_duration, d13C_SEG, corolla_diam_mm_SEG, SLA_SEG),
+               names_to = "Trait",
+               values_to = "Value")
+
+
+# Calculate trait means by Group and Trait
+trait_means <- data_long %>%
+  group_by(Group, Trait) %>%
+  summarise(mean_value = mean(Value, na.rm = TRUE), .groups = "drop")
+
+
+# Plot frequency distributions with arrows
+ggplot(data_long, aes(x = Value, fill = Group)) +
+  geom_density(alpha = 0.6) +  # Use density plots for smoother distributions
+  facet_wrap(~Trait, scales = "free", ncol = 2) +  # Separate plots by trait
+  labs(title = "Frequency Distribution of Traits with Responses to Selection",
+       x = "Trait Value",
+       y = "Density") +
+  theme_minimal() +
+  theme(legend.position = "top") +
+  scale_fill_brewer(palette = "Set2")
+
+```  
+
+
+
+```{r}
+
+# Reshape the data into long format for frequency plots
+data_long <- my_data %>%  # Use your actual dataframe here
+  pivot_longer(cols = c(msm_all, fl_duration, d13C_SEG, corolla_diam_mm_SEG, SLA_SEG),
+               names_to = "Trait",
+               values_to = "Value")
+
+data_long <- data_long %>%
+  mutate(Trait = recode(Trait,
+                        "msm_all" = "mean_seed_mass",
+                        "fl_duration" = "flower_duration",
+                        "d13C_SEG" = "delta_carbon_13",
+                        "corolla_diam_mm_SEG" = "corolla_area",
+                        "SLA_SEG" = "specific_leaf_area"))
+
+
+trait_means <- data_long %>%
+  group_by(Group, Trait) %>%
+  summarise(mean_value = mean(Value, na.rm = TRUE), .groups = "drop")
+
+
+
+frequency_dist_traits <- ggplot(data_long, aes(x = Value, fill = Group)) +
+  geom_density(alpha = 0.6) +
+  facet_grid(Group ~ Trait, scales = "free") +
+  labs(
+    title = "Frequency Distribution of Traits with Responses to Selection",
+    x = "Trait Value",
+    y = "Density"
+  ) +
+  theme_minimal() +
+  theme(
+    legend.position = "none",          # Remove legend
+    panel.grid.major = element_blank(),  # Remove major grid lines
+    panel.grid.minor = element_blank()   # Remove minor grid lines
+  ) +
+  scale_fill_brewer(palette = "Dark2") +  # Use a darker palette
+  scale_y_continuous(limits = c(0, 0.9), expand = c(0, 0))
+
+
+frequency_dist_traits
+
+ggsave("C:/Users/Helen Payne/Documents/frequency_dist_traits.png", plot = frequency_dist_traits, width = 10, height = 9, dpi = 300)
+
+
+```
+
+
+```{r}
+HR_traits_23_1 <- HR_fit_23_G1 %>%
+  dplyr::select(msm_all, fl_duration, d13C_SEG, corolla_diam_mm_SEG, SLA_SEG) %>%
+  mutate(Group = "HR", Year = "2023")
+
+
+AC_traits_23_1 <- AC_fit_23_G1 %>%
+  dplyr::select(msm_all, fl_duration, d13C_SEG, corolla_diam_mm_SEG, SLA_SEG) %>%
+  mutate(Group = "AC", Year = "2023")
+
+BB_traits_23_1 <- BB_fit_23_G1 %>%
+  dplyr::select(msm_all, fl_duration, d13C_SEG, corolla_diam_mm_SEG, SLA_SEG) %>%
+  mutate(Group = "BB", Year = "2023")
+
+BO_traits_23_1 <- BO_fit_23_G1 %>%
+  dplyr::select(msm_all, fl_duration, d13C_SEG, corolla_diam_mm_SEG, SLA_SEG) %>%
+  mutate(Group = "BO", Year = "2023")
+
+# Combine all data
+combined_traits_1 <- bind_rows(HR_traits_23_1, AC_traits_23_1, BB_traits_23_1, BO_traits_23_1)
+
+my_data <- combined_traits_1
+
+# Reshape the data into long format for frequency plots
+data_long <- my_data %>%  # Use your actual dataframe here
+  pivot_longer(cols = c(msm_all, fl_duration, d13C_SEG, corolla_diam_mm_SEG, SLA_SEG),
+               names_to = "Trait",
+               values_to = "Value")
+
+data_long <- data_long %>%
+  mutate(Trait = recode(Trait,
+                        "msm_all" = "mean_seed_mass",
+                        "fl_duration" = "flower_duration",
+                        "d13C_SEG" = "delta_carbon_13",
+                        "corolla_diam_mm_SEG" = "corolla_area",
+                        "SLA_SEG" = "specific_leaf_area"))
+
+
+trait_means <- data_long %>%
+  group_by(Group, Trait) %>%
+  summarise(mean_value = mean(Value, na.rm = TRUE), .groups = "drop")
+
+
+
+frequency_dist_traits <- ggplot(data_long, aes(x = Value, fill = Group)) +
+  geom_density(alpha = 0.3) +  # Make the colors lighter by increasing transparency
+  facet_grid(Group ~ Trait, scales = "free") +
+  labs(
+    title = "Frequency Distribution of Traits with Responses to Selection",
+    x = "Trait Value",
+    y = "Density"
+  ) +
+  theme_minimal() +
+  theme(
+    legend.position = "none",          # Remove legend
+    panel.grid.major = element_blank(),  # Remove major grid lines
+    panel.grid.minor = element_blank()   # Remove minor grid lines
+  ) +
+  scale_fill_brewer(palette = "Set2") +  # Retain the same color palette
+  scale_y_continuous(limits = c(0, 0.9), expand = c(0, 0))   # Fix y-axis limits
+  
+
+frequency_dist_traits
+
+ggsave("C:/Users/Helen Payne/Documents/frequency_dist_traits_year1.png", plot = frequency_dist_traits, width = 10, height = 9, dpi = 300)
+```
+
+
+```{r}
+```{r setup, include=FALSE}
+```{r}
+#Graphing G1 2022
+
+HR_mean_donor_traits_22_a <- HR_mean_donor_traits_22 %>%
+  dplyr::select(msm_all_std, fl_duration_std, d13C_SEG_std, corolla_diam_mm_SEG_std, SLA_SEG_std) %>%
+  mutate(Group = "HR", Year = "2023")
+
+
+AC_mean_donor_traits_22_a <- AC_mean_donor_traits_22 %>%
+  dplyr::select(msm_all_std, fl_duration_std, d13C_SEG_std, corolla_diam_mm_SEG_std, SLA_SEG_std) %>%
+  mutate(Group = "AC", Year = "2023")
+
+BB_mean_donor_traits_22_a <- BB_mean_donor_traits_22 %>%
+  dplyr::select(msm_all_std, fl_duration_std, d13C_SEG_std, corolla_diam_mm_SEG_std, SLA_SEG_std) %>%
+  mutate(Group = "BB", Year = "2023")
+
+BO_mean_donor_traits_22_a <- BO_mean_donor_traits_22 %>%
+  dplyr::select(msm_all_std, fl_duration_std, d13C_SEG_std, corolla_diam_mm_SEG_std, SLA_SEG_std) %>%
+  mutate(Group = "BO", Year = "2023")
+
+# Combine all data
+combined_traits_1 <- bind_rows(HR_mean_donor_traits_22_a, AC_mean_donor_traits_22_a, BB_mean_donor_traits_22_a, BO_mean_donor_traits_22_a)
+
+my_data <- combined_traits_1
+
+# Reshape the data into long format for frequency plots
+data_long <- my_data %>%  # Use your actual dataframe here
+  pivot_longer(cols = c(msm_all_std, fl_duration_std, d13C_SEG_std, corolla_diam_mm_SEG_std, SLA_SEG_std),
+               names_to = "Trait",
+               values_to = "Value")
+
+data_long <- data_long %>%
+  mutate(Trait = recode(Trait,
+                        "msm_all" = "mean_seed_mass",
+                        "fl_duration" = "flower_duration",
+                        "d13C_SEG" = "delta_carbon_13",
+                        "corolla_diam_mm_SEG" = "corolla_area",
+                        "SLA_SEG" = "specific_leaf_area"))
+
+
+trait_means <- data_long %>%
+  group_by(Group, Trait) %>%
+  summarise(mean_value = mean(Value, na.rm = TRUE), .groups = "drop")
+
+
+
+frequency_dist_traits <- ggplot(data_long, aes(x = Value, fill = Group)) +
+  geom_density(alpha = 0.6) +
+  facet_grid(Group ~ Trait, scales = "free") +
+  labs(
+    title = "Frequency Distribution of Traits with Responses to Selection",
+    x = "Trait Value",
+    y = "Density"
+  ) +
+  theme_minimal() +
+  theme(
+    legend.position = "none",          # Remove legend
+    panel.grid.major = element_blank(),  # Remove major grid lines
+    panel.grid.minor = element_blank()   # Remove minor grid lines
+  ) +
+  scale_fill_brewer(palette = "Dark2") +  # Use a darker palette
+  scale_y_continuous(limits = c(0, 1.3), expand = c(0, 0))
+
+
+frequency_dist_traits
+
+
+
+ggsave("C:/Users/Helen Payne/Documents/frequency_dist_g1_22.png", plot = frequency_dist_traits, width = 10, height = 10, dpi = 300)
+
+
+```
+
+```{r}
+#Graphing G1 2022
+
+HR_mean_donor_traits_23_G1_a <- HR_mean_donor_traits_23_G1 %>%
+  dplyr::select(msm_all_std, fl_duration_std, d13C_SEG_std, corolla_diam_mm_SEG_std, SLA_SEG_std) %>%
+  mutate(Group = "HR", Year = "2023")
+
+
+AC_mean_donor_traits_23_G1_a <- AC_mean_donor_traits_23_G1 %>%
+  dplyr::select(msm_all_std, fl_duration_std, d13C_SEG_std, corolla_diam_mm_SEG_std, SLA_SEG_std) %>%
+  mutate(Group = "AC", Year = "2023")
+
+BB_mean_donor_traits_23_G1_a <- BB_mean_donor_traits_23_G1 %>%
+  dplyr::select(msm_all_std, fl_duration_std, d13C_SEG_std, corolla_diam_mm_SEG_std, SLA_SEG_std) %>%
+  mutate(Group = "BB", Year = "2023")
+
+BO_mean_donor_traits_23_G1_a <- BO_mean_donor_traits_23_G1 %>%
+  dplyr::select(msm_all_std, fl_duration_std, d13C_SEG_std, corolla_diam_mm_SEG_std, SLA_SEG_std) %>%
+  mutate(Group = "BO", Year = "2023")
+
+# Combine all data
+combined_traits_1 <- bind_rows(HR_mean_donor_traits_23_G1_a, AC_mean_donor_traits_23_G1_a, BB_mean_donor_traits_23_G1_a, BO_mean_donor_traits_23_G1_a)
+
+my_data <- combined_traits_1
+
+# Reshape the data into long format for frequency plots
+data_long <- my_data %>%  # Use your actual dataframe here
+  pivot_longer(cols = c(msm_all_std, fl_duration_std, d13C_SEG_std, corolla_diam_mm_SEG_std, SLA_SEG_std),
+               names_to = "Trait",
+               values_to = "Value")
+
+data_long <- data_long %>%
+  mutate(Trait = recode(Trait,
+                        "msm_all" = "mean_seed_mass",
+                        "fl_duration" = "flower_duration",
+                        "d13C_SEG" = "delta_carbon_13",
+                        "corolla_diam_mm_SEG" = "corolla_area",
+                        "SLA_SEG" = "specific_leaf_area"))
+
+
+trait_means <- data_long %>%
+  group_by(Group, Trait) %>%
+  summarise(mean_value = mean(Value, na.rm = TRUE), .groups = "drop")
+
+
+
+frequency_dist_traits <- ggplot(data_long, aes(x = Value, fill = Group)) +
+  geom_density(alpha = 0.6) +
+  facet_grid(Group ~ Trait, scales = "free") +
+  labs(
+    title = "Frequency Distribution of Traits with Responses to Selection",
+    x = "Trait Value",
+    y = "Density"
+  ) +
+  theme_minimal() +
+  theme(
+    legend.position = "none",          # Remove legend
+    panel.grid.major = element_blank(),  # Remove major grid lines
+    panel.grid.minor = element_blank()   # Remove minor grid lines
+  ) +
+  scale_fill_brewer(palette = "Dark2") +  # Use a darker palette
+  scale_y_continuous(limits = c(0, 1.3), expand = c(0, 0))
+
+
+frequency_dist_traits
+
+
+
+ggsave("C:/Users/Helen Payne/Documents/frequency_dist_g1_22.png", plot = frequency_dist_traits, width = 10, height = 10, dpi = 300)
+
+
+```
+
+
+```{r}
+#Graphing G2 weighted by 2022
+
+HR_23_G2_weighted_by_22 <- HR_23_G2_weighted_by_22 %>%
+  dplyr::select(msm_all_std_weighted22, fl_duration_std_weighted22, d13C_SEG_std_weighted22, corolla_diam_mm_SEG_std_weighted22, SLA_SEG_std_weighted22) %>%
+  mutate(Group = "HR", Year = "2023")
+
+
+AC_23_G2_weighted_by_22 <- AC_23_G2_weighted_by_22 %>%
+  dplyr::select(msm_all_std_weighted22, fl_duration_std_weighted22, d13C_SEG_std_weighted22, corolla_diam_mm_SEG_std_weighted22, SLA_SEG_std_weighted22) %>%
+  mutate(Group = "AC", Year = "2023")
+
+BB_23_G2_weighted_by_22 <- BB_23_G2_weighted_by_22 %>%
+  dplyr::select(msm_all_std_weighted22, fl_duration_std_weighted22, d13C_SEG_std_weighted22, corolla_diam_mm_SEG_std_weighted22, SLA_SEG_std_weighted22) %>%
+  mutate(Group = "BB", Year = "2023")
+
+BO_23_G2_weighted_by_22 <- BO_23_G2_weighted_by_22 %>%
+  dplyr::select(msm_all_std_weighted22, fl_duration_std_weighted22, d13C_SEG_std_weighted22, corolla_diam_mm_SEG_std_weighted22, SLA_SEG_std_weighted22) %>%
+  mutate(Group = "BO", Year = "2023")
+
+# Combine all data
+combined_traits_1 <- bind_rows(HR_23_G2_weighted_by_22, AC_23_G2_weighted_by_22, BB_23_G2_weighted_by_22, BO_23_G2_weighted_by_22)
+
+my_data <- combined_traits_1
+
+# Reshape the data into long format for frequency plots
+data_long <- my_data %>%  # Use your actual dataframe here
+  pivot_longer(cols = c(msm_all_std_weighted22, fl_duration_std_weighted22, d13C_SEG_std_weighted22, corolla_diam_mm_SEG_std_weighted22, SLA_SEG_std_weighted22),
+               names_to = "Trait",
+               values_to = "Value")
+
+data_long <- data_long %>%
+  mutate(Trait = recode(Trait,
+                        "msm_all" = "mean_seed_mass",
+                        "fl_duration" = "flower_duration",
+                        "d13C_SEG" = "delta_carbon_13",
+                        "corolla_diam_mm_SEG" = "corolla_area",
+                        "SLA_SEG" = "specific_leaf_area"))
+
+
+trait_means <- data_long %>%
+  group_by(Group, Trait) %>%
+  summarise(mean_value = mean(Value, na.rm = TRUE), .groups = "drop")
+
+
+
+frequency_dist_traits <- ggplot(data_long, aes(x = Value, fill = Group)) +
+  geom_density(alpha = 0.3) +
+  facet_grid(Group ~ Trait, scales = "free") +
+  labs(
+    title = "Frequency Distribution of Traits with Responses to Selection",
+    x = "Trait Value",
+    y = "Density"
+  ) +
+  theme_minimal() +
+  theme(
+    legend.position = "none",          # Remove legend
+    panel.grid.major = element_blank(),  # Remove major grid lines
+    panel.grid.minor = element_blank()   # Remove minor grid lines
+  ) +
+  scale_fill_brewer(palette = "Dark2") +  # Use a darker palette
+  scale_y_continuous(limits = c(0, 1.4), expand = c(0, 0))
+
+
+frequency_dist_traits
+
+
+ggsave("C:/Users/Helen Payne/Documents/frequency_dist_g2_weighted22.png", plot = frequency_dist_traits, width = 10, height = 10, dpi = 300)
+
+
+```
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+
+
+#LETS TRY COMPARING SCALED TRAIT VALUES TOO#
+```{r}
+#Calculate mean and standard deviation for each trait in 2022
+scaling_params_22 <- AC_mean_donor_traits_22 %>%
+  summarise(across(
+    .cols = c(closed_fruits, total_fruits, filled_seeds, mean_seeds_per_fruit,
+              fl_duration, skel_dryweight_mg, msm_all, corolla_diam_mm_SEG,
+              SLA_SEG, d13C_SEG, est_fecundity, survival),
+    .fns = list(mean = ~ mean(.x, na.rm = TRUE), sd = ~ sd(.x, na.rm = TRUE))
+  ))
+
+# Scale 2022 traits using their own mean and standard deviation
+AC_mean_donor_traits_22 <- AC_mean_donor_traits_22 %>%
+  mutate(across(
+    .cols = c(closed_fruits, total_fruits, filled_seeds, mean_seeds_per_fruit,
+              fl_duration, skel_dryweight_mg, msm_all, corolla_diam_mm_SEG,
+              SLA_SEG, d13C_SEG, est_fecundity, survival),
+    .fns = ~ (. - scaling_params_22[[paste0(cur_column(), "_mean")]]) /
+             scaling_params_22[[paste0(cur_column(), "_sd")]],
+    .names = "{.col}_scaled"
+  ))
+
+
+# Scale 2023 traits using 2022 mean and standard deviation
+AC_mean_donor_traits_23_G2 <- AC_mean_donor_traits_23_G2 %>%
+  mutate(across(
+    .cols = c(closed_fruits, total_fruits, filled_seeds, mean_seeds_per_fruit,
+              fl_duration, skel_dryweight_mg, msm_all, corolla_diam_mm_SEG,
+              SLA_SEG, d13C_SEG, est_fecundity, survival),
+    .fns = ~ (. - scaling_params_22[[paste0(cur_column(), "_mean")]]) /
+             scaling_params_22[[paste0(cur_column(), "_sd")]],
+    .names = "{.col}_scaled"
+  ))
+
+# Join relative fitness from 2022 to the 2023 dataset
+AC_mean_donor_traits_23_G2 <- AC_mean_donor_traits_23_G2 %>%
+  left_join(
+    AC_mean_donor_traits_22 %>% dplyr::select(Donor, relative_fitness_22),
+    by = "Donor"
+  )
+
+# Weight each trait in 2023 by relative fitness from 2022
+AC_23_G2_weighted_by_22 <- AC_mean_donor_traits_23_G2 %>%
+  mutate(across(
+    .cols = ends_with("_scaled"),  # Use scaled traits
+    .fns = ~ . * relative_fitness_22.y,  # Multiply each trait by relative fitness from 2022
+    .names = "{.col}_weighted22"
+  ))
+
+###LETS SCALE BY 2023 too
+#Calculate mean and standard deviation for each trait in 2023
+scaling_params_23 <- AC_mean_donor_traits_23_G1 %>%
+  summarise(across(
+    .cols = c(closed_fruits, total_fruits, filled_seeds, mean_seeds_per_fruit,
+              fl_duration, skel_dryweight_mg, msm_all, corolla_diam_mm_SEG,
+              SLA_SEG, d13C_SEG, est_fecundity, survival),
+    .fns = list(mean = ~ mean(.x, na.rm = TRUE), sd = ~ sd(.x, na.rm = TRUE))
+  ))
+
+# Scale 2023 traits using their own mean and standard deviation
+AC_mean_donor_traits_23_G1 <- AC_mean_donor_traits_23_G1 %>%
+  mutate(across(
+    .cols = c(closed_fruits, total_fruits, filled_seeds, mean_seeds_per_fruit,
+              fl_duration, skel_dryweight_mg, msm_all, corolla_diam_mm_SEG,
+              SLA_SEG, d13C_SEG, est_fecundity, survival),
+    .fns = ~ (. - scaling_params_23[[paste0(cur_column(), "_mean")]]) /
+             scaling_params_23[[paste0(cur_column(), "_sd")]],
+    .names = "{.col}_scaled"
+  ))
+
+
+# Scale 2023 traits using 2023 mean and standard deviation
+AC_mean_donor_traits_23_G2 <- AC_mean_donor_traits_23_G2 %>%
+  mutate(across(
+    .cols = c(closed_fruits, total_fruits, filled_seeds, mean_seeds_per_fruit,
+              fl_duration, skel_dryweight_mg, msm_all, corolla_diam_mm_SEG,
+              SLA_SEG, d13C_SEG, est_fecundity, survival),
+    .fns = ~ (. - scaling_params_23[[paste0(cur_column(), "_mean")]]) /
+             scaling_params_23[[paste0(cur_column(), "_sd")]],
+    .names = "{.col}_scaled"
+  ))
+
+# Join relative fitness from 2023 to the 2023 dataset
+AC_mean_donor_traits_23_G2 <- AC_mean_donor_traits_23_G2 %>%
+  left_join(
+    AC_mean_donor_traits_23_G1 %>% dplyr::select(Donor, relative_fitness_23_1),
+    by = "Donor"
+  )
+
+# Weight each trait in 2023 by relative fitness from 2023
+AC_23_G2_weighted_by_23 <- AC_mean_donor_traits_23_G2 %>%
+  mutate(across(
+    .cols = ends_with("_scaled"),  # Use scaled traits
+    .fns = ~ . * relative_fitness_23_1.y,  # Multiply each trait by relative fitness from 2022
+    .names = "{.col}_weighted23"
+  ))
+```
+
+```{r}
+# Calculate mean and standard deviation for each trait in 2022
+scaling_params_22 <- BB_mean_donor_traits_22 %>%
+  summarise(across(
+    .cols = c(closed_fruits, total_fruits, filled_seeds, mean_seeds_per_fruit,
+              fl_duration, skel_dryweight_mg, msm_all, corolla_diam_mm_SEG,
+              SLA_SEG, d13C_SEG, est_fecundity, survival),
+    .fns = list(mean = ~ mean(.x, na.rm = TRUE), sd = ~ sd(.x, na.rm = TRUE))
+  ))
+
+# Scale 2022 traits using their own mean and standard deviation
+BB_mean_donor_traits_22 <- BB_mean_donor_traits_22 %>%
+  mutate(across(
+    .cols = c(closed_fruits, total_fruits, filled_seeds, mean_seeds_per_fruit,
+              fl_duration, skel_dryweight_mg, msm_all, corolla_diam_mm_SEG,
+              SLA_SEG, d13C_SEG, est_fecundity, survival),
+    .fns = ~ (. - scaling_params_22[[paste0(cur_column(), "_mean")]]) /
+             scaling_params_22[[paste0(cur_column(), "_sd")]],
+    .names = "{.col}_scaled"
+  ))
+
+# Scale 2023 traits using 2022 mean and standard deviation
+BB_mean_donor_traits_23_G2 <- BB_mean_donor_traits_23_G2 %>%
+  mutate(across(
+    .cols = c(closed_fruits, total_fruits, filled_seeds, mean_seeds_per_fruit,
+              fl_duration, skel_dryweight_mg, msm_all, corolla_diam_mm_SEG,
+              SLA_SEG, d13C_SEG, est_fecundity, survival),
+    .fns = ~ (. - scaling_params_22[[paste0(cur_column(), "_mean")]]) /
+             scaling_params_22[[paste0(cur_column(), "_sd")]],
+    .names = "{.col}_scaled"
+  ))
+
+# Join relative fitness from 2022 to the 2023 dataset
+BB_mean_donor_traits_23_G2 <- BB_mean_donor_traits_23_G2 %>%
+  left_join(
+    BB_mean_donor_traits_22 %>% dplyr::select(Donor, relative_fitness_22),
+    by = "Donor"
+  )
+
+# Weight each trait in 2023 by relative fitness from 2022
+BB_23_G2_weighted_by_22 <- BB_mean_donor_traits_23_G2 %>%
+  mutate(across(
+    .cols = ends_with("_scaled"),  # Use scaled traits
+    .fns = ~ . * relative_fitness_22.y,  # Multiply each trait by relative fitness from 2022
+    .names = "{.col}_weighted22"
+  ))
+
+### LET'S SCALE BY 2023 TOO
+# Calculate mean and standard deviation for each trait in 2023
+scaling_params_23 <- BB_mean_donor_traits_23_G1 %>%
+  summarise(across(
+    .cols = c(closed_fruits, total_fruits, filled_seeds, mean_seeds_per_fruit,
+              fl_duration, skel_dryweight_mg, msm_all, corolla_diam_mm_SEG,
+              SLA_SEG, d13C_SEG, est_fecundity, survival),
+    .fns = list(mean = ~ mean(.x, na.rm = TRUE), sd = ~ sd(.x, na.rm = TRUE))
+  ))
+
+# Scale 2023 traits using their own mean and standard deviation
+BB_mean_donor_traits_23_G1 <- BB_mean_donor_traits_23_G1 %>%
+  mutate(across(
+    .cols = c(closed_fruits, total_fruits, filled_seeds, mean_seeds_per_fruit,
+              fl_duration, skel_dryweight_mg, msm_all, corolla_diam_mm_SEG,
+              SLA_SEG, d13C_SEG, est_fecundity, survival),
+    .fns = ~ (. - scaling_params_23[[paste0(cur_column(), "_mean")]]) /
+             scaling_params_23[[paste0(cur_column(), "_sd")]],
+    .names = "{.col}_scaled"
+  ))
+
+BB_mean_donor_traits_23_G2 <- BB_mean_donor_traits_23_G2 %>%
+  mutate(across(
+    .cols = c(closed_fruits, total_fruits, filled_seeds, mean_seeds_per_fruit,
+              fl_duration, skel_dryweight_mg, msm_all, corolla_diam_mm_SEG,
+              SLA_SEG, d13C_SEG, est_fecundity, survival),
+    .fns = ~ (. - scaling_params_23[[paste0(cur_column(), "_mean")]]) /
+             scaling_params_23[[paste0(cur_column(), "_sd")]],
+    .names = "{.col}_scaled"
+  ))
+
+# Join relative fitness from 2023 to the 2023 dataset
+BB_mean_donor_traits_23_G2 <- BB_mean_donor_traits_23_G2 %>%
+  left_join(
+    BB_mean_donor_traits_23_G1 %>% dplyr::select(Donor, relative_fitness_23_1),
+    by = "Donor"
+  )
+
+# Weight each trait in 2023 by relative fitness from 2023
+BB_23_G2_weighted_by_23 <- BB_mean_donor_traits_23_G2 %>%
+  mutate(across(
+    .cols = ends_with("_scaled"),  # Use scaled traits
+    .fns = ~ . * relative_fitness_23_1.y,  # Multiply each trait by relative fitness from 2023
+    .names = "{.col}_weighted23"
+  ))
+
+```
+
+
+```{r}
+# Calculate mean and standard deviation for each trait in 2022
+scaling_params_22 <- BO_mean_donor_traits_22 %>%
+  summarise(across(
+    .cols = c(closed_fruits, total_fruits, filled_seeds, mean_seeds_per_fruit,
+              fl_duration, skel_dryweight_mg, msm_all, corolla_diam_mm_SEG,
+              SLA_SEG, d13C_SEG, est_fecundity, survival),
+    .fns = list(mean = ~ mean(.x, na.rm = TRUE), sd = ~ sd(.x, na.rm = TRUE))
+  ))
+
+# Scale 2022 traits using their own mean and standard deviation
+BO_mean_donor_traits_22 <- BO_mean_donor_traits_22 %>%
+  mutate(across(
+    .cols = c(closed_fruits, total_fruits, filled_seeds, mean_seeds_per_fruit,
+              fl_duration, skel_dryweight_mg, msm_all, corolla_diam_mm_SEG,
+              SLA_SEG, d13C_SEG, est_fecundity, survival),
+    .fns = ~ (. - scaling_params_22[[paste0(cur_column(), "_mean")]]) /
+             scaling_params_22[[paste0(cur_column(), "_sd")]],
+    .names = "{.col}_scaled"
+  ))
+
+# Scale 2023 traits using 2022 mean and standard deviation
+BO_mean_donor_traits_23_G2 <- BO_mean_donor_traits_23_G2 %>%
+  mutate(across(
+    .cols = c(closed_fruits, total_fruits, filled_seeds, mean_seeds_per_fruit,
+              fl_duration, skel_dryweight_mg, msm_all, corolla_diam_mm_SEG,
+              SLA_SEG, d13C_SEG, est_fecundity, survival),
+    .fns = ~ (. - scaling_params_22[[paste0(cur_column(), "_mean")]]) /
+             scaling_params_22[[paste0(cur_column(), "_sd")]],
+    .names = "{.col}_scaled"
+  ))
+
+# Join relative fitness from 2022 to the 2023 dataset
+BO_mean_donor_traits_23_G2 <- BO_mean_donor_traits_23_G2 %>%
+  left_join(
+    BO_mean_donor_traits_22 %>% dplyr::select(Donor, relative_fitness_22),
+    by = "Donor"
+  )
+
+# Weight each trait in 2023 by relative fitness from 2022
+BO_23_G2_weighted_by_22 <- BO_mean_donor_traits_23_G2 %>%
+  mutate(across(
+    .cols = ends_with("_scaled"),  # Use scaled traits
+    .fns = ~ . * relative_fitness_22.y,  # Multiply each trait by relative fitness from 2022
+    .names = "{.col}_weighted22"
+  ))
+
+### LET'S SCALE BY 2023 TOO
+# Calculate mean and standard deviation for each trait in 2023
+scaling_params_23 <- BO_mean_donor_traits_23_G1 %>%
+  summarise(across(
+    .cols = c(closed_fruits, total_fruits, filled_seeds, mean_seeds_per_fruit,
+              fl_duration, skel_dryweight_mg, msm_all, corolla_diam_mm_SEG,
+              SLA_SEG, d13C_SEG, est_fecundity, survival),
+    .fns = list(mean = ~ mean(.x, na.rm = TRUE), sd = ~ sd(.x, na.rm = TRUE))
+  ))
+
+# Scale 2023 traits using their own mean and standard deviation
+BO_mean_donor_traits_23_G1 <- BO_mean_donor_traits_23_G1 %>%
+  mutate(across(
+    .cols = c(closed_fruits, total_fruits, filled_seeds, mean_seeds_per_fruit,
+              fl_duration, skel_dryweight_mg, msm_all, corolla_diam_mm_SEG,
+              SLA_SEG, d13C_SEG, est_fecundity, survival),
+    .fns = ~ (. - scaling_params_23[[paste0(cur_column(), "_mean")]]) /
+             scaling_params_23[[paste0(cur_column(), "_sd")]],
+    .names = "{.col}_scaled"
+  ))
+
+BO_mean_donor_traits_23_G2 <- BO_mean_donor_traits_23_G2 %>%
+  mutate(across(
+    .cols = c(closed_fruits, total_fruits, filled_seeds, mean_seeds_per_fruit,
+              fl_duration, skel_dryweight_mg, msm_all, corolla_diam_mm_SEG,
+              SLA_SEG, d13C_SEG, est_fecundity, survival),
+    .fns = ~ (. - scaling_params_23[[paste0(cur_column(), "_mean")]]) /
+             scaling_params_23[[paste0(cur_column(), "_sd")]],
+    .names = "{.col}_scaled"
+  ))
+
+# Join relative fitness from 2023 to the 2023 dataset
+BO_mean_donor_traits_23_G2 <- BO_mean_donor_traits_23_G2 %>%
+  left_join(
+    BO_mean_donor_traits_23_G1 %>% dplyr::select(Donor, relative_fitness_23_1),
+    by = "Donor"
+  )
+
+# Weight each trait in 2023 by relative fitness from 2023
+BO_23_G2_weighted_by_23 <- BO_mean_donor_traits_23_G2 %>%
+  mutate(across(
+    .cols = ends_with("_scaled"),  # Use scaled traits
+    .fns = ~ . * relative_fitness_23_1.y,  # Multiply each trait by relative fitness from 2023
+    .names = "{.col}_weighted23"
+  ))
+
+```
+
+
+```{r}
+# Calculate mean and standard deviation for each trait in 2022
+scaling_params_22 <- HR_mean_donor_traits_22 %>%
+  summarise(across(
+    .cols = c(closed_fruits, total_fruits, filled_seeds, mean_seeds_per_fruit,
+              fl_duration, skel_dryweight_mg, msm_all, corolla_diam_mm_SEG,
+              SLA_SEG, d13C_SEG, est_fecundity, survival),
+    .fns = list(mean = ~ mean(.x, na.rm = TRUE), sd = ~ sd(.x, na.rm = TRUE))
+  ))
+
+# Scale 2022 traits using their own mean and standard deviation
+HR_mean_donor_traits_22 <- HR_mean_donor_traits_22 %>%
+  mutate(across(
+    .cols = c(closed_fruits, total_fruits, filled_seeds, mean_seeds_per_fruit,
+              fl_duration, skel_dryweight_mg, msm_all, corolla_diam_mm_SEG,
+              SLA_SEG, d13C_SEG, est_fecundity, survival),
+    .fns = ~ (. - scaling_params_22[[paste0(cur_column(), "_mean")]]) /
+             scaling_params_22[[paste0(cur_column(), "_sd")]],
+    .names = "{.col}_scaled"
+  ))
+
+# Scale 2023 traits using 2022 mean and standard deviation
+HR_mean_donor_traits_23_G2 <- HR_mean_donor_traits_23_G2 %>%
+  mutate(across(
+    .cols = c(closed_fruits, total_fruits, filled_seeds, mean_seeds_per_fruit,
+              fl_duration, skel_dryweight_mg, msm_all, corolla_diam_mm_SEG,
+              SLA_SEG, d13C_SEG, est_fecundity, survival),
+    .fns = ~ (. - scaling_params_22[[paste0(cur_column(), "_mean")]]) /
+             scaling_params_22[[paste0(cur_column(), "_sd")]],
+    .names = "{.col}_scaled"
+  ))
+
+# Join relative fitness from 2022 to the 2023 dataset
+HR_mean_donor_traits_23_G2 <- HR_mean_donor_traits_23_G2 %>%
+  left_join(
+    HR_mean_donor_traits_22 %>% dplyr::select(Donor, relative_fitness_22),
+    by = "Donor"
+  )
+
+# Weight each trait in 2023 by relative fitness from 2022
+HR_23_G2_weighted_by_22 <- HR_mean_donor_traits_23_G2 %>%
+  mutate(across(
+    .cols = ends_with("_scaled"),  # Use scaled traits
+    .fns = ~ . * relative_fitness_22.y,  # Multiply each trait by relative fitness from 2022
+    .names = "{.col}_weighted22"
+  ))
+
+### LET'S SCALE BY 2023 TOO
+# Calculate mean and standard deviation for each trait in 2023
+scaling_params_23 <- HR_mean_donor_traits_23_G1 %>%
+  summarise(across(
+    .cols = c(closed_fruits, total_fruits, filled_seeds, mean_seeds_per_fruit,
+              fl_duration, skel_dryweight_mg, msm_all, corolla_diam_mm_SEG,
+              SLA_SEG, d13C_SEG, est_fecundity, survival),
+    .fns = list(mean = ~ mean(.x, na.rm = TRUE), sd = ~ sd(.x, na.rm = TRUE))
+  ))
+
+# Scale 2023 traits using their own mean and standard deviation
+HR_mean_donor_traits_23_G1 <- HR_mean_donor_traits_23_G1 %>%
+  mutate(across(
+    .cols = c(closed_fruits, total_fruits, filled_seeds, mean_seeds_per_fruit,
+              fl_duration, skel_dryweight_mg, msm_all, corolla_diam_mm_SEG,
+              SLA_SEG, d13C_SEG, est_fecundity, survival),
+    .fns = ~ (. - scaling_params_23[[paste0(cur_column(), "_mean")]]) /
+             scaling_params_23[[paste0(cur_column(), "_sd")]],
+    .names = "{.col}_scaled"
+  ))
+
+HR_mean_donor_traits_23_G2 <- HR_mean_donor_traits_23_G2 %>%
+  mutate(across(
+    .cols = c(closed_fruits, total_fruits, filled_seeds, mean_seeds_per_fruit,
+              fl_duration, skel_dryweight_mg, msm_all, corolla_diam_mm_SEG,
+              SLA_SEG, d13C_SEG, est_fecundity, survival),
+    .fns = ~ (. - scaling_params_23[[paste0(cur_column(), "_mean")]]) /
+             scaling_params_23[[paste0(cur_column(), "_sd")]],
+    .names = "{.col}_scaled"
+  ))
+
+# Join relative fitness from 2023 to the 2023 dataset
+HR_mean_donor_traits_23_G2 <- HR_mean_donor_traits_23_G2 %>%
+  left_join(
+    HR_mean_donor_traits_23_G1 %>% dplyr::select(Donor, relative_fitness_23_1),
+    by = "Donor"
+  )
+
+# Weight each trait in 2023 by relative fitness from 2023
+HR_23_G2_weighted_by_23 <- HR_mean_donor_traits_23_G2 %>%
+  mutate(across(
+    .cols = ends_with("_scaled"),  # Use scaled traits
+    .fns = ~ . * relative_fitness_23_1.y,  # Multiply each trait by relative fitness from 2023
+    .names = "{.col}_weighted23"
+  ))
+
+```
+
+
+
+Lets graph these
+```{r}
+
+AC_mean_donor_traits_22<- AC_mean_donor_traits_22 %>%
+  dplyr::select(msm_all_scaled, fl_duration_scaled, d13C_SEG_scaled, corolla_diam_mm_SEG_scaled, SLA_SEG_scaled) %>%
+  rename_with(~ gsub("_scaled", "", .x)) %>%
+  mutate(Group = "AC", Generation = "G1", Year = "2022")
+
+BB_mean_donor_traits_22<- BB_mean_donor_traits_22 %>%
+  dplyr::select(msm_all_scaled, fl_duration_scaled, d13C_SEG_scaled, corolla_diam_mm_SEG_scaled, SLA_SEG_scaled) %>%
+  rename_with(~ gsub("_scaled", "", .x)) %>%
+  mutate(Group = "BB", Generation = "G1", Year = "2022")
+
+BO_mean_donor_traits_22<- BO_mean_donor_traits_22 %>%
+  dplyr::select(msm_all_scaled, fl_duration_scaled, d13C_SEG_scaled, corolla_diam_mm_SEG_scaled, SLA_SEG_scaled) %>%
+  rename_with(~ gsub("_scaled", "", .x)) %>%
+  mutate(Group = "BO", Generation = "G1", Year = "2022")
+
+HR_mean_donor_traits_22<- HR_mean_donor_traits_22 %>%
+  dplyr::select(msm_all_scaled, fl_duration_scaled, d13C_SEG_scaled, corolla_diam_mm_SEG_scaled, SLA_SEG_scaled) %>%
+  rename_with(~ gsub("_scaled", "", .x)) %>%
+  mutate(Group = "HR", Generation = "G1", Year = "2022")
+
+
+AC_23_G2_weighted_by_23_a <- AC_23_G2_weighted_by_23 %>%
+  dplyr::select(msm_all_scaled_weighted23, fl_duration_scaled_weighted23, d13C_SEG_scaled_weighted23, corolla_diam_mm_SEG_scaled_weighted23, SLA_SEG_scaled_weighted23) %>%
+  rename_with(~ gsub("_scaled_weighted23", "", .x)) %>%
+  mutate(Group = "AC", Generation = "G2", Year = "2023")
+
+BB_23_G2_weighted_by_23_a <- BB_23_G2_weighted_by_23 %>%
+  dplyr::select(msm_all_scaled_weighted23, fl_duration_scaled_weighted23, d13C_SEG_scaled_weighted23, corolla_diam_mm_SEG_scaled_weighted23, SLA_SEG_scaled_weighted23) %>%
+  rename_with(~ gsub("_scaled_weighted23", "", .x)) %>%
+  mutate(Group = "BB", Generation = "G2", Year = "2023")
+
+BO_23_G2_weighted_by_23_a <- BO_23_G2_weighted_by_23 %>%
+  dplyr::select(msm_all_scaled_weighted23, fl_duration_scaled_weighted23, d13C_SEG_scaled_weighted23, corolla_diam_mm_SEG_scaled_weighted23, SLA_SEG_scaled_weighted23) %>%
+  rename_with(~ gsub("_scaled_weighted23", "", .x)) %>%
+  mutate(Group = "BO", Generation = "G2", Year = "2023")
+
+HR_23_G2_weighted_by_23_a <- HR_23_G2_weighted_by_23 %>%
+  dplyr::select(msm_all_scaled_weighted23, fl_duration_scaled_weighted23, d13C_SEG_scaled_weighted23, corolla_diam_mm_SEG_scaled_weighted23, SLA_SEG_scaled_weighted23) %>%
+  rename_with(~ gsub("_scaled_weighted23", "", .x)) %>%
+  mutate(Group = "HR", Generation = "G2", Year = "2023")
+
+# Combine all data
+combined_traits <- bind_rows(
+AC_mean_donor_traits_22, BB_mean_donor_traits_22, BO_mean_donor_traits_22, HR_mean_donor_traits_22, AC_23_G2_weighted_by_23_a, BB_23_G2_weighted_by_23_a, BO_23_G2_weighted_by_23_a, HR_23_G2_weighted_by_23_a
+)
+
+# Convert data to long format
+data_long <- combined_traits %>%
+  pivot_longer(cols = c(msm_all, fl_duration, d13C_SEG, corolla_diam_mm_SEG, SLA_SEG),
+               names_to = "Trait",
+               values_to = "Value")
+
+# Convert Value to numeric
+data_long <- data_long %>% mutate(Value = as.numeric(Value))
+
+# Rename Trait values for readability
+data_long <- data_long %>%
+  mutate(
+    Trait = recode(
+      Trait,
+      "msm_all" = "Mean Seed Mass",
+      "fl_duration" = "Flowering Duration",
+      "d13C_SEG" = "δ13C",
+      "corolla_diam_mm_SEG" = "Corolla Diameter",
+      "SLA_SEG" = "Specific Leaf Area"
+    )
+  )
+
+# Create individual density plots for each trait
+plots <- lapply(unique(data_long$Trait), function(trait) {
+  ggplot(filter(data_long, Trait == trait), aes(x = Value, fill = Year)) +
+    geom_density(alpha = 0.6) +
+    facet_grid(Group ~ Trait, scales = "free_y") +  # Separate traits vertically
+    labs(
+      title = paste("Distribution of", trait, "for G1 and G2"),
+      x = "Trait Value",
+      y = "Density"
+    ) +
+    theme_minimal() +
+    theme(
+      legend.position = "top",
+      panel.grid.major = element_blank(),
+      panel.grid.minor = element_blank(),
+      strip.text.y = element_text(angle = 0),
+      strip.text.x = element_text(face = "bold")
+    ) +
+    scale_fill_manual(values = c("2022" = "#ff6f61", "2023" = "#17becf")) +
+    scale_y_continuous(expand = c(0, 0))  # Let x-axis adjust dynamically
+})
+
+# Combine and display all plots
+library(cowplot)
+combined_plot <- plot_grid(plotlist = plots, align = "v", ncol = 1)
+
+# Display the combined plot
+print(combined_plot)
+
+# Save the plot
+ggsave("frequency_dist_G1_vs_G2_dynamic_x_axis.png", plot = combined_plot, width = 12, height = 10, dpi = 300)
+
+```
+
+```{r}
+# Convert data to long format
+data_long <- combined_traits %>%
+  pivot_longer(
+    cols = c(msm_all, fl_duration, d13C_SEG, corolla_diam_mm_SEG, SLA_SEG),
+    names_to = "Trait",
+    values_to = "Value"
+  ) %>%
+  mutate(Value = as.numeric(Value)) %>%
+  mutate(
+    Trait = recode(
+      Trait,
+      "msm_all" = "Mean Seed Mass",
+      "fl_duration" = "Flowering Duration",
+      "d13C_SEG" = "δ13C",
+      "corolla_diam_mm_SEG" = "Corolla Diameter",
+      "SLA_SEG" = "Specific Leaf Area"
+    )
+  )
+
+# Create individual density plots for each trait
+plots <- lapply(unique(data_long$Trait), function(trait) {
+  ggplot(filter(data_long, Trait == trait), aes(x = Value, fill = Generation)) +
+    geom_density(alpha = 0.6) +
+    facet_grid(Group ~ Trait, scales = "free_y") +
+    labs(
+      title = paste("Distribution of", trait, "for G1 and G2"),
+      x = "Trait Value",
+      y = "Density"
+    ) +
+    theme_minimal() +
+    theme(
+      legend.position = "top",
+      panel.grid.major = element_blank(),
+      panel.grid.minor = element_blank(),
+      strip.text.y = element_text(angle = 0),
+      strip.text.x = element_text(face = "bold")
+    ) +
+    scale_fill_manual(values = c("G1" = "#ff6f61", "G2" = "#17becf")) +
+    scale_y_continuous(expand = c(0, 0))  # Let x-axis adjust dynamically
+})
+
+# Combine all plots into a vertical layout
+combined_plot <- plot_grid(plotlist = plots, align = "v", ncol = 1)
+
+# Display the combined plot
+print(combined_plot)
+
+# Save the plot
+ggsave("frequency_dist_G1_vs_G2_dynamic_x_axis.png", plot = combined_plot, width = 12, height = 10, dpi = 300)
+
+```
+
+AC_SELECTION
+---
+title: "AC_genotypic_selection"
+author: "Helen Payne"
+date: "2024-11-11"
+output: html_document
+---
+
+```{r}
+
+AC_fit_22 <- read_csv(here::here("data_sheets", "compiled_sheets", "AC_fit_22.csv"))
+AC_fit_23_G1 <- read_csv(here::here("data_sheets", "compiled_sheets", "AC_fit_23_G1.csv"))
+AC_fit_23_G2 <- read_csv(here::here("data_sheets", "compiled_sheets", "AC_fit_23_G2.csv"))
+
+```
+
+
+
+```{r}
+# Remove rows with NA values in specified columns
+AC_fit_22_clean <- AC_fit_22 %>%
+  filter(
+    !is.na(SLA_SEG),
+    !is.na(msm_all),
+    !is.na(fl_duration),
+    !is.na(d13C_SEG),
+    !is.na(corolla_diam_mm_SEG),
+    !is.na(est_fitness)
+  )
+
+
+# Standardize the continuous predictors
+##transforming each trait to have a mean of 0 and a standard deviation of 1. This transformation is useful for models that include traits measured on different scales, as it brings them onto a comparable scale and can improve model convergence and interpretability of coefficients.
+AC_fit_22_clean <- AC_fit_22_clean %>%
+  mutate(
+    SLA_SEG = scale(SLA_SEG),
+    msm_all = scale(msm_all),
+    fl_duration = scale(fl_duration),
+    d13C_SEG = scale(d13C_SEG),
+    corolla_diam_mm_SEG = scale(corolla_diam_mm_SEG),
+  )
+
+##FOR RELATIVE FITNESS:
+# Calculate mean fitness
+#mean_fitness <- mean(AC_fit_22_clean$est_fitness, na.rm = TRUE)
+
+# Calculate relative fitness based on mean
+#AC_fit_22_clean <- AC_fit_22_clean %>%
+    #mutate(relative_fitness = est_fitness / mean_fitness)
+
+#AC_fit_22_clean$relative_fitness <- round(AC_fit_22_clean$relative_fitness)
+
+
+```
+
+
+```{r}
+library(ggplot2)
+
+#AC_fit_22_clean$SLA_LOG <- log(AC_fit_22_clean$SLA_SEG + 10)
+#AC_fit_22_clean$est_fitness_LOG <- log(AC_fit_22_clean$est_fitness)
+
+#AC_fit_22_clean$est_fitness_LOG <- round(AC_fit_22_clean$est_fitness_LOG)
+#AC_fit_22_clean$est_fitness <- round(AC_fit_22_clean$est_fitness)
+
+
+#traits <- c("SLA_SEG", "msm_all", "fl_duration", "d13C_SEG", "corolla_diam_mm_SEG", "skel_dryweight_mg_SEG", "relative_fitness", "est_fitness")
+#log_traits <- c("SLA_LOG", "msm_all", "fl_duration", "d13C_SEG", "corolla_diam_mm_SEG", "skel_dryweight_mg_LOG", "est_fitness_LOG")
+
+# ##
+# # Checking histograms of traits
+# for (trait in traits) {
+#     plot <- ggplot(AC_fit_22_clean, aes_string(x = trait)) +
+#         geom_histogram(bins = 30) +
+#         ggtitle(paste("Histogram of", trait)) +
+#         theme_minimal()
+#     print(plot)
+# }
+# # Checking histograms of logged traits
+# for (trait in log_traits) {
+#     plot <- ggplot(AC_fit_22_clean, aes_string(x = trait)) +
+#         geom_histogram(bins = 30) +
+#         ggtitle(paste("Histogram of", trait)) +
+#         theme_minimal()
+#     print(plot)
+# }
+# 
+# ##
+# #Checking for Skewness and Kurtosis
+# library(e1071)
+# for (trait in traits) {
+#     cat(trait, "Skewness:", skewness(AC_fit_22_clean[[trait]], na.rm = TRUE), "\n")
+#     cat(trait, "Kurtosis:", kurtosis(AC_fit_22_clean[[trait]], na.rm = TRUE), "\n")
+# }
+# #Checking for Skewness and Kurtosis in logged traits
+# for (trait in log_traits) {
+#     cat(trait, "Skewness:", skewness(AC_fit_22_clean[[trait]], na.rm = TRUE), "\n")
+#     cat(trait, "Kurtosis:", kurtosis(AC_fit_22_clean[[trait]], na.rm = TRUE), "\n")
+# }
+# ##
+# 
+# #Checking for heteroscedasticity
+# # Loop through each trait and display the scatter plot
+# for (trait in traits) {
+#     plot <- ggplot(AC_fit_22_clean, aes_string(x = trait, y = "est_fitness")) + 
+#         geom_point() + 
+#         ggtitle(paste("Scatter Plot of", trait, "vs est_fitness")) + 
+#         theme_minimal()
+#     
+#     print(plot)  # Display the plot
+# }
+# #
+# for (trait in log_traits) {
+#     plot <- ggplot(AC_fit_22_clean, aes_string(x = trait, y = "est_fitness")) + 
+#         geom_point() + 
+#         ggtitle(paste("Scatter Plot of", trait, "vs est_fitness")) + 
+#         theme_minimal()
+#     
+#     print(plot)  # Display the plot
+# }
+# ##
+# 
+# #Checking QQ Plots
+# for (trait in traits) {
+#     qqnorm(AC_fit_22_clean[[trait]], main = paste("Q-Q Plot of", trait))
+#     qqline(AC_fit_22_clean[[trait]], col = "blue")
+# }
+# 
+# for (trait in log_traits) {
+#     qqnorm(AC_fit_22_clean[[trait]], main = paste("Q-Q Plot of", trait))
+#     qqline(AC_fit_22_clean[[trait]], col = "blue")
+# }
+# 
+```
+
+
+```{r}
+library(lmerTest)
+library(MuMIn)
+library(influence.ME)
+
+
+#model with nested maternal effects and transect
+model_1rf <- lmer(log(est_fitness) ~ SLA_SEG + msm_all + fl_duration + 
+                  d13C_SEG + corolla_diam_mm_SEG + (1|Donor:Recipient) + (1|Transect), 
+                data = AC_fit_22_clean)
+
+#model with nested maternal effects
+model_2rf <- lmer(log(est_fitness) ~ SLA_SEG + msm_all + fl_duration + 
+                  d13C_SEG + corolla_diam_mm_SEG + (1|Donor:Recipient), 
+                data = AC_fit_22_clean)
+
+#model with just transect
+model_3rf <- lmer(log(est_fitness) ~ SLA_SEG + msm_all + fl_duration + 
+                  d13C_SEG + corolla_diam_mm_SEG + (1|Transect), 
+                data = AC_fit_22_clean)
+
+
+#determine which model is the best - the one without transect
+AIC(model_1rf, model_2rf, model_3rf)
+
+#run the final model with all the fixed effects
+model_2full <- lmer(log(est_fitness) ~ SLA_SEG + msm_all + fl_duration + 
+                  d13C_SEG + corolla_diam_mm_SEG + (1|Donor:Recipient), 
+                data = AC_fit_22_clean, REML =F)
+
+#dredge the model to determine which fixed effects are the best
+dredge(model_2full)
+
+#determine the best model
+model_best <- lmer(log(est_fitness) ~ SLA_SEG + msm_all + fl_duration + 
+                  d13C_SEG + (1|Donor:Recipient), 
+                data = AC_fit_22_clean, REML =T)
+
+summary(model_best)
+
+#check if the model is any good 
+car::qqp(resid(model_best))
+
+residuals_best <- residuals(model_best, type = "pearson")
+car::qqp(ranef(model_best)$`Donor:Recipient`$`(Intercept)`)
+
+
+# Plot residuals to check for outliers
+ggplot(data = AC_fit_22_clean, aes(x = fitted(model_best), y = residuals_best)) +
+  geom_point(alpha = 0.5) +
+  geom_hline(yintercept = 0, color = "red", linetype = "dashed") +
+  labs(title = "Residuals vs Fitted Plot",
+       x = "Fitted Values",
+       y = "Pearson Residuals") +
+  theme_minimal()
+
+
+```
+
+```{r}
+#maternal genotypic trait influence on fitness for MSM
+ggplot(AC_fit_22_clean, aes(x=msm_all, y=est_fitness, col=Recipient)) + geom_point() + theme(legend.position ="") + geom_smooth(method="lm", se=F)
+
+#paternal genotypic trait influence on fitness for MSM
+ggplot(AC_fit_22_clean, aes(x=msm_all, y=est_fitness, col=Recipient)) + geom_point() + theme(legend.position ="") + geom_smooth(method="lm", se=F) +facet_wrap(~Donor)
+
+#maternal genotypic trait influence on fitness for fl duration
+ggplot(AC_fit_22_clean, aes(x=fl_duration, y=est_fitness, col=Recipient)) + geom_point() + theme(legend.position ="") + geom_smooth(method="lm", se=F)
+
+#paternal genotypic trait influence on fitness for fl duration
+ggplot(AC_fit_22_clean, aes(x=fl_duration, y=est_fitness, col=Recipient)) + geom_point() + theme(legend.position ="") + geom_smooth(method="lm", se=F) +facet_wrap(~Donor)
+
+#maternal genotypic trait influence on fitness for d13C
+ggplot(AC_fit_22_clean, aes(x=d13C, y=est_fitness, col=Recipient)) + geom_point() + theme(legend.position ="") + geom_smooth(method="lm", se=F)
+
+#paternal genotypic trait influence on fitness for d13C
+ggplot(AC_fit_22_clean, aes(x=d13C, y=est_fitness, col=Recipient)) + geom_point() + theme(legend.position ="") + geom_smooth(method="lm", se=F) +facet_wrap(~Donor)
+```
+
+
+```{r}
+##doing the same thing for AC 23 G1
+# Remove rows with NA values in specified columns
+AC_fit_23_G1_clean <- AC_fit_23_G1 %>%
+  filter(
+    !is.na(SLA_SEG),
+    !is.na(msm_all),
+    !is.na(fl_duration),
+    !is.na(d13C_SEG),
+    !is.na(corolla_diam_mm_SEG),
+    !is.na(est_fitness)
+  )
+
+
+# Standardize the continuous predictors
+##transforming each trait to have a mean of 0 and a standard deviation of 1. This transformation is useful for models that include traits measured on different scales, as it brings them onto a comparable scale and can improve model convergence and interpretability of coefficients.
+AC_fit_23_G1_clean <- AC_fit_23_G1_clean %>%
+  mutate(
+    SLA_SEG = scale(SLA_SEG),
+    msm_all = scale(msm_all),
+    fl_duration = scale(fl_duration),
+    d13C_SEG = scale(d13C_SEG),
+    corolla_diam_mm_SEG = scale(corolla_diam_mm_SEG),
+  )
+```
+
+
+```{r}
+
+#model with nested maternal effects and transect
+model_1rf <- lmer(log(est_fitness) ~ SLA_SEG + msm_all + fl_duration + 
+                  d13C_SEG + corolla_diam_mm_SEG + (1|Donor:Recipient) + (1|Transect), 
+                data = AC_fit_23_G1_clean)
+
+#model with nested maternal effects
+model_2rf <- lmer(log(est_fitness) ~ SLA_SEG + msm_all + fl_duration + 
+                  d13C_SEG + corolla_diam_mm_SEG + (1|Donor:Recipient), 
+                data = AC_fit_23_G1_clean)
+
+#model with just transect
+model_3rf <- lmer(log(est_fitness) ~ SLA_SEG + msm_all + fl_duration + 
+                  d13C_SEG + corolla_diam_mm_SEG + (1|Transect), 
+                data = AC_fit_23_G1_clean)
+
+
+
+#determine which model is the best - the one without transect
+AIC(model_1rf, model_2rf, model_3rf)
+
+#run the final model with all the fixed effects
+model_1full <-lmer(log(est_fitness) ~ SLA_SEG + msm_all + fl_duration + 
+                  d13C_SEG + corolla_diam_mm_SEG + (1|Transect), 
+                data = AC_fit_23_G1_clean, REML = F)
+
+#dredge the model to determine which fixed effects are the best
+dredge(model_1full)
+
+#determine the best model
+model_best <- lmer(log(est_fitness) ~ msm_all + fl_duration + (1|Transect), 
+                data = AC_fit_23_G1_clean, REML = T)
+
+summary(model_best)
+
+#check if the model is any good 
+car::qqp(resid(model_best))
+car::qqp(ranef(model_best)$`Transect`$`(Intercept)`)
+
+
+residuals_best <- residuals(model_best, type = "pearson")
+
+# Plot residuals to check for outliers
+ggplot(data = AC_fit_23_G1_clean, aes(x = fitted(model_best), y = residuals_best)) +
+  geom_point(alpha = 0.5) +
+  geom_hline(yintercept = 0, color = "red", linetype = "dashed") +
+  labs(title = "Residuals vs Fitted Plot",
+       x = "Fitted Values",
+       y = "Pearson Residuals") +
+  theme_minimal()
+
+```
+
+
+```{r}
+##doing the same thing for AC 23 G2
+# Remove rows with NA values in specified columns
+AC_fit_23_G2_clean <- AC_fit_23_G2 %>%
+  filter(
+    !is.na(SLA_SEG),
+    !is.na(msm_all),
+    !is.na(fl_duration),
+    !is.na(d13C_SEG),
+    !is.na(corolla_diam_mm_SEG),
+    !is.na(est_fitness)
+  )
+
+
+# Standardize the continuous predictors
+##transforming each trait to have a mean of 0 and a standard deviation of 1. This transformation is useful for models that include traits measured on different scales, as it brings them onto a comparable scale and can improve model convergence and interpretability of coefficients.
+AC_fit_23_G2_clean <- AC_fit_23_G2_clean %>%
+  mutate(
+    SLA_SEG = scale(SLA_SEG),
+    msm_all = scale(msm_all),
+    fl_duration = scale(fl_duration),
+    d13C_SEG = scale(d13C_SEG),
+    corolla_diam_mm_SEG = scale(corolla_diam_mm_SEG),
+  )
+```
+
+
+```{r}
+
+#model with nested maternal effects and transect
+model_1rf <- lmer(log(est_fitness) ~ SLA_SEG + msm_all + fl_duration + 
+                  d13C_SEG + corolla_diam_mm_SEG + (1|Donor:Recipient) + (1|Transect), 
+                data = AC_fit_23_G2_clean)
+
+#model with nested maternal effects
+model_2rf <- lmer(log(est_fitness) ~ SLA_SEG + msm_all + fl_duration + 
+                  d13C_SEG + corolla_diam_mm_SEG + (1|Donor:Recipient), 
+                data = AC_fit_23_G2_clean)
+
+#model with just transect
+model_3rf <- lmer(log(est_fitness) ~ SLA_SEG + msm_all + fl_duration + 
+                  d13C_SEG + corolla_diam_mm_SEG + (1|Transect), 
+                data = AC_fit_23_G2_clean)
+
+
+#determine which model is the best - the one without transect
+AIC(model_1rf, model_2rf, model_3rf)
+
+model_4rf <- lm(log(est_fitness) ~ SLA_SEG + msm_all + fl_duration + 
+                  d13C_SEG + corolla_diam_mm_SEG, 
+                data = AC_fit_23_G2_clean)
+
+#run the final model with all the fixed effects
+model_1full <-lm(log(est_fitness) ~ SLA_SEG + msm_all + fl_duration + 
+                  d13C_SEG + corolla_diam_mm_SEG, 
+                data = AC_fit_23_G2_clean)
+
+#dredge the model to determine which fixed effects are the best
+dredge(model_1full)
+
+#determine the best model
+model_best <-lm(log(est_fitness) ~ fl_duration, 
+                data = AC_fit_23_G2_clean)
+
+summary(model_best)
+
+#check if the model is any good 
+car::qqp(resid(model_best))
+car::qqp(ranef(model_best)$`Transect`$`(Intercept)`)
+
+
+residuals_best <- residuals(model_best, type = "pearson")
+
+# Plot residuals to check for outliers
+ggplot(data = AC_fit_23_G2_clean, aes(x = fitted(model_best), y = residuals_best)) +
+  geom_point(alpha = 0.5) +
+  geom_hline(yintercept = 0, color = "red", linetype = "dashed") +
+  labs(title = "Residuals vs Fitted Plot",
+       x = "Fitted Values",
+       y = "Pearson Residuals") +
+  theme_minimal()
+
+```
+
+
+
+```{r}
+##doing the same thing for AC G1
+# Remove rows with NA values in specified columns
+AC_fit_G1_clean <- AC_fit_G1 %>%
+  filter(
+    !is.na(SLA_SEG),
+    !is.na(msm_all),
+    !is.na(fl_duration),
+    !is.na(d13C_SEG),
+    !is.na(corolla_diam_mm_SEG),
+    !is.na(est_fitness)
+  )
+
+
+# Standardize the continuous predictors
+##transforming each trait to have a mean of 0 and a standard deviation of 1. This transformation is useful for models that include traits measured on different scales, as it brings them onto a comparable scale and can improve model convergence and interpretability of coefficients.
+AC_fit_G1_clean <- AC_fit_G1_clean %>%
+  mutate(
+    SLA_SEG = scale(SLA_SEG),
+    msm_all = scale(msm_all),
+    fl_duration = scale(fl_duration),
+    d13C_SEG = scale(d13C_SEG),
+    corolla_diam_mm_SEG = scale(corolla_diam_mm_SEG),
+  )
+```
+
+
+```{r}
+
+#model with nested maternal effects and transect
+model_1rf <- lmer(log(est_fitness) ~ SLA_SEG + msm_all + fl_duration + 
+                  d13C_SEG + corolla_diam_mm_SEG + (1|Donor:Recipient) + (1|Transect) + (1|Year), 
+                data = AC_fit_G1_clean)
+
+#model with nested maternal effects
+model_2rf <- lmer(log(est_fitness) ~ SLA_SEG + msm_all + fl_duration + 
+                  d13C_SEG + corolla_diam_mm_SEG + (1|Donor:Recipient) + (1|Year), 
+                data = AC_fit_G1_clean)
+
+#model with just transect
+model_3rf <- lmer(log(est_fitness) ~ SLA_SEG + msm_all + fl_duration + 
+                  d13C_SEG + corolla_diam_mm_SEG + (1|Donor:Recipient) + (1|Transect), 
+                data = AC_fit_G1_clean)
+
+#model with transect and year
+model_4rf <- lmer(log(est_fitness) ~ SLA_SEG + msm_all + fl_duration + 
+                  d13C_SEG + corolla_diam_mm_SEG + (1|Year) + (1|Transect), 
+                data = AC_fit_G1_clean)
+
+#determine which model is the best - the one without transect
+AIC(model_1rf, model_2rf, model_3rf, model_4rf)
+
+#run the final model with all the fixed effects
+model_1full <- lmer(log(est_fitness) ~ SLA_SEG + msm_all + fl_duration + 
+                  d13C_SEG + corolla_diam_mm_SEG + (1|Donor:Recipient) + (1|Year), 
+                data = AC_fit_G1_clean, REML = F)
+
+#dredge the model to determine which fixed effects are the best
+dredge(model_1full)
+
+#determine the best model
+model_best <- lmer(log(est_fitness) ~ SLA_SEG + msm_all + fl_duration + 
+                  d13C_SEG + (1|Donor:Recipient) + (1|Year), 
+                data = AC_fit_G1_clean, REML = T)
+
+summary(model_best)
+
+#check if the model is any good 
+car::qqp(resid(model_best))
+car::qqp(ranef(model_best)$`Donor:Recipient`$`(Intercept)`)
+
+
+residuals_best <- residuals(model_best, type = "pearson")
+
+# Plot residuals to check for outliers
+ggplot(data = AC_fit_G1_clean, aes(x = fitted(model_best), y = residuals_best)) +
+  geom_point(alpha = 0.5) +
+  geom_hline(yintercept = 0, color = "red", linetype = "dashed") +
+  labs(title = "Residuals vs Fitted Plot",
+       x = "Fitted Values",
+       y = "Pearson Residuals") +
+  theme_minimal()
+
+```
+
+
+```{r}
+##doing the same thing for AC G1
+# Remove rows with NA values in specified columns
+AC_fit_23_clean <- AC_fit_23 %>%
+  filter(
+    !is.na(SLA_SEG),
+    !is.na(msm_all),
+    !is.na(fl_duration),
+    !is.na(d13C_SEG),
+    !is.na(corolla_diam_mm_SEG),
+    !is.na(est_fitness)
+  )
+
+
+# Standardize the continuous predictors
+##transforming each trait to have a mean of 0 and a standard deviation of 1. This transformation is useful for models that include traits measured on different scales, as it brings them onto a comparable scale and can improve model convergence and interpretability of coefficients.
+AC_fit_23_clean <- AC_fit_23_clean %>%
+  mutate(
+    SLA_SEG = scale(SLA_SEG),
+    msm_all = scale(msm_all),
+    fl_duration = scale(fl_duration),
+    d13C_SEG = scale(d13C_SEG),
+    corolla_diam_mm_SEG = scale(corolla_diam_mm_SEG),
+  )
+```
+
+```{r}
+
+
+model_1rf <- lmer(log(est_fitness) ~ SLA_SEG + msm_all + fl_duration + 
+                  d13C_SEG + corolla_diam_mm_SEG + (1|Donor:Recipient) + (1|Transect) + (1|Gen), 
+                data = AC_fit_23_clean)
+
+model_2rf <- lmer(log(est_fitness) ~ SLA_SEG + msm_all + fl_duration + 
+                  d13C_SEG + corolla_diam_mm_SEG + (1|Donor:Recipient) + (1|Gen), 
+                data = AC_fit_23_clean)
+
+
+model_3rf <- lmer(log(est_fitness) ~ SLA_SEG + msm_all + fl_duration + 
+                  d13C_SEG + corolla_diam_mm_SEG + (1|Donor:Recipient) + (1|Transect), 
+                data = AC_fit_23_clean)
+
+model_4rf <- lmer(log(est_fitness) ~ SLA_SEG + msm_all + fl_duration + 
+                  d13C_SEG + corolla_diam_mm_SEG + (1|Gen) + (1|Transect), 
+                data = AC_fit_23_clean)
+
+model_5rf <- lmer(log(est_fitness) ~ SLA_SEG + msm_all + fl_duration + 
+                  d13C_SEG + corolla_diam_mm_SEG + (1|Donor:Recipient), 
+                data = AC_fit_23_clean)
+
+model_6rf <- lmer(log(est_fitness) ~ SLA_SEG + msm_all + fl_duration + 
+                  d13C_SEG + corolla_diam_mm_SEG + (1|Donor:Recipient) + (1|Gen), 
+                data = AC_fit_23_clean)
+
+model_7rf <- lmer(log(est_fitness) ~ SLA_SEG + msm_all + fl_duration + 
+                  d13C_SEG + corolla_diam_mm_SEG + (1|Transect), 
+                data = AC_fit_23_clean)
+
+model_8rf <- lmer(log(est_fitness) ~ SLA_SEG + msm_all + fl_duration + 
+                  d13C_SEG + corolla_diam_mm_SEG + (1|Gen), 
+                data = AC_fit_23_clean)
+
+
+#determine which model is the best - the one without transect
+AIC(model_1rf, model_2rf, model_3rf, model_4rf, model_5rf, model_6rf, model_7rf, model_8rf)
+
+#run the final model with all the fixed effects
+model_1full <- lmer(log(est_fitness) ~ SLA_SEG + msm_all + fl_duration + 
+                  d13C_SEG + corolla_diam_mm_SEG + (1|Transect), 
+                data = AC_fit_23_clean, REML = F)
+
+#dredge the model to determine which fixed effects are the best
+dredge(model_1full)
+
+#determine the best model
+model_best <- lmer(log(est_fitness) ~ msm_all + fl_duration + 
+                 corolla_diam_mm_SEG + (1|Transect), 
+                data = AC_fit_23_clean, REML = T)
+
+summary(model_best)
+
+#check if the model is any good 
+car::qqp(resid(model_best))
+car::qqp(ranef(model_best)$`Transect`$`(Intercept)`)
+
+
+residuals_best <- residuals(model_best, type = "pearson")
+
+# Plot residuals to check for outliers
+ggplot(data = AC_fit_23_clean, aes(x = fitted(model_best), y = residuals_best)) +
+  geom_point(alpha = 0.5) +
+  geom_hline(yintercept = 0, color = "red", linetype = "dashed") +
+  labs(title = "Residuals vs Fitted Plot",
+       x = "Fitted Values",
+       y = "Pearson Residuals") +
+  theme_minimal()
+
+```
+
+
+```{r}
+##doing the same thing for AC 23 G1
+# Remove rows with NA values in specified columns
+AC_fit_clean <- AC_fit %>%
+  filter(
+    !is.na(SLA_SEG),
+    !is.na(msm_all),
+    !is.na(fl_duration),
+    !is.na(d13C_SEG),
+    !is.na(corolla_diam_mm_SEG),
+    !is.na(est_fitness)
+  )
+
+
+# Standardize the continuous predictors
+##transforming each trait to have a mean of 0 and a standard deviation of 1. This transformation is useful for models that include traits measured on different scales, as it brings them onto a comparable scale and can improve model convergence and interpretability of coefficients.
+AC_fit_clean <- AC_fit_clean %>%
+  mutate(
+    SLA_SEG = scale(SLA_SEG),
+    msm_all = scale(msm_all),
+    fl_duration = scale(fl_duration),
+    d13C_SEG = scale(d13C_SEG),
+    corolla_diam_mm_SEG = scale(corolla_diam_mm_SEG),
+  )
+```
+
+
+```{r}
+
+
+model_1rf <- lmer(log(est_fitness) ~ SLA_SEG + msm_all + fl_duration + 
+                  d13C_SEG + corolla_diam_mm_SEG + (1|Donor:Recipient) + (1|Transect) + (1|Year)  + (1|Gen), 
+                data = AC_fit_clean)
+
+model_2rf <- lmer(log(est_fitness) ~ SLA_SEG + msm_all + fl_duration + 
+                  d13C_SEG + corolla_diam_mm_SEG + (1|Donor:Recipient) + (1|Year) + (1|Gen), 
+                data = AC_fit_clean)
+
+
+model_3rf <- lmer(log(est_fitness) ~ SLA_SEG + msm_all + fl_duration + 
+                  d13C_SEG + corolla_diam_mm_SEG + (1|Donor:Recipient) + (1|Transect), 
+                data = AC_fit_clean)
+
+model_4rf <- lmer(log(est_fitness) ~ SLA_SEG + msm_all + fl_duration + 
+                  d13C_SEG + corolla_diam_mm_SEG + (1|Year) + (1|Transect), 
+                data = AC_fit_clean)
+
+model_5rf <- lmer(log(est_fitness) ~ SLA_SEG + msm_all + fl_duration + 
+                  d13C_SEG + corolla_diam_mm_SEG + (1|Donor:Recipient) + (1|Gen), 
+                data = AC_fit_clean)
+
+model_6rf <- lmer(log(est_fitness) ~ SLA_SEG + msm_all + fl_duration + 
+                  d13C_SEG + corolla_diam_mm_SEG + (1|Donor:Recipient) + (1|Year), 
+                data = AC_fit_clean)
+
+model_7rf <- lmer(log(est_fitness) ~ SLA_SEG + msm_all + fl_duration + 
+                  d13C_SEG + corolla_diam_mm_SEG + (1|Donor:Recipient), 
+                data = AC_fit_clean)
+
+model_8rf <- lmer(log(est_fitness) ~ SLA_SEG + msm_all + fl_duration + 
+                  d13C_SEG + corolla_diam_mm_SEG + (1|Year), 
+                data = AC_fit_clean)
+
+model_9rf <- lmer(log(est_fitness) ~ SLA_SEG + msm_all + fl_duration + 
+                  d13C_SEG + corolla_diam_mm_SEG + (1|Gen), 
+                data = AC_fit_clean)
+
+#determine which model is the best - the one without transect
+AIC(model_1rf, model_2rf, model_3rf, model_4rf, model_5rf, model_6rf, model_7rf, model_8rf, model_9rf)
+
+#run the final model with all the fixed effects
+model_1full <- lmer(log(est_fitness) ~ SLA_SEG + msm_all + fl_duration + 
+                  d13C_SEG + corolla_diam_mm_SEG + (1|Year), 
+                data = AC_fit_clean, REML = F)
+
+#dredge the model to determine which fixed effects are the best
+dredge(model_1full)
+
+#determine the best model
+model_best <- lmer(log(est_fitness) ~ SLA_SEG + msm_all + fl_duration + 
+                  d13C_SEG + corolla_diam_mm_SEG + (1|Year), 
+                data = AC_fit_clean, REML = T)
+
+summary(model_best)
+
+#check if the model is any good 
+car::qqp(resid(model_best))
+#car::qqp(ranef(model_best)$`Year`$`(Intercept)`)
+
+
+residuals_best <- residuals(model_best, type = "pearson")
+
+# Plot residuals to check for outliers
+ggplot(data = AC_fit_clean, aes(x = fitted(model_best), y = residuals_best)) +
+  geom_point(alpha = 0.5) +
+  geom_hline(yintercept = 0, color = "red", linetype = "dashed") +
+  labs(title = "Residuals vs Fitted Plot",
+       x = "Fitted Values",
+       y = "Pearson Residuals") +
+  theme_minimal()
+
+```
+
+###MATERNAL TRAIT MEANS###
+```{r}
+library(dplyr)
+
+# Specify the traits
+traits <- c("SLA_SEG", "msm_all", "fl_duration", "d13C_SEG", "corolla_diam_mm_SEG", "est_fitness")
+
+# Calculate the mean values for each Recipient
+AC_22_mean <- AC_fit_22 %>%
+  select(Recipient, all_of(traits)) %>%  # Select only Recipient and the specified traits
+  group_by(Recipient) %>%               # Group by Recipient
+  summarise(across(everything(), mean, na.rm = TRUE))  # Calculate mean, ignoring NA values
+
+# View the result
+print(mean_values)
+
+AC_22_mean_scale <- AC_22_mean %>%
+  mutate(
+    SLA_SEG = scale(SLA_SEG),
+    msm_all = scale(msm_all),
+    fl_duration = scale(fl_duration),
+    d13C_SEG = scale(d13C_SEG),
+    corolla_diam_mm_SEG = scale(corolla_diam_mm_SEG)
+  )
+
+AC_22_mean_scale <- AC_22_mean_scale %>%
+  filter(
+    !is.na(SLA_SEG),
+    !is.na(msm_all),
+    !is.na(fl_duration),
+    !is.na(d13C_SEG),
+    !is.na(corolla_diam_mm_SEG),
+    !is.na(est_fitness)
+  )
+
+```
+
+
+
+```{r}
+library(lmerTest)
+library(MuMIn)
+library(influence.ME)
+
+
+model_1 <- lm(log(est_fitness) ~ SLA_SEG + msm_all + fl_duration + 
+                  d13C_SEG + corolla_diam_mm_SEG, 
+                data = AC_22_mean_scale)
+
+#run the final model with all the fixed effects
+
+
+#dredge the model to determine which fixed effects are the best
+dredge(model_1)
+
+#determine the best model
+model_best <- lm(log(est_fitness) ~ msm_all + fl_duration + 
+                  d13C_SEG, 
+                data = AC_22_mean_scale)
+
+summary(model_best)
+
+#check if the model is any good 
+car::qqp(resid(model_best))
+
+residuals_best <- residuals(model_best, type = "pearson")
+
+
+# Plot residuals to check for outliers
+ggplot(data = AC_22_mean_scale, aes(x = fitted(model_best), y = residuals_best)) +
+  geom_point(alpha = 0.5) +
+  geom_hline(yintercept = 0, color = "red", linetype = "dashed") +
+  labs(title = "Residuals vs Fitted Plot",
+       x = "Fitted Values",
+       y = "Pearson Residuals") +
+  theme_minimal()
+
+```
+
+```{r}
+
+# Specify the traits
+traits <- c("SLA_SEG", "msm_all", "fl_duration", "d13C_SEG", "corolla_diam_mm_SEG", "est_fitness")
+
+# Calculate the mean values for each Recipient
+AC_G1_23_mean <- AC_fit_23_G1 %>%
+  select(Recipient, all_of(traits)) %>%  # Select only Recipient and the specified traits
+  group_by(Recipient) %>%               # Group by Recipient
+  summarise(across(everything(), mean, na.rm = TRUE))  # Calculate mean, ignoring NA values
+
+# View the result
+print(mean_values)
+
+AC_G1_23_mean_scale <- AC_G1_23_mean %>%
+  mutate(
+    SLA_SEG = scale(SLA_SEG),
+    msm_all = scale(msm_all),
+    fl_duration = scale(fl_duration),
+    d13C_SEG = scale(d13C_SEG),
+    corolla_diam_mm_SEG = scale(corolla_diam_mm_SEG)
+  )
+
+AC_G1_23_mean_scale <- AC_G1_23_mean_scale %>%
+  filter(
+    !is.na(SLA_SEG),
+    !is.na(msm_all),
+    !is.na(fl_duration),
+    !is.na(d13C_SEG),
+    !is.na(corolla_diam_mm_SEG),
+    !is.na(est_fitness)
+  )
+
+```
+
+
+```{r}
+
+model_1 <- lm(log(est_fitness) ~ SLA_SEG + msm_all + fl_duration + 
+                  d13C_SEG + corolla_diam_mm_SEG, 
+                data = AC_G1_23_mean_scale)
+
+
+#run the final model with all the fixed effects
+
+
+#dredge the model to determine which fixed effects are the best
+dredge(model_1)
+
+#determine the best model
+model_best <- lm(log(est_fitness) ~ fl_duration, 
+                data = AC_G1_23_mean_scale)
+
+summary(model_best)
+
+#check if the model is any good 
+car::qqp(resid(model_best))
+
+residuals_best <- residuals(model_best, type = "pearson")
+
+
+# Plot residuals to check for outliers
+ggplot(data = AC_G1_23_mean_scale, aes(x = fitted(model_best), y = residuals_best)) +
+  geom_point(alpha = 0.5) +
+  geom_hline(yintercept = 0, color = "red", linetype = "dashed") +
+  labs(title = "Residuals vs Fitted Plot",
+       x = "Fitted Values",
+       y = "Pearson Residuals") +
+  theme_minimal()
+
+```
+
+```{r}
+
+# Specify the traits
+traits <- c("SLA_SEG", "msm_all", "fl_duration", "d13C_SEG", "corolla_diam_mm_SEG", "est_fitness")
+
+# Calculate the mean values for each Recipient
+AC_G2_23_mean <- AC_fit_23_G2 %>%
+  select(Recipient, all_of(traits)) %>%  # Select only Recipient and the specified traits
+  group_by(Recipient) %>%               # Group by Recipient
+  summarise(across(everything(), mean, na.rm = TRUE))  # Calculate mean, ignoring NA values
+
+# View the result
+print(mean_values)
+
+AC_G2_23_mean_scale <- AC_G2_23_mean %>%
+  mutate(
+    SLA_SEG = scale(SLA_SEG),
+    msm_all = scale(msm_all),
+    fl_duration = scale(fl_duration),
+    d13C_SEG = scale(d13C_SEG),
+    corolla_diam_mm_SEG = scale(corolla_diam_mm_SEG)
+  )
+
+AC_G2_23_mean_scale <- AC_G2_23_mean_scale %>%
+  filter(
+    !is.na(SLA_SEG),
+    !is.na(msm_all),
+    !is.na(fl_duration),
+    !is.na(d13C_SEG),
+    !is.na(corolla_diam_mm_SEG),
+    !is.na(est_fitness)
+  )
+
+```
+
+
+```{r}
+
+model_1 <-lm(log(est_fitness) ~ SLA_SEG + msm_all + fl_duration + 
+                  d13C_SEG + corolla_diam_mm_SEG, 
+                data = AC_G2_23_mean_scale)
+
+
+#run the final model with all the fixed effects
+
+
+#dredge the model to determine which fixed effects are the best
+dredge(model_1)
+
+#determine the best model
+model_best <- lm(log(est_fitness) ~ fl_duration + msm_all, 
+                data = AC_G2_23_mean_scale)
+
+summary(model_best)
+
+#check if the model is any good 
+car::qqp(resid(model_best))
+
+residuals_best <- residuals(model_best, type = "pearson")
+
+
+# Plot residuals to check for outliers
+ggplot(data = AC_G2_23_mean_scale, aes(x = fitted(model_best), y = residuals_best)) +
+  geom_point(alpha = 0.5) +
+  geom_hline(yintercept = 0, color = "red", linetype = "dashed") +
+  labs(title = "Residuals vs Fitted Plot",
+       x = "Fitted Values",
+       y = "Pearson Residuals") +
+  theme_minimal()
+
+```
+
+```{r}
+
+# Specify the traits
+traits <- c("SLA_SEG", "msm_all", "fl_duration", "d13C_SEG", "corolla_diam_mm_SEG", "est_fitness")
+
+# Calculate the mean values for each Recipient
+AC_G1_mean <- AC_fit_G1 %>%
+  select(Recipient, all_of(traits)) %>%  # Select only Recipient and the specified traits
+  group_by(Recipient) %>%               # Group by Recipient
+  summarise(across(everything(), mean, na.rm = TRUE))  # Calculate mean, ignoring NA values
+
+# View the result
+print(mean_values)
+
+AC_G1_mean_scale <- AC_G1_mean %>%
+  mutate(
+    SLA_SEG = scale(SLA_SEG),
+    msm_all = scale(msm_all),
+    fl_duration = scale(fl_duration),
+    d13C_SEG = scale(d13C_SEG),
+    corolla_diam_mm_SEG = scale(corolla_diam_mm_SEG)
+  )
+
+AC_G1_mean_scale <- AC_G1_mean_scale %>%
+  filter(
+    !is.na(SLA_SEG),
+    !is.na(msm_all),
+    !is.na(fl_duration),
+    !is.na(d13C_SEG),
+    !is.na(corolla_diam_mm_SEG),
+    !is.na(est_fitness)
+  )
+
+```
+
+
+```{r}
+
+model_1 <- lm(log(est_fitness) ~ SLA_SEG + msm_all + fl_duration + 
+                  d13C_SEG + corolla_diam_mm_SEG, 
+                data = AC_G1_mean_scale)
+
+#run the final model with all the fixed effects
+
+#dredge the model to determine which fixed effects are the best
+dredge(model_1)
+
+#determine the best model
+model_best <- lm(log(est_fitness) ~ msm_all + fl_duration + 
+                  d13C_SEG, 
+                data = AC_G1_mean_scale)
+
+summary(model_best)
+
+#check if the model is any good 
+car::qqp(resid(model_best))
+
+residuals_best <- residuals(model_best, type = "pearson")
+
+
+# Plot residuals to check for outliers
+ggplot(data =  AC_G1_mean_scale, aes(x = fitted(model_best), y = residuals_best)) +
+  geom_point(alpha = 0.5) +
+  geom_hline(yintercept = 0, color = "red", linetype = "dashed") +
+  labs(title = "Residuals vs Fitted Plot",
+       x = "Fitted Values",
+       y = "Pearson Residuals") +
+  theme_minimal()
+
+```
+
+
+```{r}
+
+# Specify the traits
+traits <- c("SLA_SEG", "msm_all", "fl_duration", "d13C_SEG", "corolla_diam_mm_SEG", "est_fitness")
+
+names(AC_fit_23)
+
+# Calculate the mean values for each Recipient
+AC_2023_mean <- AC_fit_23 %>%
+  select(Recipient, all_of(traits)) %>%  # Select only Recipient and the specified traits
+  group_by(Recipient) %>%               # Group by Recipient
+  summarise(across(everything(), mean, na.rm = TRUE))  # Calculate mean, ignoring NA values
+
+# View the result
+print(mean_values)
+
+AC_2023_mean_scale <- AC_2023_mean %>%
+  mutate(
+    SLA_SEG = scale(SLA_SEG),
+    msm_all = scale(msm_all),
+    fl_duration = scale(fl_duration),
+    d13C_SEG = scale(d13C_SEG),
+    corolla_diam_mm_SEG = scale(corolla_diam_mm_SEG)
+  )
+
+AC_2023_mean_scale <- AC_2023_mean_scale %>%
+  filter(
+    !is.na(SLA_SEG),
+    !is.na(msm_all),
+    !is.na(fl_duration),
+    !is.na(d13C_SEG),
+    !is.na(corolla_diam_mm_SEG),
+    !is.na(est_fitness)
+  )
+
+```
+
+
+```{r}
+
+#model with nested maternal effects and transect
+model_1 <- lm(log(est_fitness) ~ SLA_SEG + msm_all + fl_duration + 
+                  d13C_SEG + corolla_diam_mm_SEG, 
+                data = AC_2023_mean_scale)
+
+#dredge the model to determine which fixed effects are the best
+dredge(model_1)
+
+#determine the best model
+model_best <- lm(log(est_fitness) ~ fl_duration, 
+                data = AC_2023_mean_scale)
+
+summary(model_best)
+
+#check if the model is any good 
+car::qqp(resid(model_best))
+
+residuals_best <- residuals(model_best, type = "pearson")
+
+
+# Plot residuals to check for outliers
+ggplot(data =  AC_G1_mean_scale, aes(x = fitted(model_best), y = residuals_best)) +
+  geom_point(alpha = 0.5) +
+  geom_hline(yintercept = 0, color = "red", linetype = "dashed") +
+  labs(title = "Residuals vs Fitted Plot",
+       x = "Fitted Values",
+       y = "Pearson Residuals") +
+  theme_minimal()
+
+```
+
+
+```{r}
+
+# Specify the traits
+traits <- c("SLA_SEG", "msm_all", "fl_duration", "d13C_SEG", "corolla_diam_mm_SEG", "est_fitness")
+
+
+# Calculate the mean values for each Recipient
+AC_mean <- AC_fit %>%
+  select(Recipient, all_of(traits)) %>%  # Select only Recipient and the specified traits
+  group_by(Recipient) %>%               # Group by Recipient
+  summarise(across(everything(), mean, na.rm = TRUE))  # Calculate mean, ignoring NA values
+
+# View the result
+print(mean_values)
+
+AC_mean_scale <- AC_mean %>%
+  mutate(
+    SLA_SEG = scale(SLA_SEG),
+    msm_all = scale(msm_all),
+    fl_duration = scale(fl_duration),
+    d13C_SEG = scale(d13C_SEG),
+    corolla_diam_mm_SEG = scale(corolla_diam_mm_SEG)
+  )
+
+AC_mean_scale <- AC_mean_scale %>%
+  filter(
+    !is.na(SLA_SEG),
+    !is.na(msm_all),
+    !is.na(fl_duration),
+    !is.na(d13C_SEG),
+    !is.na(corolla_diam_mm_SEG),
+    !is.na(est_fitness)
+  )
+
+```
+
+
+```{r}
+
+#model with nested maternal effects and transect
+model_1 <- lm(log(est_fitness) ~ SLA_SEG + msm_all + fl_duration + 
+                  d13C_SEG + corolla_diam_mm_SEG, 
+                data = AC_mean_scale)
+
+#dredge the model to determine which fixed effects are the best
+dredge(model_1)
+
+#determine the best model
+model_best <- lm(log(est_fitness) ~ d13C_SEG + fl_duration + msm_all, 
+                data = AC_mean_scale)
+
+summary(model_best)
+
+#check if the model is any good 
+car::qqp(resid(model_best))
+
+residuals_best <- residuals(model_best, type = "pearson")
+
+
+# Plot residuals to check for outliers
+ggplot(data =  AC_G1_mean_scale, aes(x = fitted(model_best), y = residuals_best)) +
+  geom_point(alpha = 0.5) +
+  geom_hline(yintercept = 0, color = "red", linetype = "dashed") +
+  labs(title = "Residuals vs Fitted Plot",
+       x = "Fitted Values",
+       y = "Pearson Residuals") +
+  theme_minimal()
+
+```
+
+#Donor means
+```{r}
+library(dplyr)
+
+# Specify the traits
+traits <- c("SLA_SEG", "msm_all", "fl_duration", "d13C_SEG", "corolla_diam_mm_SEG", "est_fitness")
+
+# Calculate the mean values for each Recipient
+AC_22_mean <- AC_fit_22 %>%
+  select(Donor, all_of(traits)) %>%  # Select only Recipient and the specified traits
+  group_by(Donor) %>%               # Group by Recipient
+  summarise(across(everything(), mean, na.rm = TRUE))  # Calculate mean, ignoring NA values
+
+
+AC_22_mean_scale <- AC_22_mean %>%
+  mutate(
+    SLA_SEG = scale(SLA_SEG),
+    msm_all = scale(msm_all),
+    fl_duration = scale(fl_duration),
+    d13C_SEG = scale(d13C_SEG),
+    corolla_diam_mm_SEG = scale(corolla_diam_mm_SEG)
+  )
+
+AC_22_mean_scale <- AC_22_mean_scale %>%
+  filter(
+    !is.na(SLA_SEG),
+    !is.na(msm_all),
+    !is.na(fl_duration),
+    !is.na(d13C_SEG),
+    !is.na(corolla_diam_mm_SEG),
+    !is.na(est_fitness)
+  )
+
+```
+
+
+
+```{r}
+library(lmerTest)
+library(MuMIn)
+library(influence.ME)
+
+options(na.action = "na.fail")
+
+
+model_1 <- lm(log(est_fitness) ~ SLA_SEG + msm_all + fl_duration + 
+                  d13C_SEG + corolla_diam_mm_SEG, 
+                data = AC_22_mean_scale)
+
+
+#run the final model with all the fixed effects
+
+
+#dredge the model to determine which fixed effects are the best
+dredge(model_1)
+
+#determine the best model
+model_best <- lm(log(est_fitness) ~ fl_duration + 
+                 corolla_diam_mm_SEG, 
+                data = AC_22_mean_scale)
+
+summary(model_best)
+
+#check if the model is any good 
+car::qqp(resid(model_best))
+
+residuals_best <- residuals(model_best, type = "pearson")
+
+
+# Plot residuals to check for outliers
+ggplot(data = AC_22_mean_scale, aes(x = fitted(model_best), y = residuals_best)) +
+  geom_point(alpha = 0.5) +
+  geom_hline(yintercept = 0, color = "red", linetype = "dashed") +
+  labs(title = "Residuals vs Fitted Plot",
+       x = "Fitted Values",
+       y = "Pearson Residuals") +
+  theme_minimal()
+
+```
+```{r}
+library(dplyr)
+
+# Specify the traits
+traits <- c("SLA_SEG", "msm_all", "fl_duration", "d13C_SEG", "corolla_diam_mm_SEG", "est_fitness")
+
+# Calculate the mean values for each Recipient
+AC_23_G1_mean <- AC_fit_23_G1 %>%
+  select(Donor, all_of(traits)) %>%  # Select only Recipient and the specified traits
+  group_by(Donor) %>%               # Group by Recipient
+  summarise(across(everything(), mean, na.rm = TRUE))  # Calculate mean, ignoring NA values
+
+
+AC_23_G1_mean_scale <- AC_23_G1_mean %>%
+  mutate(
+    SLA_SEG = scale(SLA_SEG),
+    msm_all = scale(msm_all),
+    fl_duration = scale(fl_duration),
+    d13C_SEG = scale(d13C_SEG),
+    corolla_diam_mm_SEG = scale(corolla_diam_mm_SEG)
+  )
+
+AC_23_G1_mean_scale <- AC_23_G1_mean_scale %>%
+  filter(
+    !is.na(SLA_SEG),
+    !is.na(msm_all),
+    !is.na(fl_duration),
+    !is.na(d13C_SEG),
+    !is.na(corolla_diam_mm_SEG),
+    !is.na(est_fitness)
+  )
+
+```
+
+
+
+```{r}
+library(lmerTest)
+library(MuMIn)
+library(influence.ME)
+
+options(na.action = "na.fail")
+
+
+model_1 <- lm(log(est_fitness) ~ SLA_SEG + msm_all + fl_duration + 
+                  d13C_SEG + corolla_diam_mm_SEG, 
+                data = AC_23_G1_mean_scale)
+
+
+#run the final model with all the fixed effects
+
+
+#dredge the model to determine which fixed effects are the best
+dredge(model_1)
+
+#determine the best model
+model_best <- lm(log(est_fitness) ~ fl_duration, 
+                data = AC_23_G1_mean_scale)
+
+summary(model_best)
+
+#check if the model is any good 
+car::qqp(resid(model_best))
+
+residuals_best <- residuals(model_best, type = "pearson")
+
+
+# Plot residuals to check for outliers
+ggplot(data = AC_23_G1_mean_scale, aes(x = fitted(model_best), y = residuals_best)) +
+  geom_point(alpha = 0.5) +
+  geom_hline(yintercept = 0, color = "red", linetype = "dashed") +
+  labs(title = "Residuals vs Fitted Plot",
+       x = "Fitted Values",
+       y = "Pearson Residuals") +
+  theme_minimal()
+
+```
+
+```{r}
+library(dplyr)
+
+# Specify the traits
+traits <- c("SLA_SEG", "msm_all", "fl_duration", "d13C_SEG", "corolla_diam_mm_SEG", "est_fitness")
+
+# Calculate the mean values for each Recipient
+AC_23_G2_mean <- AC_fit_23_G2 %>%
+  select(Donor, all_of(traits)) %>%  # Select only Recipient and the specified traits
+  group_by(Donor) %>%               # Group by Recipient
+  summarise(across(everything(), mean, na.rm = TRUE))  # Calculate mean, ignoring NA values
+
+
+AC_23_G2_mean_scale <- AC_23_G2_mean %>%
+  mutate(
+    SLA_SEG = scale(SLA_SEG),
+    msm_all = scale(msm_all),
+    fl_duration = scale(fl_duration),
+    d13C_SEG = scale(d13C_SEG),
+    corolla_diam_mm_SEG = scale(corolla_diam_mm_SEG)
+  )
+
+AC_23_G2_mean_scale <- AC_23_G2_mean_scale %>%
+  filter(
+    !is.na(SLA_SEG),
+    !is.na(msm_all),
+    !is.na(fl_duration),
+    !is.na(d13C_SEG),
+    !is.na(corolla_diam_mm_SEG),
+    !is.na(est_fitness)
+  )
+
+```
+
+
+
+```{r}
+library(lmerTest)
+library(MuMIn)
+library(influence.ME)
+
+options(na.action = "na.fail")
+
+
+model_1 <- lm(log(est_fitness) ~ SLA_SEG + msm_all + fl_duration + 
+                  d13C_SEG + corolla_diam_mm_SEG, 
+                data = AC_23_G2_mean_scale)
+
+
+#run the final model with all the fixed effects
+
+
+#dredge the model to determine which fixed effects are the best
+dredge(model_1)
+
+#determine the best model
+model_best <- lm(log(est_fitness) ~ SLA_SEG + msm_all + fl_duration + 
+                  corolla_diam_mm_SEG, 
+                data = AC_23_G2_mean_scale)
+
+summary(model_best)
+
+#check if the model is any good 
+car::qqp(resid(model_best))
+
+residuals_best <- residuals(model_best, type = "pearson")
+
+
+# Plot residuals to check for outliers
+ggplot(data = AC_23_G2_mean_scale, aes(x = fitted(model_best), y = residuals_best)) +
+  geom_point(alpha = 0.5) +
+  geom_hline(yintercept = 0, color = "red", linetype = "dashed") +
+  labs(title = "Residuals vs Fitted Plot",
+       x = "Fitted Values",
+       y = "Pearson Residuals") +
+  theme_minimal()
+
+```
+
+
+
+```{r}
+library(dplyr)
+
+# Specify the traits
+traits <- c("SLA_SEG", "msm_all", "fl_duration", "d13C_SEG", "corolla_diam_mm_SEG", "est_fitness")
+
+# Calculate the mean values for each Recipient
+AC_G1_mean <- AC_fit_G1 %>%
+  select(Donor, all_of(traits)) %>%  # Select only Recipient and the specified traits
+  group_by(Donor) %>%               # Group by Recipient
+  summarise(across(everything(), mean, na.rm = TRUE))  # Calculate mean, ignoring NA values
+
+
+AC_G1_mean_scale <- AC_G1_mean %>%
+  mutate(
+    SLA_SEG = scale(SLA_SEG),
+    msm_all = scale(msm_all),
+    fl_duration = scale(fl_duration),
+    d13C_SEG = scale(d13C_SEG),
+    corolla_diam_mm_SEG = scale(corolla_diam_mm_SEG)
+  )
+
+AC_G1_mean_scale <- AC_G1_mean_scale %>%
+  filter(
+    !is.na(SLA_SEG),
+    !is.na(msm_all),
+    !is.na(fl_duration),
+    !is.na(d13C_SEG),
+    !is.na(corolla_diam_mm_SEG),
+    !is.na(est_fitness)
+  )
+
+```
+
+
+
+```{r}
+library(lmerTest)
+library(MuMIn)
+library(influence.ME)
+
+options(na.action = "na.fail")
+
+
+model_1 <- lm(log(est_fitness) ~ SLA_SEG + msm_all + fl_duration + 
+                  d13C_SEG + corolla_diam_mm_SEG, 
+                data = AC_G1_mean_scale)
+
+
+#run the final model with all the fixed effects
+
+
+#dredge the model to determine which fixed effects are the best
+dredge(model_1)
+
+# #determine the best model
+# model_best <- lm(log(est_fitness) ~
+#                   corolla_diam_mm_SEG, 
+#                 data = AC_G1_mean_scale)
+# 
+# summary(model_best)
+# 
+# #check if the model is any good 
+# car::qqp(resid(model_best))
+# 
+# residuals_best <- residuals(model_best, type = "pearson")
+# 
+# 
+# # Plot residuals to check for outliers
+# ggplot(data = AC_G1_mean_scale, aes(x = fitted(model_best), y = residuals_best)) +
+#   geom_point(alpha = 0.5) +
+#   geom_hline(yintercept = 0, color = "red", linetype = "dashed") +
+#   labs(title = "Residuals vs Fitted Plot",
+#        x = "Fitted Values",
+#        y = "Pearson Residuals") +
+#   theme_minimal()
+
+```
+
+```{r}
+library(dplyr)
+
+# Specify the traits
+traits <- c("SLA_SEG", "msm_all", "fl_duration", "d13C_SEG", "corolla_diam_mm_SEG", "est_fitness")
+
+# Calculate the mean values for each Recipient
+AC_23_mean <- AC_fit_23 %>%
+  select(Donor, all_of(traits)) %>%  # Select only Recipient and the specified traits
+  group_by(Donor) %>%               # Group by Recipient
+  summarise(across(everything(), mean, na.rm = TRUE))  # Calculate mean, ignoring NA values
+
+
+AC_23_mean_scale <- AC_23_mean %>%
+  mutate(
+    SLA_SEG = scale(SLA_SEG),
+    msm_all = scale(msm_all),
+    fl_duration = scale(fl_duration),
+    d13C_SEG = scale(d13C_SEG),
+    corolla_diam_mm_SEG = scale(corolla_diam_mm_SEG)
+  )
+
+AC_23_mean_scale <- AC_23_mean_scale %>%
+  filter(
+    !is.na(SLA_SEG),
+    !is.na(msm_all),
+    !is.na(fl_duration),
+    !is.na(d13C_SEG),
+    !is.na(corolla_diam_mm_SEG),
+    !is.na(est_fitness)
+  )
+
+```
+
+
+
+```{r}
+library(lmerTest)
+library(MuMIn)
+library(influence.ME)
+
+options(na.action = "na.fail")
+
+
+model_1 <- lm(log(est_fitness) ~ SLA_SEG + msm_all + fl_duration + 
+                  d13C_SEG + corolla_diam_mm_SEG, 
+                data = AC_23_mean_scale)
+
+
+#run the final model with all the fixed effects
+
+
+#dredge the model to determine which fixed effects are the best
+dredge(model_1)
+
+# #determine the best model
+ model_best <- lm(log(est_fitness) ~
+                  fl_duration, 
+               data = AC_23_mean_scale)
+
+ summary(model_best)
+
+# #check if the model is any good 
+car::qqp(resid(model_best))
+
+ residuals_best <- residuals(model_best, type = "pearson")
+
+# # Plot residuals to check for outliers
+ ggplot(data = AC_23_mean_scale, aes(x = fitted(model_best), y = residuals_best)) +
+   geom_point(alpha = 0.5) +
+   geom_hline(yintercept = 0, color = "red", linetype = "dashed") +
+   labs(title = "Residuals vs Fitted Plot",
+       x = "Fitted Values",
+       y = "Pearson Residuals") +
+   theme_minimal()
+
+```
+
+```{r}
+library(dplyr)
+
+# Specify the traits
+traits <- c("SLA_SEG", "msm_all", "fl_duration", "d13C_SEG", "corolla_diam_mm_SEG", "est_fitness")
+
+# Calculate the mean values for each Recipient
+AC_mean <- AC_fit %>%
+  select(Donor, all_of(traits)) %>%  # Select only Recipient and the specified traits
+  group_by(Donor) %>%               # Group by Recipient
+  summarise(across(everything(), mean, na.rm = TRUE))  # Calculate mean, ignoring NA values
+
+
+AC_mean_scale <- AC_mean %>%
+  mutate(
+    SLA_SEG = scale(SLA_SEG),
+    msm_all = scale(msm_all),
+    fl_duration = scale(fl_duration),
+    d13C_SEG = scale(d13C_SEG),
+    corolla_diam_mm_SEG = scale(corolla_diam_mm_SEG)
+  )
+
+AC_mean_scale <- AC_mean_scale %>%
+  filter(
+    !is.na(SLA_SEG),
+    !is.na(msm_all),
+    !is.na(fl_duration),
+    !is.na(d13C_SEG),
+    !is.na(corolla_diam_mm_SEG),
+    !is.na(est_fitness)
+  )
+
+```
+
+
+
+```{r}
+library(lmerTest)
+library(MuMIn)
+library(influence.ME)
+
+options(na.action = "na.fail")
+
+
+model_1 <- lm(log(est_fitness) ~ SLA_SEG + msm_all + fl_duration + 
+                  d13C_SEG + corolla_diam_mm_SEG, 
+                data = AC_mean_scale)
+
+
+#run the final model with all the fixed effects
+
+
+#dredge the model to determine which fixed effects are the best
+dredge(model_1)
+
+# #determine the best model
+ model_best <- lm(log(est_fitness) ~
+                  fl_duration, 
+               data = AC_mean_scale)
+
+ summary(model_best)
+
+# #check if the model is any good 
+car::qqp(resid(model_best))
+
+ residuals_best <- residuals(model_best, type = "pearson")
+
+# # Plot residuals to check for outliers
+ ggplot(data = AC_23_mean_scale, aes(x = fitted(model_best), y = residuals_best)) +
+   geom_point(alpha = 0.5) +
+   geom_hline(yintercept = 0, color = "red", linetype = "dashed") +
+   labs(title = "Residuals vs Fitted Plot",
+       x = "Fitted Values",
+       y = "Pearson Residuals") +
+   theme_minimal()
+
+```
+
+
+

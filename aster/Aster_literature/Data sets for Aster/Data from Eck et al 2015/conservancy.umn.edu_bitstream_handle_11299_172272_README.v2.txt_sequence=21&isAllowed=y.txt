@@ -1,0 +1,26 @@
+The "techreport.v2.Rnw" document can be compiled in R (requires knitr and aster2 packages):
+
+In R, type:
+
+        require(knitr) || install.packages("knitr")
+        require(aster2) || install.packages("aster2")
+
+        setwd([set to location of .Rnw file])
+
+and then compile:
+
+        library(knitr)
+        knit("techreport.v2.Rnw")
+
+Or type the following outside of R (in unix, e. g., linux or Mac OS X):
+
+        Rscript -e "library(knitr); knit('techreport.v2.Rnw')"
+
+Once the .Rnw file is compiled and saved as a .tex file in the working directory, type the following outside R (in unix, e. g., linux or Mac OS X: need to be in the same location as directory above). This requires MacTeX for MacOSX, and proTeXt for Windows:
+
+        pdflatex techreport.v2.tex
+        pdflatex techreport.v2.tex
+
+(may need to repeat the "pdflatex" command several times). This will result in the "tech report.v2.pdf" file. 
+
+

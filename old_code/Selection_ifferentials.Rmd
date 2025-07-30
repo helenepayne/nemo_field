@@ -1,0 +1,396 @@
+---
+title: "Selection_differentials"
+author: "Helen Payne"
+date: "2025-02-07"
+output: html_document
+---
+
+Load in libraries and the datasets, plus a bit of tidying
+```{r}
+# Load the lme4 package
+library(lme4)
+library(dplyr)
+library(tidyverse)
+
+
+
+AC_fit_22 <- read_csv(here::here("data_sheets", "compiled_sheets", "AC_fit_22.csv"))
+
+BB_fit_22 <- read_csv(here::here("data_sheets", "compiled_sheets", "BB_fit_22.csv"))
+
+BO_fit_22 <- read_csv(here::here("data_sheets", "compiled_sheets", "BO_fit_22.csv"))
+
+HR_fit_22 <- read_csv(here::here("data_sheets", "compiled_sheets", "HR_fit_22.csv"))
+
+AC_fit_23_G1 <- read_csv(here::here("data_sheets", "compiled_sheets", "AC_fit_23_G1.csv"))
+
+BB_fit_23_G1 <- read_csv(here::here("data_sheets", "compiled_sheets", "BB_fit_23_G1.csv"))
+
+BO_fit_23_G1 <- read_csv(here::here("data_sheets", "compiled_sheets", "BO_fit_23_G1.csv"))
+
+HR_fit_23_G1 <- read_csv(here::here("data_sheets", "compiled_sheets", "HR_fit_23_G1.csv"))
+
+AC_fit_23_G2 <- read_csv(here::here("data_sheets", "compiled_sheets", "AC_fit_23_G2.csv"))
+
+BB_fit_23_G2 <- read_csv(here::here("data_sheets", "compiled_sheets", "BB_fit_23_G2.csv"))
+
+BO_fit_23_G2 <- read_csv(here::here("data_sheets", "compiled_sheets", "BO_fit_23_G2.csv"))
+
+HR_fit_23_G2 <- read_csv(here::here("data_sheets", "compiled_sheets", "HR_fit_23_G2.csv"))
+
+```
+
+```{r}
+AC_mean_donor_traits_22 <- read_csv(here::here("data_sheets", "compiled_sheets", "AC_mean_donor_traits_22.csv"))
+
+BB_mean_donor_traits_22 <- read_csv(here::here("data_sheets", "compiled_sheets", "BB_mean_donor_traits_22.csv"))
+
+BO_mean_donor_traits_22 <- read_csv(here::here("data_sheets", "compiled_sheets", "BO_mean_donor_traits_22.csv"))
+
+HR_mean_donor_traits_22 <- read_csv(here::here("data_sheets", "compiled_sheets", "HR_mean_donor_traits_22.csv"))
+
+AC_mean_donor_traits_23_G1 <- read_csv(here::here("data_sheets", "compiled_sheets", "AC_mean_donor_traits_23_G1.csv"))
+
+BB_mean_donor_traits_23_G1 <- read_csv(here::here("data_sheets", "compiled_sheets", "BB_mean_donor_traits_23_G1.csv"))
+
+BO_mean_donor_traits_23_G1 <- read_csv(here::here("data_sheets", "compiled_sheets", "BO_mean_donor_traits_23_G1.csv"))
+
+HR_mean_donor_traits_23_G1 <- read_csv(here::here("data_sheets", "compiled_sheets", "HR_mean_donor_traits_23_G1.csv"))
+
+AC_mean_donor_traits_23_G2 <- read_csv(here::here("data_sheets", "compiled_sheets", "AC_mean_donor_traits_23_G2.csv"))
+
+BB_mean_donor_traits_23_G2 <- read_csv(here::here("data_sheets", "compiled_sheets", "BB_mean_donor_traits_23_G2.csv"))
+
+BO_mean_donor_traits_23_G2 <- read_csv(here::here("data_sheets", "compiled_sheets", "BO_mean_donor_traits_23_G2.csv"))
+
+HR_mean_donor_traits_23_G2 <- read_csv(here::here("data_sheets", "compiled_sheets", "HR_mean_donor_traits_23_G2.csv"))
+```
+
+
+Remove NAs
+```{r}
+# Remove rows with NA values in specified columns
+AC_mean_donor_traits_22 <- AC_mean_donor_traits_22 %>%
+  filter(
+    !is.na(SLA_SEG),
+    !is.na(msm_all),
+    !is.na(fl_duration),
+    !is.na(d13C_SEG),
+    !is.na(corolla_diam_mm_SEG),
+    !is.na(est_fitness),
+    !is.na(g0_msm)
+  )
+
+```
+
+SPECIFIC LEAF AREA- Selenction differential includes both the direct and indirect effects of traits on fitness, therefore we can get our selection differential from the bivariate model trait estimate vale.
+```{r}
+#Transect not included because it doesn't improve the model (makes it singular)
+model_1 <- lm(est_fitness ~ SLA_SEG, 
+                data = AC_mean_donor_traits_22)
+
+summary(model_1)
+```
+
+MEAN SEED MASS
+```{r}
+
+model_2 <- lm(est_fitness ~ msm_all, 
+                data = AC_mean_donor_traits_22)
+
+summary(model_2)
+```
+
+
+FLOWERING DURATION
+```{r}
+
+model_3 <- lm(est_fitness ~ fl_duration, 
+                data = AC_mean_donor_traits_22)
+
+summary(model_3)
+```
+fl_duration + 
+                  d13C_SEG + corolla_diam_mm_SEG
+
+DELTA CARBON 13
+```{r}
+
+model_4 <- lm(est_fitness ~ d13C_SEG, 
+                data = AC_mean_donor_traits_22)
+
+summary(model_4)
+```
+
+
+COROLLA DIAMETER
+```{r}
+
+model_5 <- lm(est_fitness ~ corolla_diam_mm_SEG, 
+                data = AC_mean_donor_traits_22)
+
+summary(model_5)
+```
+
+
+SEWN SEED MASS (G0)
+```{r}
+
+model_6 <- lm(est_fitness ~ g0_msm, 
+                data = AC_mean_donor_traits_22)
+
+summary(model_6)
+```
+
+
+```{r}
+# Remove rows with NA values in specified columns
+BB_mean_donor_traits_22 <- BB_mean_donor_traits_22 %>%
+  filter(
+    !is.na(SLA_SEG),
+    !is.na(msm_all),
+    !is.na(fl_duration),
+    !is.na(d13C_SEG),
+    !is.na(corolla_diam_mm_SEG),
+    !is.na(est_fitness),
+    !is.na(g0_msm)
+  )
+```
+
+
+
+SPECIFIC LEAF AREA- Selenction differential includes both the direct and indirect effects of traits on fitness, therefore we can get our selection differential from the bivariate model trait estimate vale.
+```{r}
+#Transect not included because it doesn't improve the model (makes it singular)
+
+model_1 <- lm(est_fitness ~ SLA_SEG, 
+                data = BB_mean_donor_traits_22)
+
+summary(model_1)
+```
+
+MEAN SEED MASS
+```{r}
+
+model_2 <- lm(est_fitness ~ msm_all, 
+                data = BB_mean_donor_traits_22)
+
+summary(model_2)
+```
+
+
+FLOWERING DURATION
+```{r}
+
+model_3 <- lm(est_fitness ~ fl_duration, 
+                data = BB_mean_donor_traits_22)
+
+summary(model_3)
+```
+fl_duration + 
+                  d13C_SEG + corolla_diam_mm_SEG
+
+DELTA CARBON 13
+```{r}
+
+model_4 <- lm(est_fitness ~ d13C_SEG, 
+                data = BB_mean_donor_traits_22)
+
+summary(model_4)
+```
+
+
+COROLLA DIAMETER
+```{r}
+
+model_5 <- lm(est_fitness ~ corolla_diam_mm_SEG, 
+                data = BB_mean_donor_traits_22)
+
+summary(model_5)
+```
+
+SEWN SEED MASS (G0)
+```{r}
+
+model_6 <- lm(est_fitness ~ g0_msm, 
+                data = BB_mean_donor_traits_22)
+
+summary(model_6)
+```
+
+
+```{r}
+# Remove rows with NA values in specified columns
+BO_mean_donor_traits_22 <- BO_mean_donor_traits_22 %>%
+  filter(
+    !is.na(SLA_SEG),
+    !is.na(msm_all),
+    !is.na(fl_duration),
+    !is.na(d13C_SEG),
+    !is.na(corolla_diam_mm_SEG),
+    !is.na(est_fitness),
+    !is.na(g0_msm)
+  )
+```
+
+
+SPECIFIC LEAF AREA- Selenction differential includes both the direct and indirect effects of traits on fitness, therefore we can get our selection differential from the bivariate model trait estimate vale.
+```{r}
+#Transect not included because it doesn't improve the model (makes it singular)
+model_1 <- lm(est_fitness ~ SLA_SEG, 
+                data = BO_mean_donor_traits_22)
+
+summary(model_1)
+```
+
+MEAN SEED MASS
+```{r}
+
+model_2 <- lm(est_fitness ~ msm_all, 
+                data = BO_mean_donor_traits_22)
+
+summary(model_2)
+```
+
+
+FLOWERING DURATION
+```{r}
+
+model_3 <- lm(est_fitness ~ fl_duration, 
+                data = BO_mean_donor_traits_22)
+
+summary(model_3)
+```
+fl_duration + 
+                  d13C_SEG + corolla_diam_mm_SEG
+
+DELTA CARBON 13
+```{r}
+
+model_4 <- lm(est_fitness ~ d13C_SEG, 
+                data = BO_mean_donor_traits_22)
+
+summary(model_4)
+```
+
+COROLLA DIAMETER
+```{r}
+
+model_5 <- lm(est_fitness ~ corolla_diam_mm_SEG, 
+                data = BO_mean_donor_traits_22)
+
+summary(model_5)
+```
+
+SEWN SEED MASS (G0)
+```{r}
+
+model_6 <- lm(est_fitness ~ g0_msm, 
+                data = BO_mean_donor_traits_22)
+
+summary(model_6)
+```
+
+
+
+```{r}
+# Remove rows with NA values in specified columns
+HR_mean_donor_traits_22 <- HR_mean_donor_traits_22 %>%
+  filter(
+    !is.na(SLA_SEG),
+    !is.na(msm_all),
+    !is.na(fl_duration),
+    !is.na(d13C_SEG),
+    !is.na(corolla_diam_mm_SEG),
+    !is.na(est_fitness),
+    !is.na(g0_msm)
+  )
+```
+
+
+
+SPECIFIC LEAF AREA- Selenction differential includes both the direct and indirect effects of traits on fitness, therefore we can get our selection differential from the bivariate model trait estimate vale.
+```{r}
+#Transect not included because it doesn't improve the model (makes it singular)
+model_1 <- lm(est_fitness ~ SLA_SEG, 
+                data = HR_mean_donor_traits_22)
+
+summary(model_1)
+```
+
+MEAN SEED MASS
+```{r}
+
+model_2 <- lm(est_fitness ~ msm_all, 
+                data = HR_mean_donor_traits_22)
+
+summary(model_2)
+```
+
+
+FLOWERING DURATION
+```{r}
+
+model_3 <- lm(est_fitness ~ fl_duration, 
+                data = HR_mean_donor_traits_22)
+
+summary(model_3)
+```
+
+DELTA CARBON 13
+```{r}
+
+model_4 <- lm(est_fitness ~ d13C_SEG, 
+                data = HR_mean_donor_traits_22)
+
+summary(model_4)
+```
+
+COROLLA DIAMETER
+```{r}
+
+model_5 <- lm(est_fitness ~ corolla_diam_mm_SEG, 
+                data = HR_mean_donor_traits_22)
+
+summary(model_5)
+```
+
+SEWN SEED MASS (G0)
+```{r}
+
+model_6 <- lm(est_fitness ~ g0_msm, 
+                data = HR_mean_donor_traits_22)
+
+summary(model_6)
+```
+
+
+
+###TRYING TO COMPARE TRAIT MEANS WHEN THERE IS UNEVEN NUMBERS IN A PATERNAL FAMILY
+
+BB estimated fitness is not significantly different if only 5 individuals are averaged rather than 9. This is good:)
+
+```{r}
+# Filter data for donors with count of 7 and 9
+filtered_data <- BB_mean_donor_traits_22 %>%
+  filter(count %in% c(5, 9))
+
+# Compare means of est_fitness between the two counts
+comparison <- filtered_data %>%
+  group_by(count) %>%
+  summarise(
+    mean_est_fitness = mean(est_fitness, na.rm = TRUE),
+    sd_est_fitness = sd(est_fitness, na.rm = TRUE),
+    n = n() # Number of donors with the same count
+  )
+
+# View the comparison
+print(comparison)
+
+```
+```{r}
+# Perform t-test to compare means of est_fitness
+t_test_result <- t.test(est_fitness ~ count, data = filtered_data)
+print(t_test_result)
+
+```

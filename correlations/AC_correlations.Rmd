@@ -1,0 +1,918 @@
+---
+title: "AC_correlations"
+author: "Helen Payne"
+date: "2024-07-26"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r}
+library(tidyverse)
+library(corrplot) #Correlation Matrix
+library(reshape2)
+```
+
+
+```{r}
+# Load and preprocess data
+# Read the CSV file and create 'sample_ID' column
+AC_fit <- read_csv(here::here("data_sheets", "compiled_sheets", "AC_22_23_fit.csv")) %>%
+  rename_at(vars(48), ~"surv_to_fruitpod") %>%
+  mutate(
+    # Construct sample_ID conditionally
+    sample_ID = case_when(
+      is.na(SegPos) ~ paste(Year, Recipient, Gen, str_pad(Transect, width = 3, pad = "0"), Plant_ID, sep = "-"),
+      TRUE ~ paste(Year, Recipient, Gen, str_pad(Transect, width = 3, pad = "0"), SegPos, Plant_ID, sep = "-")
+    ),
+    # Replace leading underscores in sample_ID with hyphens
+    sample_ID = str_replace(sample_ID, "^([^_]*)_", "\\1-")
+  )
+
+AC_22_23_full <- read_csv(here::here("data_sheets", "compiled_sheets", "AC_22_23_full.csv"))
+
+AC_22_23_full <- AC_22_23_full %>%
+  group_by(Year, Gen, Transect, Sequence, Donor, Recipient, SegPos) %>%
+  mutate(prop_surv_to_flower = mean(surv_to_flower, na.rm = TRUE)) %>%
+  ungroup()  # Remove grouping
+
+AC_prop_sample <- AC_22_23_full %>%
+  dplyr::select(c(Year, Gen, Transect, Sequence, Donor, Recipient, SegPos, prop_surv_to_flower))  %>%
+    distinct()
+
+AC_fit <- AC_fit %>%
+  left_join(AC_prop_sample %>% dplyr::select(Year, Gen, Transect, Sequence, Donor, Recipient, SegPos, prop_surv_to_flower),
+            by = c("Year", "Gen", "Transect", "Sequence", "Donor", "Recipient", "SegPos"))
+
+# Create the new column
+AC_fit <- AC_fit %>%
+  mutate(est_fitness = prop_surv_to_flower * est_fecundity) %>%
+  mutate(est_fitness = replace_na(est_fitness, 0))
+
+AC_fit_22 <- AC_fit %>%
+  filter(Year == "2022")
+
+AC_fit_23_G1 <- AC_fit %>%
+  filter(Year == "2023", Gen == "G1")
+
+AC_fit_23_G2 <- AC_fit %>%
+  filter(Year == "2023", Gen == "G2")
+
+```
+
+
+```{r}
+Desktop/nemo_field/data_sheets/compiled_sheets/AC_fit_23_G1.csv
+AC_fit_22 <- read_csv(here::here("Desktop/nemo_field/data_sheets/compiled_sheets/AC_fit_22.csv"))
+
+
+AC_fit_23_G1 <- read_csv(here::here("Desktop/nemo_field/data_sheets/compiled_sheets/AC_fit_23_G1.csv"))
+
+
+
+AC_fit_23_G2 <- read_csv(here::here("Desktop/nemo_field/data_sheets/compiled_sheets/AC_fit_23_G2.csv"))
+
+
+```
+
+
+
+
+```{r}
+
+##AC 22: all individuals
+corrplot(cor(AC_fit_22 %>% dplyr::select(closed_fruits, total_fruits, filled_seeds, est_fecundity, mean_seeds_per_fruit, g0_msm, survival, msm_all), use="complete.obs"), method = "color", addCoef.col = "black", number.cex = .6, outline = TRUE, tl.col = "red", title = "AC 22 fecundity traits (all individuals)") #ignores NAs
+
+
+##AC 23 G1: all individuals
+corrplot(cor(AC_fit_23_G1 %>% dplyr::select(closed_fruits, total_fruits, filled_seeds, est_fecundity, mean_seeds_per_fruit, g0_msm, survival, msm_all), use="complete.obs"), method = "color", addCoef.col = "black", number.cex = .6, outline = TRUE, tl.col = "red", title = "AC 23 G1 fecundity traits (all individuals)") #ignores NAs
+
+
+##AC 23 G2: all individuals
+corrplot(cor(AC_fit_23_G2 %>% dplyr::select(closed_fruits, total_fruits, filled_seeds, est_fecundity, mean_seeds_per_fruit, g0_msm, survival, msm_all), use="complete.obs"), method = "color", addCoef.col = "black", number.cex = .6, outline = TRUE, tl.col = "red", title = "AC 23 G2 fecundity traits (all individuals)") #ignores NAs
+```
+
+
+
+```{r}
+##AC 22: Individual means
+corrplot(cor(AC_fit_22 %>% dplyr::select(est_fecundity, mean_seeds_per_fruit, fl_duration, 
+                                          skel_dryweight_mg, msm_all, corolla_diam_mm, SLA_SEG, d13C, g0_msm), use="complete.obs"), method = "color", addCoef.col = "black", number.cex = .6, outline = TRUE, tl.col = "red", title = "AC 22 all traits (all individuals)") #ignores NAs
+
+##AC 23 G1: Individual means
+corrplot(cor(AC_fit_23_G1 %>% dplyr::select(est_fecundity, mean_seeds_per_fruit, fl_duration, 
+                                          skel_dryweight_mg, msm_all, corolla_diam_mm, SLA_SEG, d13C, g0_msm), use="complete.obs"), method = "color", addCoef.col = "black", number.cex = .6, outline = TRUE, tl.col = "red", title = "AC 23 G1 all traits (all individuals)") #ignores NAs
+
+##AC 23 G2: Individual means
+corrplot(cor(AC_fit_23_G2 %>% dplyr::select(est_fecundity, mean_seeds_per_fruit, fl_duration, 
+                                          skel_dryweight_mg, msm_all, corolla_diam_mm, SLA_SEG, d13C, g0_msm), use="complete.obs"), method = "color", addCoef.col = "black", number.cex = .6, outline = TRUE, tl.col = "red", title = "AC 23 G2 all traits (all individuals)") #ignores NAs
+```
+
+
+Comparison of matrices
+```{r}
+# Extract correlation matrices
+cor_matrix_22 <- cor(AC_fit_22 %>% dplyr::select(closed_fruits, total_fruits, filled_seeds, est_fecundity, mean_seeds_per_fruit, fl_duration, skel_dryweight_mg, msm_all, corolla_diam_mm, SLA_SEG, d13C, g0_msm), use = "complete.obs")
+cor_matrix_23_G1 <- cor(AC_fit_23_G1 %>% dplyr::select(closed_fruits, total_fruits, filled_seeds, est_fecundity, mean_seeds_per_fruit, fl_duration, skel_dryweight_mg, msm_all, corolla_diam_mm, SLA_SEG, d13C, g0_msm), use = "complete.obs")
+cor_matrix_23_G2 <- cor(AC_fit_23_G2 %>% dplyr::select(closed_fruits, total_fruits, filled_seeds, est_fecundity, mean_seeds_per_fruit, fl_duration, skel_dryweight_mg, msm_all, corolla_diam_mm, SLA_SEG, d13C, g0_msm), use = "complete.obs")
+
+# Flatten correlation matrices
+cor_22_flat <- as.vector(cor_matrix_22)
+cor_23_G1_flat <- as.vector(cor_matrix_23_G1)
+cor_23_G2_flat <- as.vector(cor_matrix_23_G2)
+
+# Combine into a data frame for comparison
+cor_comparison <- data.frame(
+  Correlation = c(cor_22_flat, cor_23_G1_flat, cor_23_G2_flat),
+  Dataset = rep(c("AC 22", "AC 23 G1", "AC 23 G2"), each = length(cor_22_flat))
+)
+
+# Summary statistics
+cor_comparison %>%
+  group_by(Dataset) %>%
+  summarise(
+    Mean = mean(Correlation, na.rm = TRUE),
+    SD = sd(Correlation, na.rm = TRUE)
+  )
+
+# Melt correlation matrices for ggplot
+melt_cor_matrix <- function(cor_matrix, title) {
+  melted <- melt(cor_matrix)
+  melted$Dataset <- title
+  return(melted)
+}
+
+cor_22_melt <- melt_cor_matrix(cor_matrix_22, "AC 22")
+cor_23_G1_melt <- melt_cor_matrix(cor_matrix_23_G1, "AC 23 G1")
+cor_23_G2_melt <- melt_cor_matrix(cor_matrix_23_G2, "AC 23 G2")
+
+combined_melt <- rbind(cor_22_melt, cor_23_G1_melt, cor_23_G2_melt)
+
+# Plot heatmaps
+ggplot(combined_melt, aes(x = Var1, y = Var2, fill = value)) +
+  geom_tile() +
+  facet_wrap(~Dataset) +
+  scale_fill_gradient2(low = "blue", high = "red", mid = "white", midpoint = 0, limit = c(-1, 1)) +
+  theme_minimal() +
+  labs(title = "Heatmaps of Correlation Matrices", x = "", y = "")
+
+
+# Plot histograms of correlations
+ggplot(cor_comparison, aes(x = Correlation, fill = Dataset)) +
+  geom_histogram(position = "dodge", bins = 30, alpha = 0.5) +
+  labs(title = "Distribution of Correlation Coefficients", x = "Correlation", y = "Frequency") +
+  theme_minimal()
+```
+
+```{r}
+AC_fit_22$reproductive_yield <- AC_fit_22$msm_all * AC_fit_22$filled_seeds
+
+```
+
+
+```{r}
+# Aggregate data by donor
+mean_donor_traits_22 <- AC_fit_22%>%
+  filter(est_fecundity != 0) %>%  # Filter out rows where est_fecundity is zero
+  group_by(Donor) %>%             # Group by donor
+  summarise(
+    closed_fruits = mean(closed_fruits, na.rm = TRUE),
+    total_fruits = mean(total_fruits, na.rm = TRUE),
+    filled_seeds = mean(filled_seeds, na.rm = TRUE),
+    est_fecundity = mean(est_fecundity, na.rm = TRUE),
+    mean_seeds_per_fruit = mean(mean_seeds_per_fruit, na.rm = TRUE),
+    fl_duration = mean(fl_duration, na.rm = TRUE),
+    skel_dryweight_mg = mean(skel_dryweight_mg, na.rm = TRUE),
+    est_fecundity = mean(est_fecundity, na.rm = TRUE),
+    msm_all = mean(msm_all, na.rm = TRUE),
+    corolla_diam_mm = mean(corolla_diam_mm, na.rm = TRUE),
+    SLA_SEG = mean(SLA_SEG, na.rm = TRUE),
+    d13C = mean(d13C, na.rm = TRUE),
+    survival = mean(survival, na.rm = TRUE),
+    reproductive_yield = mean(reproductive_yield , na.rm =TRUE)
+  )
+
+# Aggregate data by donor
+mean_donor_traits_23_G1 <- AC_fit_23_G1%>%
+  filter(est_fecundity != 0) %>%  # Filter out rows where est_fecundity is zero
+  group_by(Donor) %>%             # Group by donor
+  summarise(
+    closed_fruits = mean(closed_fruits, na.rm = TRUE),
+    total_fruits = mean(total_fruits, na.rm = TRUE),
+    filled_seeds = mean(filled_seeds, na.rm = TRUE),
+    est_fecundity = mean(est_fecundity, na.rm = TRUE),
+    mean_seeds_per_fruit = mean(mean_seeds_per_fruit, na.rm = TRUE),
+    fl_duration = mean(fl_duration, na.rm = TRUE),
+    skel_dryweight_mg = mean(skel_dryweight_mg, na.rm = TRUE),
+    est_fecundity = mean(est_fecundity, na.rm = TRUE),
+    msm_all = mean(msm_all, na.rm = TRUE),
+    corolla_diam_mm = mean(corolla_diam_mm, na.rm = TRUE),
+    SLA_SEG = mean(SLA_SEG, na.rm = TRUE),
+    d13C = mean(d13C, na.rm = TRUE),
+    survival = mean(survival, na.rm = TRUE)
+  )
+
+# Aggregate data by donor
+mean_donor_traits_23_G2 <- AC_fit_23_G2%>%
+  filter(est_fecundity != 0) %>%  # Filter out rows where est_fecundity is zero
+  group_by(Donor) %>%             # Group by donor
+  summarise(
+    closed_fruits = mean(closed_fruits, na.rm = TRUE),
+    total_fruits = mean(total_fruits, na.rm = TRUE),
+    filled_seeds = mean(filled_seeds, na.rm = TRUE),
+    est_fecundity = mean(est_fecundity, na.rm = TRUE),
+    mean_seeds_per_fruit = mean(mean_seeds_per_fruit, na.rm = TRUE),
+    fl_duration = mean(fl_duration, na.rm = TRUE),
+    skel_dryweight_mg = mean(skel_dryweight_mg, na.rm = TRUE),
+    est_fecundity = mean(est_fecundity, na.rm = TRUE),
+    msm_all = mean(msm_all, na.rm = TRUE),
+    corolla_diam_mm = mean(corolla_diam_mm, na.rm = TRUE),
+    SLA_SEG = mean(SLA_SEG, na.rm = TRUE),
+    d13C = mean(d13C, na.rm = TRUE)
+  )
+```
+
+
+```{r}
+
+mean_donor_traits_22 <- read_csv(here::here("data_sheets", "compiled_sheets", "AC_mean_donor_traits_22.csv"))
+
+
+mean_donor_traits_23_G1 <- read_csv(here::here("data_sheets", "compiled_sheets", "AC_mean_donor_traits_23_G1.csv"))
+
+
+mean_donor_traits_23_G2 <- read_csv(here::here("data_sheets", "compiled_sheets", "AC_mean_donor_traits_23_G2.csv"))
+
+```
+
+```{r}
+##AC 22: Paternal averages of fitness estimates
+corrplot(cor(mean_donor_traits_22 %>% dplyr::select(closed_fruits, total_fruits, filled_seeds, est_fecundity, mean_seeds_per_fruit, g0_msm, survival, msm_all), use="complete.obs"), method = "color", addCoef.col = "black", number.cex = .6, outline = TRUE, tl.col = "red", title = "AC 23 G2 fecundity traits (paternal means)") #ignores NAs
+
+##AC 23 G1: Paternal averages of fitness estimates
+corrplot(cor(mean_donor_traits_23_G1 %>% dplyr::select(closed_fruits, total_fruits, filled_seeds, est_fecundity, mean_seeds_per_fruit, , g0_msm, survival, msm_all), use="complete.obs"), method = "color", addCoef.col = "black", number.cex = .6, outline = TRUE, tl.col = "red", title = "AC 23 G2 fecundity traits (paternal means)") #ignores NAs
+
+##AC 23 G2: Paternal averages of fitness estimates
+corrplot(cor(mean_donor_traits_23_G2 %>% dplyr::select(closed_fruits, total_fruits, filled_seeds, est_fecundity, mean_seeds_per_fruit, , g0_msm, survival, msm_all), use="complete.obs"), method = "color", addCoef.col = "black", number.cex = .6, outline = TRUE, tl.col = "red", title = "AC 23 G2 fecundity traits (paternal means)") #ignores NAs
+
+
+#as the number of closed fruits increases, the mean number of seeds per fruit tends to decrease, as total_fruits increases, mean seeds per fruit tends to decrease (and vice versa)
+##This correlation is only apparent when looking at the paternal means
+```
+
+```{r}
+# Adjust margins before plotting
+par(mfrow = c(1, 3), mar = c(5, 5, 5, 5))  # Change 'mar' to adjust margins
+
+# AC 2022 G1 Correlation Matrix - Donor only
+AC22G1_corr_matrix <- cor(mean_donor_traits_22 %>% 
+                            dplyr::select(est_fecundity, mean_seeds_per_fruit, fl_duration, 
+                                          skel_dryweight_mg, msm_all, corolla_diam_mm_SEG, SLA_SEG, d13C_SEG, g0_msm), 
+                            use = "complete.obs")
+corrplot(AC22G1_corr_matrix, method = "color", addCoef.col = "black", 
+         number.cex = 0.6, outline = TRUE, tl.col = "red", title = "AC 22 all traits (paternal)")
+
+# AC 2023 G1 Correlation Matrix - Donor only
+AC23G1_corr_matrix <- cor(mean_donor_traits_23_G1 %>% 
+                            dplyr::select(est_fecundity, mean_seeds_per_fruit, fl_duration, 
+                                          skel_dryweight_mg, msm_all, corolla_diam_mm, SLA_SEG, d13C, g0_msm), 
+                            use = "complete.obs")
+
+corrplot(AC23G1_corr_matrix, method = "color", addCoef.col = "black", 
+         number.cex = 0.6, outline = TRUE, tl.col = "red", title = "AC 23 all traits (paternal)")
+
+# AC 2023 G2 Correlation Matrix - Donor only
+AC23G2_corr_matrix <- cor(mean_donor_traits_23_G2 %>% 
+                            dplyr::select(est_fecundity, mean_seeds_per_fruit, fl_duration, 
+                                          skel_dryweight_mg, msm_all, corolla_diam_mm, SLA_SEG, d13C, g0_msm), 
+                            use = "complete.obs")
+
+corrplot(AC23G2_corr_matrix, method = "color", addCoef.col = "black", 
+         number.cex = 0.6, outline = TRUE, tl.col = "red", title = "AC 23 all traits (paternal)")
+
+```
+
+
+```{r}
+
+##AC 22: Paternal averages of fitness estimates
+AC22G1 <- corrplot(cor(mean_donor_traits_22 %>% dplyr::select(est_fecundity, mean_seeds_per_fruit, fl_duration, skel_dryweight_mg, msm_all, corolla_diam_mm, SLA_SEG, d13C), use="complete.obs"), method = "color", addCoef.col = "black", number.cex = .6, outline = TRUE, tl.col = "red", title = "AC 22 all traits (paternal means)") #ignores NAs
+
+##AC 23 G1: Paternal averages of fitness estimates
+AC23G1 <- corrplot(cor(mean_donor_traits_23_G1 %>% dplyr::select(est_fecundity, mean_seeds_per_fruit, fl_duration, skel_dryweight_mg, msm_all, corolla_diam_mm, SLA_SEG, d13C), use="complete.obs"), method = "color", addCoef.col = "black", number.cex = .6, outline = TRUE, tl.col = "red", title = "AC 23 G1 all traits (paternal means)") #ignores NAs
+
+##AC 23 G2: Paternal averages of fitness estimates
+AC23G2 <- corrplot(cor(mean_donor_traits_23_G2 %>% dplyr::select(est_fecundity, mean_seeds_per_fruit, fl_duration, skel_dryweight_mg, msm_all, corolla_diam_mm, SLA_SEG, d13C), use="complete.obs"), method = "color", addCoef.col = "black", number.cex = .6, outline = TRUE, tl.col = "red", title = "AC 23 G2 all traits (paternal means)") #ignores NAs
+
+
+
+#code to save plot
+ggsave('prob_density_BV.png', device="png", dpi=1200)
+```
+
+Comparison of matrices
+```{r}
+# Extract correlation matrices
+cor_matrix_22 <- cor(mean_donor_traits_22 %>% dplyr::select(est_fecundity, mean_seeds_per_fruit, fl_duration, skel_dryweight_mg, msm_all, corolla_diam_mm, SLA_SEG, d13C), use = "complete.obs")
+cor_matrix_23_G1 <- cor(mean_donor_traits_23_G1 %>% dplyr::select(est_fecundity, mean_seeds_per_fruit, fl_duration, skel_dryweight_mg, msm_all, corolla_diam_mm, SLA_SEG, d13C), use = "complete.obs")
+cor_matrix_23_G2 <- cor(mean_donor_traits_23_G2 %>% dplyr::select(est_fecundity, mean_seeds_per_fruit, fl_duration, skel_dryweight_mg, msm_all, corolla_diam_mm, SLA_SEG, d13C), use = "complete.obs")
+
+# Flatten correlation matrices
+cor_22_flat <- as.vector(cor_matrix_22)
+cor_23_G1_flat <- as.vector(cor_matrix_23_G1)
+cor_23_G2_flat <- as.vector(cor_matrix_23_G2)
+
+# Combine into a data frame for comparison
+cor_comparison <- data.frame(
+  Correlation = c(cor_22_flat, cor_23_G1_flat, cor_23_G2_flat),
+  Dataset = rep(c("AC 22", "AC 23 G1", "AC 23 G2"), each = length(cor_22_flat))
+)
+
+# Summary statistics
+cor_comparison %>%
+  group_by(Dataset) %>%
+  summarise(
+    Mean = mean(Correlation, na.rm = TRUE),
+    SD = sd(Correlation, na.rm = TRUE)
+  )
+
+# Melt correlation matrices for ggplot
+melt_cor_matrix <- function(cor_matrix, title) {
+  melted <- melt(cor_matrix)
+  melted$Dataset <- title
+  return(melted)
+}
+
+cor_22_melt <- melt_cor_matrix(cor_matrix_22, "AC 22")
+cor_23_G1_melt <- melt_cor_matrix(cor_matrix_23_G1, "AC 23 G1")
+cor_23_G2_melt <- melt_cor_matrix(cor_matrix_23_G2, "AC 23 G2")
+
+combined_melt <- rbind(cor_22_melt, cor_23_G1_melt, cor_23_G2_melt)
+
+# Plot heatmaps
+ggplot(combined_melt, aes(x = Var1, y = Var2, fill = value)) +
+  geom_tile() +
+  facet_wrap(~Dataset) +
+  scale_fill_gradient2(low = "blue", high = "red", mid = "white", midpoint = 0, limit = c(-1, 1)) +
+  theme_minimal() +
+  labs(title = "Heatmaps of Correlation Matrices", x = "", y = "")
+
+
+# Plot histograms of correlations
+ggplot(cor_comparison, aes(x = Correlation, fill = Dataset)) +
+  geom_histogram(position = "dodge", bins = 30, alpha = 0.5) +
+  labs(title = "Distribution of Correlation Coefficients", x = "Correlation", y = "Frequency") +
+  theme_minimal()
+```
+
+
+```{r}
+
+# Load the required libraries
+library(corrplot)
+library(dplyr)
+
+# Set up a 1x3 layout for the correlation plots with space for the overall title
+par(mfrow = c(1, 3), oma = c(0, 0, 3, 0))  # Adjust oma to leave space for the title
+
+# Define new trait names
+trait_names <- c("Estimated Fecundity", "Mean Seeds Per Fruit", "Flowering Duration", 
+                 "Dry Weight", "Mean Seed Mass", "Corolla Diameter", "SLA", "δ13C")
+
+# Create the correlation matrix
+cor_matrix <- cor(mean_donor_traits_22 %>%
+                  dplyr::select(est_fecundity, mean_seeds_per_fruit, fl_duration, 
+                                skel_dryweight_mg, msm_all, corolla_diam_mm, SLA_SEG, d13C), 
+                  use = "complete.obs")
+
+# Set new column and row names
+colnames(cor_matrix) <- trait_names
+rownames(cor_matrix) <- trait_names
+
+# First correlation plot (AC 22) with renamed traits
+AC_22_corr_donor <- corrplot(
+  cor_matrix,                             # Use the renamed correlation matrix
+  method = "color", 
+  addCoef.col = "black", 
+  number.cex = 0.8, 
+  tl.col = "black", 
+  tl.srt = 45, 
+  col = colorRampPalette(c("red", "white", "blue"))(200), 
+  cl.lim = c(-1, 1), 
+  outline = TRUE, 
+  mar = c(0, 0, 2, 0), 
+  title = "AC 22 Paternal Averages"
+)
+
+
+# Create the correlation matrix
+cor_matrix <- cor(mean_donor_traits_23_G1 %>%
+                  dplyr::select(est_fecundity, mean_seeds_per_fruit, fl_duration, 
+                                skel_dryweight_mg, msm_all, corolla_diam_mm, SLA_SEG, d13C), 
+                  use = "complete.obs")
+
+# Set new column and row names
+colnames(cor_matrix) <- trait_names
+rownames(cor_matrix) <- trait_names
+
+# First correlation plot (AC 22) with renamed traits
+AC_23_G1_corr_donor <- corrplot(
+  cor_matrix,                             # Use the renamed correlation matrix
+  method = "color", 
+  addCoef.col = "black", 
+  number.cex = 0.8, 
+  tl.col = "black", 
+  tl.srt = 45, 
+  col = colorRampPalette(c("red", "white", "blue"))(200), 
+  cl.lim = c(-1, 1), 
+  outline = TRUE, 
+  mar = c(0, 0, 2, 0), 
+  title = "AC 23 G2 Paternal Averages"
+)
+
+# Create the correlation matrix
+cor_matrix <- cor(mean_donor_traits_23_G2 %>%
+                  dplyr::select(est_fecundity, mean_seeds_per_fruit, fl_duration, 
+                                skel_dryweight_mg, msm_all, corolla_diam_mm, SLA_SEG, d13C), 
+                  use = "complete.obs")
+
+# Set new column and row names
+colnames(cor_matrix) <- trait_names
+rownames(cor_matrix) <- trait_names
+
+# First correlation plot (AC 22) with renamed traits
+AC_23_G2_corr_donor <- corrplot(
+  cor_matrix,                             # Use the renamed correlation matrix
+  method = "color", 
+  addCoef.col = "black", 
+  number.cex = 0.8, 
+  tl.col = "black", 
+  tl.srt = 45, 
+  col = colorRampPalette(c("red", "white", "blue"))(200), 
+  cl.lim = c(-1, 1), 
+  outline = TRUE, 
+  mar = c(0, 0, 2, 0), 
+  title = "AC 23 G2 Paternal Averages"
+)
+
+```
+
+```{r}
+# Load the required libraries
+library(corrplot)
+library(dplyr)
+
+# Set up a 1x3 layout for the correlation plots with space for the overall title
+par(mfrow = c(1, 3), oma = c(0, 0, 3, 0))  # Adjust oma to leave space for the title
+
+# Define new trait names
+trait_names <- c("Estimated Fecundity", "Mean Seeds Per Fruit", "Flowering Duration", 
+                 "Dry Weight", "Mean Seed Mass", "Corolla Diameter", "SLA", "δ13C")
+
+# Create the correlation matrix
+cor_matrix <- cor(mean_donor_traits_22 %>%
+                  dplyr::select(est_fecundity, mean_seeds_per_fruit, fl_duration, 
+                                skel_dryweight_mg, msm_all, corolla_diam_mm, SLA_SEG, d13C), 
+                  use = "complete.obs")
+
+# Set new column and row names
+colnames(cor_matrix) <- trait_names
+rownames(cor_matrix) <- trait_names
+
+# First correlation plot (BB 22) with renamed traits
+AC_22_corr_donor <- corrplot(
+  cor_matrix,                             # Use the renamed correlation matrix
+  method = "color", 
+  addCoef.col = "black", 
+  number.cex = 0.8, 
+  tl.col = "black", 
+  tl.srt = 45, 
+  col = colorRampPalette(c("red", "white", "blue"))(200), 
+  cl.lim = c(-1, 1), 
+  outline = TRUE, 
+  mar = c(0, 0, 2, 0), 
+  title = "AC 22 Paternal Averages"
+)
+
+
+# Create the correlation matrix
+cor_matrix <- cor(mean_donor_traits_23_G1 %>%
+                  dplyr::select(est_fecundity, mean_seeds_per_fruit, fl_duration, 
+                                skel_dryweight_mg, msm_all, corolla_diam_mm, SLA_SEG, d13C), 
+                  use = "complete.obs")
+
+# Set new column and row names
+colnames(cor_matrix) <- trait_names
+rownames(cor_matrix) <- trait_names
+
+# First correlation plot (BB 22) with renamed traits
+AC_23_G1_corr_donor <- corrplot(
+  cor_matrix,                             # Use the renamed correlation matrix
+  method = "color", 
+  addCoef.col = "black", 
+  number.cex = 0.8, 
+  tl.col = "black", 
+  tl.srt = 45, 
+  col = colorRampPalette(c("red", "white", "blue"))(200), 
+  cl.lim = c(-1, 1), 
+  outline = TRUE, 
+  mar = c(0, 0, 2, 0), 
+  title = "AC 23 G1 Paternal Averages"
+)
+
+# Create the correlation matrix
+cor_matrix <- cor(mean_donor_traits_23_G2 %>%
+                  dplyr::select(est_fecundity, mean_seeds_per_fruit, fl_duration, 
+                                skel_dryweight_mg, msm_all, corolla_diam_mm, SLA_SEG, d13C), 
+                  use = "complete.obs")
+
+# Set new column and row names
+colnames(cor_matrix) <- trait_names
+rownames(cor_matrix) <- trait_names
+
+# First correlation plot (BB 22) with renamed traits
+AC_23_G2_corr_donor <- corrplot(
+  cor_matrix,                             # Use the renamed correlation matrix
+  method = "color", 
+  addCoef.col = "black", 
+  number.cex = 0.8, 
+  tl.col = "black", 
+  tl.srt = 45, 
+  col = colorRampPalette(c("red", "white", "blue"))(200), 
+  cl.lim = c(-1, 1), 
+  outline = TRUE, 
+  mar = c(0, 0, 2, 0), 
+  title = "AC 23 G2 Paternal Averages"
+)
+
+```
+
+
+##My attempt at a G-matix
+##Trying to include random effects##
+```{r}
+
+library(MCMCglmm)
+
+# Step 1: Clean the data by omitting rows with NA values
+AC_22_fit_clean <- na.omit(AC_fit_22[, c("skel_dryweight_mg_SEG", "d13C_SEG", 
+                                         "est_fecundity", "msm_all", "SLA_SEG", "corolla_diam_mm_SEG", "est_fitness", "Donor", "Recipient", "Transect")])
+
+# Step 2: Reshape the data from wide to long format
+long_data <- melt(AC_22_fit_clean, 
+                  id.vars = c("Donor", "Recipient", "Transect"), 
+                  measure.vars = c("skel_dryweight_mg_SEG", "d13C_SEG", "est_fecundity", 
+                                   "msm_all", "SLA_SEG", "corolla_diam_mm_SEG", "est_fitness"), 
+                  variable.name = "Fitness_Related_Traits_", 
+                  value.name = "value")
+
+# Step 3: Update the priors to match the number of random effects
+priors <- list(
+  R = list(V = diag(7), nu = 7),  # Residual variance (7 traits)
+  G = list(
+    G1 = list(V = diag(7), nu = 7),  # Random effect variance for Donor (7 traits)
+    G2 = list(V = diag(7), nu = 7),  # Random effect variance for Recipient (7 traits)
+    G3 = list(V = diag(7), nu = 7)   # Random effect variance for Transect (7 traits)
+  )
+)
+
+# Step 4: Correct the rcov structure and run the MCMCglmm model
+multivariate_model <- MCMCglmm(
+  value ~ Fitness_Related_Traits_ - 1,  # Fixed effects for each trait
+  random = ~us(Fitness_Related_Traits_):Donor + 
+            us(Fitness_Related_Traits_):Recipient + 
+            us(Fitness_Related_Traits_):Transect,  # Random effects for Donor, Recipient, and Transect
+  rcov = ~idh(Fitness_Related_Traits_):units,  # Correct residual structure, unique residuals per data point
+  family = "gaussian",  # Gaussian family for the response variable
+  prior = priors,  # Use the updated priors
+  data = long_data,  # Use the long-format data
+  nitt = 13000, burnin = 3000, thin = 10  # MCMC settings
+)
+
+# Step 5: Summary of the model
+summary(multivariate_model)
+
+# Step 6: Extract the G-matrix (covariances between traits)
+# Step 6: Extract the G-matrix (covariances between traits)
+# Extract the variance-covariance components (VCV)
+vcv_matrix <- multivariate_model$VCV
+
+# Extract the G-matrices for each random effect (Donor, Recipient, Transect)
+G_donor <- matrix(colMeans(vcv_matrix[, grepl("Donor", colnames(vcv_matrix))]), ncol = 7, nrow = 7)
+G_recipient <- matrix(colMeans(vcv_matrix[, grepl("Recipient", colnames(vcv_matrix))]), ncol = 7, nrow = 7)
+G_transect <- matrix(colMeans(vcv_matrix[, grepl("Transect", colnames(vcv_matrix))]), ncol = 7, nrow = 7)
+
+# Convert the covariance matrices to correlation matrices
+G_donor_corr <- cov2cor(G_donor)
+G_recipient_corr <- cov2cor(G_recipient)
+G_transect_corr <- cov2cor(G_transect)
+
+# Print the G-matrices (correlation matrices)
+print("Donor G-matrix (correlations):")
+print(G_donor_corr)
+
+print("Recipient G-matrix (correlations):")
+print(G_recipient_corr)
+
+print("Transect G-matrix (correlations):")
+print(G_transect_corr)
+
+
+```
+#Visualizing G-matixes
+```{r}
+
+library(ggplot2)
+library(reshape2)
+
+# Create a function to visualize the G-matrix as a heatmap
+plot_G_matrix <- function(G_matrix, title) {
+  
+  # Convert the G-matrix to a data frame for ggplot
+  G_df <- melt(G_matrix)
+  
+  # Plot the heatmap
+  ggplot(G_df, aes(Var1, Var2, fill = value)) +
+    geom_tile() +
+    scale_fill_gradient2(low = "blue", high = "red", mid = "white", 
+                         midpoint = 0, limit = c(-1, 1), space = "Lab", 
+                         name = "Correlation") +
+    theme_minimal() +
+    labs(x = "Trait", y = "Trait", title = title) +
+    theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1))
+}
+
+# Visualize the G-matrices for Donor, Recipient, and Transect
+plot_G_matrix(G_donor_corr, "Donor G-Matrix (Correlations)")
+plot_G_matrix(G_recipient_corr, "Recipient G-Matrix (Correlations)")
+plot_G_matrix(G_transect_corr, "Transect G-Matrix (Correlations)")
+
+```
+
+```{r}
+
+library(corrplot)
+
+# Visualize the Donor G-matrix
+corrplot(G_donor_corr, method = "color", addCoef.col = "black", tl.srt = 45,
+         title = "", col = colorRampPalette(c("blue", "white", "red"))(200))
+
+# Visualize the Recipient G-matrix
+corrplot(G_recipient_corr, method = "color", addCoef.col = "black", tl.srt = 45,
+         title = "", col = colorRampPalette(c("blue", "white", "red"))(200))
+
+# Visualize the Transect G-matrix
+corrplot(G_transect_corr, method = "color", addCoef.col = "black", tl.srt = 45,
+         title = "", col = colorRampPalette(c("blue", "white", "red"))(200))
+
+```
+
+
+```{r}
+
+# Function to create covariance ellipses using real data
+create_covariance_plot_real_data <- function(data, trait1, trait2, title) {
+  # Extract the two traits from the data
+  data_df <- data %>% dplyr::select(!!sym(trait1), !!sym(trait2))
+  colnames(data_df) <- c("Trait1", "Trait2")  # Rename for consistency
+  
+  
+# Remove rows with missing values in the traits you're interested in
+AC_22_fit_clean <- AC_fit_22 %>%
+  dplyr::select(skel_dryweight_mg_SEG, d13C_SEG, est_fecundity, msm_all, SLA_SEG) %>%
+  na.omit()
+
+# Now create your plots using the cleaned data
+plot_real_data <- create_covariance_plot_real_data(AC_22_fit_clean, "skel_dryweight_mg_SEG", "d13C_SEG", "Trait 1 vs Trait 2")
+plot_real_data_2 <- create_covariance_plot_real_data(AC_22_fit_clean, "est_fecundity", "msm_all", "Trait 3 vs Trait 4")
+plot_real_data_3 <- create_covariance_plot_real_data(AC_22_fit_clean, "SLA_SEG", "d13C_SEG", "Trait 5 vs Trait 6")
+
+# Combine the plots into one panel
+combined_plot_real_data <- plot_grid(plot_real_data, plot_real_data_2, plot_real_data_3, ncol = 3)
+
+# Display the combined plot
+combined_plot_real_data
+
+
+# Fill missing values with the mean of each column
+AC_22_fit_clean <- AC_fit_22 %>%
+  mutate(
+    skel_dryweight_mg_SEG = ifelse(is.na(skel_dryweight_mg_SEG), mean(skel_dryweight_mg_SEG, na.rm = TRUE), skel_dryweight_mg_SEG),
+    d13C_SEG = ifelse(is.na(d13C_SEG), mean(d13C_SEG, na.rm = TRUE), d13C_SEG),
+    est_fecundity = ifelse(is.na(est_fecundity), mean(est_fecundity, na.rm = TRUE), est_fecundity),
+    msm_all = ifelse(is.na(msm_all), mean(msm_all, na.rm = TRUE), msm_all),
+    SLA_SEG = ifelse(is.na(SLA_SEG), mean(SLA_SEG, na.rm = TRUE), SLA_SEG)
+  )
+
+# Now create the plots with the imputed data
+plot_real_data <- create_covariance_plot_real_data(AC_22_fit_clean, "skel_dryweight_mg_SEG", "d13C_SEG", "Trait 1 vs Trait 2")
+plot_real_data_2 <- create_covariance_plot_real_data(AC_22_fit_clean, "est_fecundity", "msm_all", "Trait 3 vs Trait 4")
+plot_real_data_3 <- create_covariance_plot_real_data(AC_22_fit_clean, "SLA_SEG", "d13C_SEG", "Trait 5 vs Trait 6")
+
+# Combine and display the plots
+combined_plot_real_data <- plot_grid(plot_real_data, plot_real_data_2, plot_real_data_3, ncol = 3)
+combined_plot_real_data
+
+
+# Remove rows where there are missing values only in the columns you care about
+AC_22_fit_clean <- AC_fit_22 %>%
+  filter(!is.na(skel_dryweight_mg_SEG), !is.na(d13C_SEG), !is.na(est_fecundity), !is.na(msm_all), !is.na(SLA_SEG), !is.na(corolla_diam_mm_SEG))
+
+# Now create your plots
+plot_real_data <- create_covariance_plot_real_data(AC_22_fit_clean, "skel_dryweight_mg_SEG", "d13C_SEG", "Trait 1 vs Trait 2")
+plot_real_data_2 <- create_covariance_plot_real_data(AC_22_fit_clean, "est_fecundity", "msm_all", "Trait 3 vs Trait 4")
+plot_real_data_3 <- create_covariance_plot_real_data(AC_22_fit_clean, "SLA_SEG", "d13C_SEG", "Trait 5 vs Trait 6")
+
+# Combine and display the plots
+combined_plot_real_data <- plot_grid(plot_real_data, plot_real_data_2, plot_real_data_3, ncol = 3)
+combined_plot_real_data
+
+
+plot_real_data <- create_covariance_plot_real_data(AC_22_fit_clean, "skel_dryweight_mg_SEG", "d13C_SEG", "") +
+  theme(plot.margin = margin(10, 10, 10, 10))  # Adjust the plot margins
+
+plot_real_data_2 <- create_covariance_plot_real_data(AC_22_fit_clean, "msm_all", "est_fecundity", "") +
+  theme(plot.margin = margin(10, 10, 10, 10))
+
+plot_real_data_3 <- create_covariance_plot_real_data(AC_22_fit_clean, "SLA_SEG", "d13C_SEG", "") +
+  theme(plot.margin = margin(10, 10, 10, 10))
+
+combined_plot_real_data <- plot_grid(plot_real_data, plot_real_data_2, plot_real_data_3, ncol = 3)
+
+# Save the plot as a PNG file
+ggsave(
+  filename = "combined_plot_real_data.png",    # Output file name
+  plot = combined_plot_real_data,              # The combined plot object
+  width = 12, height = 4,                      # Adjust width and height
+  dpi = 300                                    # High resolution for publication-quality output
+)
+
+```
+ 
+```{r}
+
+# Extract fixed effect estimates from the MCMCglmm model
+fixed_effects <- summary(multivariate_model)$solutions
+
+# Create a dataframe for plotting
+fixed_effects_df <- data.frame(
+  TraitName = rownames(fixed_effects),
+  Estimate = fixed_effects[, "post.mean"],
+  LowerCI = fixed_effects[, "l-95% CI"],
+  UpperCI = fixed_effects[, "u-95% CI"]
+)
+
+# Plot the estimates and credible intervals
+ggplot(fixed_effects_df, aes(x = reorder(TraitName, Estimate), y = Estimate)) +
+  geom_point(size = 4, color = "blue") +  # Points for estimates
+  geom_errorbar(aes(ymin = LowerCI, ymax = UpperCI), width = 0.2, color = "blue") +  # Error bars
+  geom_hline(yintercept = 0, linetype = "solid", color = "red") +  # Horizontal line at 0
+  coord_flip() +  # Flip coordinates for readability
+  labs(title = "", x = "", y = "Estimated Effect") +
+  theme_minimal() +
+  theme(axis.line = element_line(color = "black"),  # Add solid axis lines
+        panel.border = element_blank())  # Remove panel border
+```
+ 
+#Fitness landscapes
+```{r}
+# Fit a model using two traits as predictors for fitness (est_fecundity)
+fitness_model <- lm(est_fitness ~ SLA_SEG + d13C_SEG, data = AC_22_fit_clean)
+
+# Summary of the model
+summary(fitness_model)
+
+# Create a grid of values for SLA_SEG and d13C_SEG
+SLA_range <- seq(min(AC_22_fit_clean$SLA_SEG, na.rm = TRUE), max(AC_22_fit_clean$SLA_SEG, na.rm = TRUE), length.out = 100)
+d13C_range <- seq(min(AC_22_fit_clean$d13C_SEG, na.rm = TRUE), max(AC_22_fit_clean$d13C_SEG, na.rm = TRUE), length.out = 100)
+
+# Create a data frame with all combinations of SLA_SEG and d13C_SEG
+trait_grid <- expand.grid(SLA_SEG = SLA_range, d13C_SEG = d13C_range)
+
+# Predict fitness (est_fecundity) for each combination of SLA_SEG and d13C_SEG
+trait_grid$predicted_fitness <- predict(fitness_model, newdata = trait_grid)
+
+# Install and load plotly if not already installed
+#install.packages("plotly")
+library(plotly)
+
+# Create a 3D surface plot
+plot_ly(x = ~trait_grid$SLA_SEG, y = ~trait_grid$d13C_SEG, z = ~trait_grid$predicted_fitness, type = "scatter3d", mode = "lines")
+
+
+# 2D contour plot using ggplot2
+library(ggplot2)
+
+ggplot(trait_grid, aes(x = SLA_SEG, y = d13C_SEG, z = predicted_fitness)) +
+  geom_contour_filled() +
+  labs(title = "Fitness Landscape", x = "SLA", y = "d13C", fill = "Predicted Fitness") +
+  theme_minimal()
+
+```
+#using pairwise combinations of traits
+
+```{r}
+
+library(tidyverse)
+library(ggplot2)
+
+# List of traits to use in pairwise combinations
+traits <- c("SLA_SEG", "d13C_SEG", "msm_all", "skel_dryweight_mg_SEG")
+
+# Generate all possible pairwise combinations of the traits
+trait_combinations <- combn(traits, 2, simplify = FALSE)
+
+# Show the trait combinations
+print(trait_combinations)
+
+# Function to fit model and create grid for pairwise traits
+create_fitness_landscape <- function(trait1, trait2, data, fitness_var = "est_fecundity") {
+  
+  # Fit a linear model using the two traits to predict fitness
+  formula <- as.formula(paste(fitness_var, "~", trait1, "+", trait2))
+  model <- lm(formula, data = data)
+  
+  # Create a grid of values for the two traits
+  trait1_range <- seq(min(data[[trait1]], na.rm = TRUE), max(data[[trait1]], na.rm = TRUE), length.out = 100)
+  trait2_range <- seq(min(data[[trait2]], na.rm = TRUE), max(data[[trait2]], na.rm = TRUE), length.out = 100)
+  
+  # Create a data frame with all combinations of the two traits
+  grid <- expand.grid(trait1 = trait1_range, trait2 = trait2_range)
+  colnames(grid) <- c(trait1, trait2)
+  
+  # Predict fitness for each combination of traits
+  grid$predicted_fitness <- predict(model, newdata = grid)
+  
+  # Return the grid and the model
+  return(list(grid = grid, model = model))
+}
+
+
+# Function to plot a fitness landscape
+plot_fitness_landscape <- function(grid, trait1, trait2) {
+  ggplot(grid, aes_string(x = trait1, y = trait2, z = "predicted_fitness")) +
+    geom_contour_filled() +
+    labs(title = paste(),
+         x = trait1, y = trait2, fill = "Fitness") +
+    theme_minimal()
+}
+
+# Create a list to store the plots
+fitness_plots <- list()
+
+# Loop through each trait combination, create the fitness landscape, and store the plot
+for (combo in trait_combinations) {
+  trait1 <- combo[1]
+  trait2 <- combo[2]
+  
+  # Create the fitness landscape
+  fitness_landscape <- create_fitness_landscape(trait1, trait2, data = AC_22_fit_clean)
+  
+  # Create the plot
+  plot <- plot_fitness_landscape(fitness_landscape$grid, trait1, trait2)
+  
+  # Store the plot
+  fitness_plots[[paste(trait1, trait2, sep = "_vs_")]] <- plot
+}
+
+# Display one of the plots as an example
+print(fitness_plots[["SLA_SEG_vs_d13C_SEG"]])
+
+
+library(cowplot)
+
+# Combine all plots into a single figure
+combined_plot <- plot_grid(plotlist = fitness_plots, ncol = 2)
+
+# Display the combined plot
+print(combined_plot)
+
+
+ggsave("fitness_landscapes.png", combined_plot, width = 12, height = 10)
+
+```
+
+##Comparing correlation matrices##
+```{r}
+library(vegan)
+
+
+#Clean the data by omitting rows with NA values
+AC_22_fit_clean <- na.omit(AC_fit_22[, c("skel_dryweight_mg_SEG", "d13C_SEG", 
+                                         "est_fecundity", "msm_all", "SLA_SEG", "corolla_diam_mm_SEG", "est_fitness", "Donor", "Recipient", "Transect")])
+
+AC_G1_2022 <- lm(est_fitness ~ skel_dryweight_mg_SEG + d13C_SEG + est_fecundity + msm_all + SLA_SEG + corolla_diam_mm_SEG, data = AC_22_fit_clean)
+
+AC_23_G1_fit_clean <- na.omit(AC_fit_23_G1[, c("skel_dryweight_mg_SEG", "d13C_SEG", 
+                                         "est_fecundity", "msm_all", "SLA_SEG", "corolla_diam_mm_SEG", "est_fitness", "Donor", "Recipient", "Transect")])
+
+AC_G1_2023 <- lm(est_fitness ~ skel_dryweight_mg_SEG + d13C_SEG + est_fecundity + msm_all + SLA_SEG + corolla_diam_mm_SEG, data = AC_23_G1_fit_clean)
+
+
+cor_A_2022 <- cov2cor(vcov(AC_G1_2022))
+cor_B_2023 <- cov2cor(vcov(AC_G1_2023))
+
+mantel(cor_A_2022, cor_B_2023)
+
+```
+

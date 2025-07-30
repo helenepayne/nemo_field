@@ -1,0 +1,1638 @@
+---
+title: "AC_22_Vs_23"
+author: "Helen Payne"
+date: "2024-06-19"
+output: html_document
+---
+```{r}
+# Load libraries
+library(tidyverse)
+library(lme4)
+library(car)
+```
+
+
+```{r}
+AC_22_23_fit <- read_csv(here::here("data_sheets", "compiled_sheets", "AC_22_23_fit.csv"))
+```
+
+
+```{r}
+# Create a new column "Genotype" by merging "Donor" and "Recipient" with a hyphen in between
+AC_22_23_fit$Genotype <- paste(AC_22_23_fit$Donor, AC_22_23_fit$Recipient, sep = "-")
+
+```
+
+```{r}
+#Subset the data for each year and each generation
+AC_22_fit <- AC_22_23_fit %>%
+  filter(Year == 2022)
+
+AC_23_fit_G1 <- AC_22_23_fit %>%
+  filter(Year == 2023) %>%
+  filter(Gen == "G1")
+
+AC_23_fit_G2 <- AC_22_23_fit %>%
+  filter(Year == 2023) %>%
+  filter(Gen == "G2")
+
+```
+
+***COMPARING GENOTYPES***
+**COROLLA AREA**
+*2022 vs 2023*
+Now compare Generation 1 from AC in both 2022 and 2023
+```{r}
+# Create a dataframe with common "Genotype" values for 2022
+AC_common_22_23_G1_22 <- semi_join(AC_22_fit, AC_23_fit_G1, by = "Genotype")
+
+# Create a dataframe with common "Genotype" values for 2022
+AC_common_22_23_G1_23 <- semi_join(AC_23_fit_G1, AC_22_fit, by = "Genotype")
+
+# Merge these two dataframes to have one finalized dataset to compare G1 2022 and G1 2023
+AC_common_22_23_G1 <- full_join(AC_common_22_23_G1_22, AC_common_22_23_G1_23, by = intersect(names(AC_common_22_23_G1_22), names(AC_common_22_23_G1_23)))
+
+```
+
+Calculate the corolla diameter means for maternal and paternal genotypes
+```{r}
+# Calculate the mean corolla diameter for each maternal (Recipient) family for 2022
+maternal_means_22 <- AC_common_22_23_G1_22 %>%
+  group_by(Recipient, Donor) %>%
+  summarise(mean_corolla_diam_mm = mean(corolla_diam_mm, na.rm = TRUE))
+
+# Calculate the mean corolla diameter for each paternal (Donor) family for 2022
+paternal_means_22 <- AC_common_22_23_G1_22 %>%
+  group_by(Donor) %>%
+  summarise(mean_corolla_diam_mm = mean(corolla_diam_mm, na.rm = TRUE))
+
+# Calculate the mean corolla diameter for each maternal (Recipient) family for 2023 G1
+maternal_means_23_G1 <- AC_common_22_23_G1_23 %>%
+  group_by(Recipient, Donor) %>%
+  summarise(mean_corolla_diam_mm = mean(corolla_diam_mm, na.rm = TRUE))
+
+
+# Calculate the mean corolla diameter for each paternal (Donor) family for 2023 G1
+paternal_means_23_G1 <- AC_common_22_23_G1_23 %>%
+  group_by(Donor) %>%
+  summarise(mean_corolla_diam_mm = mean(corolla_diam_mm, na.rm = TRUE))
+```
+
+
+
+
+Check if maternal corolla means are significantly different:
+```{r}
+maternal_means_22 <- maternal_means_22 %>%
+  mutate(Year = "2022")
+
+
+maternal_means_23_G1 <- maternal_means_23_G1 %>%
+  mutate(Year = "2023_G1")
+
+
+# Combine the dataframes
+mat_combined_data_year <- bind_rows(maternal_means_22, maternal_means_23_G1)
+
+# Create the histogram
+ggplot(mat_combined_data_year, aes(x = mean_corolla_diam_mm, fill = Year)) +
+  geom_histogram(position = "identity", alpha = 0.6, binwidth = 0.2) +
+  labs(title = "Comparison of Recipient Mean Corolla Diameter",
+       x = "Mean Corolla Diameter (mm)",
+       y = "Frequency") +
+  scale_fill_manual(values = c("2022" = "blue", "2023_G1" = "red")) +
+  theme_minimal()
+
+```
+```{r}
+# Split the data by year
+corolla_2022 <- na.omit(maternal_means_22$mean_corolla_diam_mm)
+corolla_2023 <- na.omit(maternal_means_23_G1$mean_corolla_diam_mm)
+
+# Check normality with Shapiro-Wilk test
+shapiro_test_2022 <- shapiro.test(corolla_2022)
+shapiro_test_2023 <- shapiro.test(corolla_2023)
+
+# Print Shapiro-Wilk test results
+print(shapiro_test_2022) #2022 is not normally distributed
+print(shapiro_test_2023) #2023 is normally distributed
+
+# Q-Q plots
+qqnorm(corolla_2022, main = "Q-Q Plot for 2022 Corolla Diameter")
+
+qqnorm(corolla_2023, main = "Q-Q Plot for 2023 Corolla Diameter")
+
+# Perform Levene's test for homogeneity of variances
+levene_test <- leveneTest(mean_corolla_diam_mm ~ Year, data = mat_combined_data_year)
+
+# Print Levene's test result
+print(levene_test)
+
+# Perform the t-test- can't use because not normally distributed
+#mat_t_test_result_year <- t.test(mean_corolla_diam_mm ~ Year, data = mat_combined_data_year)
+
+# Print t-test result
+#print(mat_t_test_result_year)
+
+# Perform Mann-Whitney U test (Wilcoxon rank-sum test) instead of t-test
+mann_whitney_test <- wilcox.test(mean_corolla_diam_mm ~ Year, data = mat_combined_data_year)
+
+# Print t-test result
+print(mann_whitney_test)
+```
+
+
+
+
+
+
+Now check if paternal corolla means are significantly different:
+```{r}
+paternal_means_22 <- paternal_means_22 %>%
+  mutate(Year = "2022")
+
+
+paternal_means_23_G1 <- paternal_means_23_G1 %>%
+  mutate(Year = "2023_G1")
+
+# Combine the dataframes
+pat_combined_data_year <- bind_rows(paternal_means_22, paternal_means_23_G1)
+
+# Create the histogram
+ggplot(pat_combined_data_year, aes(x = mean_corolla_diam_mm, fill = Year)) +
+  geom_histogram(position = "identity", alpha = 0.6, binwidth = 0.2) +
+  labs(title = "Comparison of Recipient Mean Corolla Diameter",
+       x = "Mean Corolla Diameter (mm)",
+       y = "Frequency") +
+  scale_fill_manual(values = c("2022" = "blue", "2023_G1" = "red")) +
+  theme_minimal()
+```
+
+
+```{r}
+# Split the data by year
+corolla_2022 <- na.omit(paternal_means_22$mean_corolla_diam_mm)
+corolla_2023 <- na.omit(paternal_means_23_G1$mean_corolla_diam_mm)
+
+# Check normality with Shapiro-Wilk test
+shapiro_test_2022 <- shapiro.test(corolla_2022)
+shapiro_test_2023 <- shapiro.test(corolla_2023)
+
+# Print Shapiro-Wilk test results
+print(shapiro_test_2022) #2022 is normally distributed
+print(shapiro_test_2023) #2023 is normally distributed
+
+# Q-Q plots
+qqnorm(corolla_2022, main = "Q-Q Plot for 2022 Corolla Diameter")
+
+qqnorm(corolla_2023, main = "Q-Q Plot for 2023 Corolla Diameter")
+
+# Perform Levene's test for homogeneity of variances
+levene_test <- leveneTest(mean_corolla_diam_mm ~ Year, data = pat_combined_data_year)
+
+# Print Levene's test result
+print(levene_test)
+
+# Perform t-test
+pat_t_test_result_year <- t.test(mean_corolla_diam_mm ~ Year, data = pat_combined_data_year)
+
+# Print result
+print(pat_t_test_result_year)
+```
+
+*G1 vs G2*
+Now compare Generation 1 and 2 from AC in 2023
+```{r}
+# Create a dataframe with common "Genotype" values for 2022
+AC_common_23_G1 <- semi_join(AC_23_fit_G1, AC_23_fit_G2, by = "Genotype")
+
+# Create a dataframe with common "Genotype" values for 2022
+AC_common_23_G2 <- semi_join(AC_23_fit_G2, AC_23_fit_G1, by = "Genotype")
+
+# Merge these two dataframes to have one finalized dataset to compare G1 2022 and G1 2023
+AC_common_23_G1_G2 <- full_join(AC_common_23_G1, AC_common_23_G2, by = intersect(names(AC_common_23_G1), names(AC_common_23_G2)))
+
+```
+
+
+Calculate the corolla diameter means for maternal and paternal genotypes
+```{r}
+# Calculate the mean corolla diameter for each maternal (Recipient) family for G1, 2023
+maternal_means_23_G1 <- AC_common_23_G1 %>%
+  group_by(Recipient, Donor) %>%
+  summarise(mean_corolla_diam_mm = mean(corolla_diam_mm, na.rm = TRUE))
+
+# Calculate the mean corolla diameter for each paternal (Donor) family for 2022
+paternal_means_23_G1 <- AC_common_23_G1 %>%
+  group_by(Donor) %>%
+  summarise(mean_corolla_diam_mm = mean(corolla_diam_mm, na.rm = TRUE))
+
+# Calculate the mean corolla diameter for each maternal (Recipient) family for G2, 2023
+maternal_means_23_G2 <- AC_common_23_G2 %>%
+  group_by(Recipient, Donor) %>%
+  summarise(mean_corolla_diam_mm = mean(corolla_diam_mm, na.rm = TRUE))
+
+# Calculate the mean corolla diameter for each paternal (Donor) family for 2023
+paternal_means_23_G2 <- AC_common_23_G2 %>%
+  group_by(Donor) %>%
+  summarise(mean_corolla_diam_mm = mean(corolla_diam_mm, na.rm = TRUE))
+```
+
+
+
+
+Check if maternal corolla means are significantly different:
+```{r}
+maternal_means_23_G1 <- maternal_means_23_G1  %>%
+  mutate(Gen = "1")
+
+maternal_means_23_G2 <- maternal_means_23_G2 %>%
+  mutate(Gen = "2")
+
+# Combine the dataframes
+mat_combined_data_gen <- bind_rows(maternal_means_23_G1, maternal_means_23_G2)
+
+# Create the histogram
+ggplot(mat_combined_data_gen, aes(x = mean_corolla_diam_mm, fill = Gen)) +
+  geom_histogram(position = "identity", alpha = 0.6, binwidth = 0.2) +
+  labs(title = "Comparison of Recipient Mean Corolla Diameter",
+       x = "Mean Corolla Diameter (mm)",
+       y = "Frequency") +
+  scale_fill_manual(values = c("1" = "blue", "2" = "red")) +
+  theme_minimal()
+
+# Perform t-test
+mat_t_test_result_gen <- t.test(mean_corolla_diam_mm ~ Gen, data = mat_combined_data_gen)
+
+# Print result
+print(mat_t_test_result_gen)
+```
+
+
+```{r}
+# Split the data by year
+corolla_2022 <- na.omit(maternal_means_23_G1$mean_corolla_diam_mm)
+corolla_2023 <- na.omit(maternal_means_23_G2$mean_corolla_diam_mm)
+
+# Check normality with Shapiro-Wilk test
+shapiro_test_2022 <- shapiro.test(corolla_2022)
+shapiro_test_2023 <- shapiro.test(corolla_2023)
+
+# Print Shapiro-Wilk test results
+print(shapiro_test_2022) #2022 is normally distributed
+print(shapiro_test_2023) #2023 is normally distributed
+
+# Q-Q plots
+qqnorm(corolla_2022, main = "Q-Q Plot for 2022 Corolla Diameter")
+
+qqnorm(corolla_2023, main = "Q-Q Plot for 2023 Corolla Diameter")
+
+# Perform Levene's test for homogeneity of variances
+levene_test <- leveneTest(mean_corolla_diam_mm ~ Year, data = mat_combined_data_year)
+
+# Print Levene's test result
+print(levene_test)
+
+# Perform t-test
+mat_t_test_result_gen <- t.test(mean_corolla_diam_mm ~ Gen, data = mat_combined_data_gen)
+
+# Print result
+print(mat_t_test_result_gen)
+```
+
+
+
+
+Check if maternal corolla means are significantly different:
+```{r}
+paternal_means_23_G1 <- paternal_means_23_G1  %>%
+  mutate(Gen = "1")
+
+paternal_means_23_G2 <- paternal_means_23_G2 %>%
+  mutate(Gen = "2")
+
+# Combine the dataframes
+pat_combined_data_gen <- bind_rows(paternal_means_23_G1, paternal_means_23_G2)
+
+# Create the histogram
+ggplot(pat_combined_data_gen, aes(x = mean_corolla_diam_mm, fill = Gen)) +
+  geom_histogram(position = "identity", alpha = 0.6, binwidth = 0.2) +
+  labs(title = "Comparison of Recipient Mean Corolla Diameter",
+       x = "Mean Corolla Diameter (mm)",
+       y = "Frequency") +
+  scale_fill_manual(values = c("1" = "blue", "2" = "red")) +
+  theme_minimal()
+
+# Perform t-test
+pat_t_test_result_gen <- t.test(mean_corolla_diam_mm ~ Gen, data = pat_combined_data_gen)
+
+# Print result
+print(pat_t_test_result_gen)
+```
+
+
+```{r}
+# Split the data by year
+corolla_2022 <- na.omit(paternal_means_23_G1$mean_corolla_diam_mm)
+corolla_2023 <- na.omit(paternal_means_23_G2$mean_corolla_diam_mm)
+
+# Check normality with Shapiro-Wilk test
+shapiro_test_2022 <- shapiro.test(corolla_2022)
+shapiro_test_2023 <- shapiro.test(corolla_2023)
+
+# Print Shapiro-Wilk test results
+print(shapiro_test_2022) #2022 is normally distributed
+print(shapiro_test_2023) #2023 is normally distributed
+
+# Q-Q plots
+qqnorm(corolla_2022, main = "Q-Q Plot for 2022 Corolla Diameter")
+
+qqnorm(corolla_2023, main = "Q-Q Plot for 2023 Corolla Diameter")
+
+# Perform Levene's test for homogeneity of variances
+levene_test <- leveneTest(mean_corolla_diam_mm ~ Year, data = pat_combined_data_year)
+
+# Print Levene's test result
+print(levene_test)
+
+# Perform t-test
+mat_t_test_result_gen <- t.test(mean_corolla_diam_mm ~ Gen, data = mat_combined_data_gen)
+
+# Print result
+print(mat_t_test_result_gen)
+```
+
+
+***COMPARING PHENOTYPES***
+**COROLLA AREA**
+*2022 vs 2023*
+
+```{r}
+
+# Convert 'Year' to factor if it's not already
+if (!is.factor(AC_common_22_23_G1$Year)) {
+  AC_common_22_23_G1$Year <- as.factor(AC_common_22_23_G1$Year)
+}
+
+# Create the histogram
+ggplot(AC_common_22_23_G1, aes(x = corolla_diam_mm, fill = Year)) +
+  geom_histogram(position = "identity", alpha = 0.6, binwidth = 0.2) +
+  labs(title = "Comparison of Corolla Diameter",
+       x = "Corolla Diameter (mm)",
+       y = "Frequency") +
+  scale_fill_manual(values = c("2022" = "blue", "2023" = "red")) +
+  theme_minimal()
+
+# Perform t-test
+AC_common_22_23_G1_t.test <- t.test(corolla_diam_mm ~ Year, data = AC_common_22_23_G1)
+
+# Print result
+print(AC_common_22_23_G1_t.test)
+```
+
+
+```{r}
+# Split the data by year
+corolla_2022 <- na.omit(AC_common_22_23_G1_22$corolla_diam_mm)
+corolla_2023 <- na.omit(AC_common_22_23_G1_23$corolla_diam_mm)
+
+# Check normality with Shapiro-Wilk test
+shapiro_test_2022 <- shapiro.test(corolla_2022)
+shapiro_test_2023 <- shapiro.test(corolla_2023)
+
+# Print Shapiro-Wilk test results
+print(shapiro_test_2022) #2022 is normally distributed
+print(shapiro_test_2023) #2023 is not normally distributed
+
+# Q-Q plots
+qqnorm(corolla_2022, main = "Q-Q Plot for 2022 Corolla Diameter")
+
+qqnorm(corolla_2023, main = "Q-Q Plot for 2023 Corolla Diameter")
+
+# Perform Levene's test for homogeneity of variances
+levene_test <- leveneTest(corolla_diam_mm ~ as.factor(Year), data = AC_common_22_23_G1)
+
+# Print Levene's test result
+print(levene_test)
+
+# Perform Mann-Whitney U test (Wilcoxon rank-sum test) instead of t-test
+mann_whitney_test <- wilcox.test(corolla_diam_mm ~ Year, data = AC_common_22_23_G1)
+
+# Print t-test result
+print(mann_whitney_test)
+
+# Perform t-test
+#t_test_result_gen <- t.test(mean_corolla_diam_mm ~ Gen, data = mat_combined_data_gen)
+
+# Print result
+#print(t_test_result_gen)
+```
+
+*G1 vs G2*
+
+```{r}
+
+# Convert 'Year' to factor if it's not already
+if (!is.factor(AC_common_23_G1_G2$Gen)) {
+  AC_common_23_G1_G2$Gen <- as.factor(AC_common_23_G1_G2$Gen)
+}
+
+# Create the histogram
+ggplot(AC_common_23_G1_G2, aes(x = corolla_diam_mm, fill = Gen)) +
+  geom_histogram(position = "identity", alpha = 0.6, binwidth = 0.2) +
+  labs(title = "Comparison of Corolla Diameter",
+       x = "Corolla Diameter (mm)",
+       y = "Frequency") +
+  scale_fill_manual(values = c("G1" = "blue", "G2" = "red")) +
+  theme_minimal()
+
+# Perform t-test
+AC_common_23_G1_G2_t.test <- t.test(corolla_diam_mm ~ Gen, data = AC_common_23_G1_G2)
+
+# Print result
+print(AC_common_23_G1_G2_t.test)
+```
+
+```{r}
+# Split the data by year
+corolla_2022 <- na.omit(AC_common_23_G1$corolla_diam_mm)
+corolla_2023 <- na.omit(AC_common_23_G2$corolla_diam_mm)
+
+# Check normality with Shapiro-Wilk test
+shapiro_test_2022 <- shapiro.test(corolla_2022)
+shapiro_test_2023 <- shapiro.test(corolla_2023)
+
+# Print Shapiro-Wilk test results
+print(shapiro_test_2022) #2022 is not normally distributed
+print(shapiro_test_2023) #2023 is normally distributed
+
+# Q-Q plots
+qqnorm(corolla_2022, main = "Q-Q Plot for 2022 Corolla Diameter")
+
+qqnorm(corolla_2023, main = "Q-Q Plot for 2023 Corolla Diameter")
+
+# Perform Levene's test for homogeneity of variances
+levene_test <- leveneTest(corolla_diam_mm ~ as.factor(Gen), data = AC_common_23_G1_G2)
+
+# Print Levene's test result
+print(levene_test)
+
+# Perform Mann-Whitney U test (Wilcoxon rank-sum test) instead of t-test
+mann_whitney_test <- wilcox.test(corolla_diam_mm ~ Gen, data = AC_common_23_G1_G2)
+
+# Print t-test result
+print(mann_whitney_test)
+
+# Perform t-test
+#t_test_result_gen <- t.test(mean_corolla_diam_mm ~ Gen, data = mat_combined_data_gen)
+
+# Print result
+#print(t_test_result_gen)
+```
+
+###################################################################################################
+
+***COMPARING GENOTYPES***
+**SKELETON WEIGHT**
+*2022 vs 2023*
+
+
+Calculate the skeleton weight mean for maternal and paternal genotypes
+```{r}
+# Calculate the mean corolla diameter for each maternal (Recipient) family for 2022
+maternal_means_22 <- AC_common_22_23_G1_22 %>%
+  group_by(Recipient, Donor) %>%
+  summarise(mean_skel_dryweight_mg_SEG = mean(skel_dryweight_mg_SEG, na.rm = TRUE))
+
+# Calculate the mean corolla diameter for each paternal (Donor) family for 2022
+paternal_means_22 <- AC_common_22_23_G1_22 %>%
+  group_by(Donor) %>%
+  summarise(mean_skel_dryweight_mg_SEG = mean(skel_dryweight_mg_SEG, na.rm = TRUE))
+
+# Calculate the mean corolla diameter for each maternal (Recipient) family for 2023 G1
+maternal_means_23_G1 <- AC_common_22_23_G1_23 %>%
+  group_by(Recipient, Donor) %>%
+  summarise(mean_skel_dryweight_mg_SEG = mean(skel_dryweight_mg_SEG, na.rm = TRUE))
+
+
+# Calculate the mean corolla diameter for each paternal (Donor) family for 2023 G1
+paternal_means_23_G1 <- AC_common_22_23_G1_23 %>%
+  group_by(Donor) %>%
+  summarise(mean_skel_dryweight_mg_SEG = mean(skel_dryweight_mg_SEG, na.rm = TRUE))
+```
+
+
+
+Check if maternal skeleton weights are significantly different:
+```{r}
+maternal_means_22 <- maternal_means_22 %>%
+  mutate(Year = "2022")
+
+maternal_means_23_G1 <- maternal_means_23_G1 %>%
+  mutate(Year = "2023_G1")
+
+# Combine the dataframes
+mat_combined_data_year <- bind_rows(maternal_means_22, maternal_means_23_G1)
+
+# Create the histogram
+ggplot(mat_combined_data_year, aes(x = mean_skel_dryweight_mg_SEG, fill = Year)) +
+  geom_histogram(position = "identity", alpha = 0.6, binwidth = 0.2) +
+  labs(title = "Comparison of Recipient Mean Skeleton Weight: 2022 vs 2023",
+       x = "Skeleton Dry Weight (mg)",
+       y = "Frequency") +
+  scale_fill_manual(values = c("2022" = "blue", "2023_G1" = "red")) +
+  theme_minimal()
+
+# Perform t-test
+mat_t_test_result_year <- t.test(mean_skel_dryweight_mg_SEG ~ Year, data = mat_combined_data_year)
+
+# Print result
+print(mat_t_test_result_year)
+```
+
+```{r}
+# Split the data by year
+skel_2022 <- na.omit(maternal_means_22$mean_skel_dryweight_mg_SEG)
+skel_2023 <- na.omit(maternal_means_23_G1$mean_skel_dryweight_mg_SEG)
+
+# Check normality with Shapiro-Wilk test
+shapiro_test_2022 <- shapiro.test(skel_2022)
+shapiro_test_2023 <- shapiro.test(skel_2023)
+
+# Print Shapiro-Wilk test results
+print(shapiro_test_2022) #2022 is not normally distributed
+print(shapiro_test_2023) #2023 is not normally distributed
+
+# Q-Q plots
+qqnorm(skel_2022, main = "Q-Q Plot for 2022 Corolla Diameter")
+
+qqnorm(skel_2023, main = "Q-Q Plot for 2023 Corolla Diameter")
+
+# Perform Levene's test for homogeneity of variances
+levene_test <- leveneTest(mean_skel_dryweight_mg_SEG ~ as.factor(Year), data = mat_combined_data_year)
+
+# Print Levene's test result
+print(levene_test)
+
+# Perform Mann-Whitney U test (Wilcoxon rank-sum test) instead of t-test
+mann_whitney_test <- wilcox.test(mean_skel_dryweight_mg_SEG ~ Year, data = mat_combined_data_year)
+
+# Print t-test result
+print(mann_whitney_test)
+
+# Perform t-test
+#t_test_result_gen <- t.test(mean_corolla_diam_mm ~ Gen, data = mat_combined_data_gen)
+
+# Print result
+#print(t_test_result_gen)
+```
+
+
+Now check if paternal corolla means are significantly different:
+```{r}
+paternal_means_22 <- paternal_means_22 %>%
+  mutate(Year = "2022")
+
+paternal_means_23_G1 <- paternal_means_23_G1 %>%
+  mutate(Year = "2023_G1")
+
+# Combine the dataframes
+pat_combined_data_year <- bind_rows(paternal_means_22, paternal_means_23_G1)
+
+# Create the histogram
+ggplot(pat_combined_data_year, aes(x = mean_skel_dryweight_mg_SEG, fill = Year)) +
+  geom_histogram(position = "identity", alpha = 0.6, binwidth = 0.2) +
+  labs(title = "Comparison of Donor Mean Skeleton Weight: 2022 vs 2023",
+       x = "Skeleton Dry Weight (mg)",
+       y = "Frequency") +
+  scale_fill_manual(values = c("2022" = "blue", "2023_G1" = "red")) +
+  theme_minimal()
+
+# Perform t-test
+pat_t_test_result_year <- t.test(mean_skel_dryweight_mg_SEG ~ Year, data = pat_combined_data_year)
+
+# Print result
+print(pat_t_test_result_year)
+```
+
+```{r}
+# Split the data by year
+skel_2022 <- na.omit(paternal_means_22$mean_skel_dryweight_mg_SEG)
+skel_2023 <- na.omit(paternal_means_23_G1$mean_skel_dryweight_mg_SEG)
+
+# Check normality with Shapiro-Wilk test
+shapiro_test_2022 <- shapiro.test(skel_2022)
+shapiro_test_2023 <- shapiro.test(skel_2023)
+
+# Print Shapiro-Wilk test results
+print(shapiro_test_2022) #2022 is not normally distributed
+print(shapiro_test_2023) #2023 is not normally distributed
+
+ # Q-Q plots
+qqnorm(skel_2022, main = "Q-Q Plot for 2022 Corolla Diameter")
+
+qqnorm(skel_2023, main = "Q-Q Plot for 2023 Corolla Diameter")
+
+# Perform Levene's test for homogeneity of variances
+levene_test <- leveneTest(mean_skel_dryweight_mg_SEG ~ as.factor(Year), data = pat_combined_data_year)
+
+# Print Levene's test result
+print(levene_test)
+
+# Perform Mann-Whitney U test (Wilcoxon rank-sum test) instead of t-test
+mann_whitney_test <- wilcox.test(mean_skel_dryweight_mg_SEG ~ Year, data = pat_combined_data_year)
+
+# Print t-test result
+print(mann_whitney_test)
+
+# Perform t-test
+#t_test_result_gen <- t.test(mean_corolla_diam_mm ~ Gen, data = mat_combined_data_gen)
+
+# Print result
+#print(t_test_result_gen)
+```
+
+*G1 vs G2*
+Now compare Generation 1 and 2 from AC in 2023
+```{r}
+# Create a dataframe with common "Genotype" values for 2022
+AC_common_23_G1 <- semi_join(AC_23_fit_G1, AC_23_fit_G2, by = "Genotype")
+
+# Create a dataframe with common "Genotype" values for 2022
+AC_common_23_G2 <- semi_join(AC_23_fit_G2, AC_23_fit_G1, by = "Genotype")
+
+# Merge these two dataframes to have one finalized dataset to compare G1 2022 and G1 2023
+AC_common_23_G1_G2 <- full_join(AC_common_23_G1, AC_common_23_G2, by = intersect(names(AC_common_23_G1), names(AC_common_23_G2)))
+
+```
+
+
+Calculate the corolla diameter means for maternal and paternal genotypes
+```{r}
+# Calculate the mean corolla diameter for each maternal (Recipient) family for G1, 2023
+maternal_means_23_G1 <- AC_common_23_G1 %>%
+  group_by(Recipient, Donor) %>%
+  summarise(mean_skel_dryweight_mg_SEG = mean(skel_dryweight_mg_SEG, na.rm = TRUE))
+
+# Calculate the mean corolla diameter for each paternal (Donor) family for 2022
+paternal_means_23_G1 <- AC_common_23_G1 %>%
+  group_by(Donor) %>%
+  summarise(mean_skel_dryweight_mg_SEG = mean(skel_dryweight_mg_SEG, na.rm = TRUE))
+
+# Calculate the mean corolla diameter for each maternal (Recipient) family for G2, 2023
+maternal_means_23_G2 <- AC_common_23_G2 %>%
+  group_by(Recipient, Donor) %>%
+  summarise(mean_skel_dryweight_mg_SEG = mean(skel_dryweight_mg_SEG, na.rm = TRUE))
+
+# Calculate the mean corolla diameter for each paternal (Donor) family for 2023
+paternal_means_23_G2 <- AC_common_23_G2 %>%
+  group_by(Donor) %>%
+  summarise(mean_skel_dryweight_mg_SEG = mean(skel_dryweight_mg_SEG, na.rm = TRUE))
+```
+
+
+
+
+Check if maternal corolla means are significantly different:
+```{r}
+maternal_means_23_G1 <- maternal_means_23_G1  %>%
+  mutate(Gen = "1")
+
+maternal_means_23_G2 <- maternal_means_23_G2 %>%
+  mutate(Gen = "2")
+
+# Combine the dataframes
+mat_combined_data_gen <- bind_rows(maternal_means_23_G1, maternal_means_23_G2)
+
+# Create the histogram
+ggplot(mat_combined_data_gen, aes(x = mean_skel_dryweight_mg_SEG, fill = Gen)) +
+  geom_histogram(position = "identity", alpha = 0.6, binwidth = 0.2) +
+  labs(title = "Comparison of Recipient Mean Skeleton Weight: G1 vs G2",
+       x = "Mean Skeleton Weight (mg)",
+       y = "Frequency") +
+  scale_fill_manual(values = c("1" = "blue", "2" = "red")) +
+  theme_minimal()
+
+# Perform t-test
+mat_t_test_result_gen <- t.test(mean_skel_dryweight_mg_SEG ~ Gen, data = mat_combined_data_gen)
+
+# Print result
+print(mat_t_test_result_gen)
+```
+
+
+```{r}
+# Split the data by year
+skel_G1 <- na.omit(maternal_means_23_G1$mean_skel_dryweight_mg_SEG)
+skel_G2 <- na.omit(maternal_means_23_G2$mean_skel_dryweight_mg_SEG)
+
+# Check normality with Shapiro-Wilk test
+shapiro_test_G1 <- shapiro.test(skel_G1)
+shapiro_test_G2 <- shapiro.test(skel_G2)
+
+# Print Shapiro-Wilk test results
+print(shapiro_test_G1) #2022 is not normally distributed
+print(shapiro_test_G2) #2023 is not normally distributed
+
+ # Q-Q plots
+qqnorm(skel_2022, main = "Q-Q Plot for 2022 Corolla Diameter")
+
+qqnorm(skel_2023, main = "Q-Q Plot for 2023 Corolla Diameter")
+
+# Perform Levene's test for homogeneity of variances
+levene_test <- leveneTest(mean_skel_dryweight_mg_SEG ~ as.factor(Year), data = mat_combined_data_year)
+
+# Print Levene's test result
+print(levene_test)
+
+# Perform Mann-Whitney U test (Wilcoxon rank-sum test) instead of t-test
+mann_whitney_test <- wilcox.test(mean_skel_dryweight_mg_SEG ~ Year, data = pat_combined_data_year)
+
+# Print t-test result
+print(mann_whitney_test)
+
+# Perform t-test
+#t_test_result_gen <- t.test(mean_corolla_diam_mm ~ Gen, data = mat_combined_data_gen)
+
+# Print result
+#print(t_test_result_gen)
+```
+
+Check if maternal corolla means are significantly different:
+```{r}
+paternal_means_23_G1 <- paternal_means_23_G1  %>%
+  mutate(Gen = "1")
+
+paternal_means_23_G2 <- paternal_means_23_G2 %>%
+  mutate(Gen = "2")
+
+# Combine the dataframes
+pat_combined_data_gen <- bind_rows(paternal_means_23_G1, paternal_means_23_G2)
+
+# Create the histogram
+ggplot(pat_combined_data_gen, aes(x = mean_skel_dryweight_mg_SEG, fill = Gen)) +
+  geom_histogram(position = "identity", alpha = 0.6, binwidth = 0.2) +
+  labs(title = "Comparison of Donor Mean Skeleton Weight: G1 vs G2",
+       x = "Skeleton Dry Weight (mg)",
+       y = "Frequency") +
+  scale_fill_manual(values = c("1" = "blue", "2" = "red")) +
+  theme_minimal()
+
+# Perform t-test
+pat_t_test_result_gen <- t.test(mean_skel_dryweight_mg_SEG ~ Gen, data = mat_combined_data_gen)
+
+# Print result
+print(pat_t_test_result_gen)
+```
+
+```{r}
+
+# Split the data by year
+skel_G1 <- na.omit(paternal_means_23_G1$mean_skel_dryweight_mg_SEG)
+skel_G2 <- na.omit(paternal_means_23_G2$mean_skel_dryweight_mg_SEG)
+
+# Check normality with Shapiro-Wilk test
+shapiro_test_G1 <- shapiro.test(skel_G1)
+shapiro_test_G2 <- shapiro.test(skel_G2)
+
+# Print Shapiro-Wilk test results
+print(shapiro_test_G1) #2022 is not normally distributed
+print(shapiro_test_G2) #2023 is not normally distributed
+
+# Q-Q plots
+qqnorm(skel_2022, main = "Q-Q Plot for 2022 Corolla Diameter")
+
+qqnorm(skel_2023, main = "Q-Q Plot for 2023 Corolla Diameter")
+
+# Perform Levene's test for homogeneity of variances
+levene_test <- leveneTest(mean_skel_dryweight_mg_SEG ~ as.factor(Year), data = pat_combined_data_year)
+
+# Print Levene's test result
+print(levene_test)
+
+# Perform Mann-Whitney U test (Wilcoxon rank-sum test) instead of t-test
+mann_whitney_test <- wilcox.test(mean_skel_dryweight_mg_SEG ~ Year, data = pat_combined_data_year)
+
+# Print t-test result
+print(mann_whitney_test)
+
+# Perform t-test
+#t_test_result_gen <- t.test(mean_corolla_diam_mm ~ Gen, data = mat_combined_data_gen)
+
+# Print result
+#print(t_test_result_gen)
+
+```
+
+#left off checking variablity
+***COMPARING PHENOTYPES***
+**SKELETON WEIGHT**
+*2022 vs 2023*
+
+```{r}
+
+# Convert 'Year' to factor if it's not already
+if (!is.factor(AC_common_22_23_G1$Year)) {
+  AC_common_22_23_G1$Year <- as.factor(AC_common_22_23_G1$Year)
+}
+
+# Create the histogram
+ggplot(AC_common_22_23_G1, aes(x = skel_dryweight_mg_SEG, fill = Year)) +
+  geom_histogram(position = "identity", alpha = 0.6, binwidth = 0.2) +
+  labs(title = "Comparison of Skeleton Dry Weight",
+       x = "Skeleton Dry Weight (mg)",
+       y = "Frequency") +
+  scale_fill_manual(values = c("2022" = "blue", "2023" = "red")) +
+  theme_minimal()
+
+# Perform t-test
+AC_common_22_23_G1_t.test <- t.test(skel_dryweight_mg_SEG ~ Year, data = AC_common_22_23_G1)
+
+# Print result
+print(AC_common_22_23_G1_t.test)
+```
+
+*G1 vs G2*
+
+```{r}
+
+# Convert 'Year' to factor if it's not already
+if (!is.factor(AC_common_23_G1_G2$Gen)) {
+  AC_common_23_G1_G2$Gen <- as.factor(AC_common_23_G1_G2$Gen)
+}
+
+# Create the histogram
+ggplot(AC_common_23_G1_G2, aes(x = skel_dryweight_mg_SEG, fill = Gen)) +
+  geom_histogram(position = "identity", alpha = 0.6, binwidth = 0.2) +
+  labs(title = "Comparison of Skeleton Dry Weight",
+       x = "Skeleton Dry Weight (mg)",
+       y = "Frequency") +
+  scale_fill_manual(values = c("G1" = "blue", "G2" = "red")) +
+  theme_minimal()
+
+# Perform t-test
+AC_common_23_G1_G2_t.test <- t.test(skel_dryweight_mg_SEG ~ Gen, data = AC_common_23_G1_G2)
+
+# Print result
+print(AC_common_23_G1_G2_t.test)
+```
+
+###################################################################################################
+
+***COMPARING GENOTYPES***
+**SLA_SEG**
+*2022 vs 2023*
+
+
+Calculate the skeleton weight mean for maternal and paternal genotypes
+```{r}
+# Calculate the mean corolla diameter for each maternal (Recipient) family for 2022
+maternal_means_22 <- AC_common_22_23_G1_22 %>%
+  group_by(Recipient, Donor) %>%
+  summarise(mean_SLA_SEG = mean(SLA_SEG, na.rm = TRUE))
+
+# Calculate the mean corolla diameter for each paternal (Donor) family for 2022
+paternal_means_22 <- AC_common_22_23_G1_22 %>%
+  group_by(Donor) %>%
+  summarise(mean_SLA_SEG = mean(SLA_SEG, na.rm = TRUE))
+
+# Calculate the mean corolla diameter for each maternal (Recipient) family for 2023 G1
+maternal_means_23_G1 <- AC_common_22_23_G1_23 %>%
+  group_by(Recipient, Donor) %>%
+  summarise(mean_SLA_SEG = mean(SLA_SEG, na.rm = TRUE))
+
+
+# Calculate the mean corolla diameter for each paternal (Donor) family for 2023 G1
+paternal_means_23_G1 <- AC_common_22_23_G1_23 %>%
+  group_by(Donor) %>%
+  summarise(mean_SLA_SEG = mean(SLA_SEG, na.rm = TRUE))
+```
+
+
+
+Check if maternal skeleton weights are significantly different:
+```{r}
+maternal_means_22 <- maternal_means_22 %>%
+  mutate(Year = "2022")
+
+maternal_means_23_G1 <- maternal_means_23_G1 %>%
+  mutate(Year = "2023_G1")
+
+# Combine the dataframes
+mat_combined_data_year <- bind_rows(maternal_means_22, maternal_means_23_G1)
+
+# Create the histogram
+ggplot(mat_combined_data_year, aes(x = mean_SLA_SEG, fill = Year)) +
+  geom_histogram(position = "identity", alpha = 0.6, binwidth = 0.2) +
+  labs(title = "Comparison of Recipient Mean SLA: 2022 vs 2023",
+       x = "SLA",
+       y = "Frequency") +
+  scale_fill_manual(values = c("2022" = "blue", "2023_G1" = "red")) +
+  theme_minimal()
+
+# Perform t-test
+mat_t_test_result_year <- t.test(mean_SLA_SEG ~ Year, data = mat_combined_data_year)
+
+# Print result
+print(mat_t_test_result_year)
+```
+
+
+Now check if paternal corolla means are significantly different:
+```{r}
+paternal_means_22 <- paternal_means_22 %>%
+  mutate(Year = "2022")
+
+paternal_means_23_G1 <- paternal_means_23_G1 %>%
+  mutate(Year = "2023_G1")
+
+# Combine the dataframes
+pat_combined_data_year <- bind_rows(paternal_means_22, paternal_means_23_G1)
+
+# Create the histogram
+ggplot(pat_combined_data_year, aes(x = mean_SLA_SEG, fill = Year)) +
+  geom_histogram(position = "identity", alpha = 0.6, binwidth = 0.2) +
+  labs(title = "Comparison of Donor Mean SLA: 2022 vs 2023",
+       x = "SLA",
+       y = "Frequency") +
+  scale_fill_manual(values = c("2022" = "blue", "2023_G1" = "red")) +
+  theme_minimal()
+
+# Perform t-test
+pat_t_test_result_year <- t.test(mean_SLA_SEG ~ Year, data = pat_combined_data_year)
+
+# Print result
+print(pat_t_test_result_year)
+```
+
+*G1 vs G2*
+Now compare Generation 1 and 2 from AC in 2023
+```{r}
+# Create a dataframe with common "Genotype" values for 2022
+AC_common_23_G1 <- semi_join(AC_23_fit_G1, AC_23_fit_G2, by = "Genotype")
+
+# Create a dataframe with common "Genotype" values for 2022
+AC_common_23_G2 <- semi_join(AC_23_fit_G2, AC_23_fit_G1, by = "Genotype")
+
+# Merge these two dataframes to have one finalized dataset to compare G1 2022 and G1 2023
+AC_common_23_G1_G2 <- full_join(AC_common_23_G1, AC_common_23_G2, by = intersect(names(AC_common_23_G1), names(AC_common_23_G2)))
+
+```
+
+
+Calculate the corolla diameter means for maternal and paternal genotypes
+```{r}
+# Calculate the mean corolla diameter for each maternal (Recipient) family for G1, 2023
+maternal_means_23_G1 <- AC_common_23_G1 %>%
+  group_by(Recipient, Donor) %>%
+  summarise(mean_SLA_SEG = mean(SLA_SEG, na.rm = TRUE))
+
+# Calculate the mean corolla diameter for each paternal (Donor) family for 2022
+paternal_means_23_G1 <- AC_common_23_G1 %>%
+  group_by(Donor) %>%
+  summarise(mean_SLA_SEG = mean(SLA_SEG, na.rm = TRUE))
+
+# Calculate the mean corolla diameter for each maternal (Recipient) family for G2, 2023
+maternal_means_23_G2 <- AC_common_23_G2 %>%
+  group_by(Recipient, Donor) %>%
+  summarise(mean_SLA_SEG = mean(SLA_SEG, na.rm = TRUE))
+
+# Calculate the mean corolla diameter for each paternal (Donor) family for 2023
+paternal_means_23_G2 <- AC_common_23_G2 %>%
+  group_by(Donor) %>%
+  summarise(mean_SLA_SEG = mean(SLA_SEG, na.rm = TRUE))
+```
+
+
+
+
+Check if maternal corolla means are significantly different:
+```{r}
+maternal_means_23_G1 <- maternal_means_23_G1  %>%
+  mutate(Gen = "1")
+
+maternal_means_23_G2 <- maternal_means_23_G2 %>%
+  mutate(Gen = "2")
+
+# Combine the dataframes
+mat_combined_data_gen <- bind_rows(maternal_means_23_G1, maternal_means_23_G2)
+
+# Create the histogram
+ggplot(mat_combined_data_gen, aes(x = mean_SLA_SEG, fill = Gen)) +
+  geom_histogram(position = "identity", alpha = 0.6, binwidth = 0.2) +
+  labs(title = "Comparison of Recipient Mean SLA: G1 vs G2",
+       x = "SLA",
+       y = "Frequency") +
+  scale_fill_manual(values = c("1" = "blue", "2" = "red")) +
+  theme_minimal()
+
+# Perform t-test
+mat_t_test_result_gen <- t.test(mean_SLA_SEG ~ Gen, data = mat_combined_data_gen)
+
+# Print result
+print(mat_t_test_result_gen)
+```
+
+Check if maternal corolla means are significantly different:
+```{r}
+paternal_means_23_G1 <- paternal_means_23_G1  %>%
+  mutate(Gen = "1")
+
+paternal_means_23_G2 <- paternal_means_23_G2 %>%
+  mutate(Gen = "2")
+
+# Combine the dataframes
+pat_combined_data_gen <- bind_rows(paternal_means_23_G1, paternal_means_23_G2)
+
+# Create the histogram
+ggplot(pat_combined_data_gen, aes(x = mean_SLA_SEG, fill = Gen)) +
+  geom_histogram(position = "identity", alpha = 0.6, binwidth = 0.2) +
+  labs(title = "Comparison of Donor Mean SLA: G1 vs G2",
+       x = "SLA",
+       y = "Frequency") +
+  scale_fill_manual(values = c("1" = "blue", "2" = "red")) +
+  theme_minimal()
+
+# Perform t-test
+pat_t_test_result_gen <- t.test(mean_SLA_SEG ~ Gen, data = pat_combined_data_gen)
+
+# Print result
+print(pat_t_test_result_gen)
+```
+
+***COMPARING PHENOTYPES***
+**SLA**
+*2022 vs 2023*
+
+```{r}
+
+# Convert 'Year' to factor if it's not already
+if (!is.factor(AC_common_22_23_G1$Year)) {
+  AC_common_22_23_G1$Year <- as.factor(AC_common_22_23_G1$Year)
+}
+
+# Create the histogram
+ggplot(AC_common_22_23_G1, aes(x = SLA_SEG, fill = Year)) +
+  geom_histogram(position = "identity", alpha = 0.6, binwidth = 0.2) +
+  labs(title = "Comparison of SLA",
+       x = "SLA",
+       y = "Frequency") +
+  scale_fill_manual(values = c("2022" = "blue", "2023" = "red")) +
+  theme_minimal()
+
+# Perform t-test
+AC_common_22_23_G1_t.test <- t.test(SLA_SEG ~ Year, data = AC_common_22_23_G1)
+
+# Print result
+print(AC_common_22_23_G1_t.test)
+```
+
+*G1 vs G2*
+
+```{r}
+
+# Convert 'Year' to factor if it's not already
+if (!is.factor(AC_common_23_G1_G2$Gen)) {
+  AC_common_23_G1_G2$Gen <- as.factor(AC_common_23_G1_G2$Gen)
+}
+
+# Create the histogram
+ggplot(AC_common_23_G1_G2, aes(x = SLA_SEG, fill = Gen)) +
+  geom_histogram(position = "identity", alpha = 0.6, binwidth = 0.2) +
+  labs(title = "Comparison of SLA",
+       x = "SLA (mg)",
+       y = "Frequency") +
+  scale_fill_manual(values = c("G1" = "blue", "G2" = "red")) +
+  theme_minimal()
+
+# Perform t-test
+AC_common_23_G1_G2_t.test <- t.test(SLA_SEG ~ Gen, data = AC_common_23_G1_G2)
+
+# Print result
+print(AC_common_23_G1_G2_t.test)
+```
+
+
+###################################################################################################
+
+***COMPARING GENOTYPES***
+**d13C_SEG**
+*2022 vs 2023*
+
+
+Calculate the skeleton weight mean for maternal and paternal genotypes
+```{r}
+# Calculate the mean corolla diameter for each maternal (Recipient) family for 2022
+maternal_means_22 <- AC_common_22_23_G1_22 %>%
+  group_by(Recipient, Donor) %>%
+  summarise(mean_d13C_SEG = mean(d13C_SEG, na.rm = TRUE))
+
+# Calculate the mean corolla diameter for each paternal (Donor) family for 2022
+paternal_means_22 <- AC_common_22_23_G1_22 %>%
+  group_by(Donor) %>%
+  summarise(mean_d13C_SEG = mean(d13C_SEG, na.rm = TRUE))
+
+# Calculate the mean corolla diameter for each maternal (Recipient) family for 2023 G1
+maternal_means_23_G1 <- AC_common_22_23_G1_23 %>%
+  group_by(Recipient, Donor) %>%
+  summarise(mean_d13C_SEG = mean(d13C_SEG, na.rm = TRUE))
+
+
+# Calculate the mean corolla diameter for each paternal (Donor) family for 2023 G1
+paternal_means_23_G1 <- AC_common_22_23_G1_23 %>%
+  group_by(Donor) %>%
+  summarise(mean_d13C_SEG = mean(d13C_SEG, na.rm = TRUE))
+```
+
+
+
+Check if maternal skeleton weights are significantly different:
+```{r}
+maternal_means_22 <- maternal_means_22 %>%
+  mutate(Year = "2022")
+
+maternal_means_23_G1 <- maternal_means_23_G1 %>%
+  mutate(Year = "2023_G1")
+
+# Combine the dataframes
+mat_combined_data_year <- bind_rows(maternal_means_22, maternal_means_23_G1)
+
+# Create the histogram
+ggplot(mat_combined_data_year, aes(x = mean_d13C_SEG, fill = Year)) +
+  geom_histogram(position = "identity", alpha = 0.6, binwidth = 0.2) +
+  labs(title = "Comparison of Recipient Mean d13C: 2022 vs 2023",
+       x = "d13C",
+       y = "Frequency") +
+  scale_fill_manual(values = c("2022" = "blue", "2023_G1" = "red")) +
+  theme_minimal()
+
+# Perform t-test
+mat_t_test_result_year <- t.test(mean_d13C_SEG ~ Year, data = mat_combined_data_year)
+
+# Print result
+print(mat_t_test_result_year)
+```
+
+
+Now check if paternal corolla means are significantly different:
+```{r}
+paternal_means_22 <- paternal_means_22 %>%
+  mutate(Year = "2022")
+
+paternal_means_23_G1 <- paternal_means_23_G1 %>%
+  mutate(Year = "2023_G1")
+
+# Combine the dataframes
+pat_combined_data_year <- bind_rows(paternal_means_22, paternal_means_23_G1)
+
+# Create the histogram
+ggplot(pat_combined_data_year, aes(x = mean_d13C_SEG, fill = Year)) +
+  geom_histogram(position = "identity", alpha = 0.6, binwidth = 0.2) +
+  labs(title = "Comparison of Donor Mean d13C: 2022 vs 2023",
+       x = "d13C",
+       y = "Frequency") +
+  scale_fill_manual(values = c("2022" = "blue", "2023_G1" = "red")) +
+  theme_minimal()
+
+# Perform t-test
+pat_t_test_result_year <- t.test(mean_d13C_SEG ~ Year, data = pat_combined_data_year)
+
+# Print result
+print(pat_t_test_result_year)
+```
+
+*G1 vs G2*
+Now compare Generation 1 and 2 from AC in 2023
+```{r}
+# Create a dataframe with common "Genotype" values for 2022
+AC_common_23_G1 <- semi_join(AC_23_fit_G1, AC_23_fit_G2, by = "Genotype")
+
+# Create a dataframe with common "Genotype" values for 2022
+AC_common_23_G2 <- semi_join(AC_23_fit_G2, AC_23_fit_G1, by = "Genotype")
+
+# Merge these two dataframes to have one finalized dataset to compare G1 2022 and G1 2023
+AC_common_23_G1_G2 <- full_join(AC_common_23_G1, AC_common_23_G2, by = intersect(names(AC_common_23_G1), names(AC_common_23_G2)))
+
+```
+
+
+Calculate the corolla diameter means for maternal and paternal genotypes
+```{r}
+# Calculate the mean corolla diameter for each maternal (Recipient) family for G1, 2023
+maternal_means_23_G1 <- AC_common_23_G1 %>%
+  group_by(Recipient, Donor) %>%
+  summarise(mean_d13C_SEG = mean(d13C_SEG, na.rm = TRUE))
+
+# Calculate the mean corolla diameter for each paternal (Donor) family for 2022
+paternal_means_23_G1 <- AC_common_23_G1 %>%
+  group_by(Donor) %>%
+  summarise(mean_d13C_SEG = mean(d13C_SEG, na.rm = TRUE))
+
+# Calculate the mean corolla diameter for each maternal (Recipient) family for G2, 2023
+maternal_means_23_G2 <- AC_common_23_G2 %>%
+  group_by(Recipient, Donor) %>%
+  summarise(mean_d13C_SEG = mean(d13C_SEG, na.rm = TRUE))
+
+# Calculate the mean corolla diameter for each paternal (Donor) family for 2023
+paternal_means_23_G2 <- AC_common_23_G2 %>%
+  group_by(Donor) %>%
+  summarise(mean_d13C_SEG = mean(d13C_SEG, na.rm = TRUE))
+```
+
+
+Check if maternal corolla means are significantly different:
+```{r}
+maternal_means_23_G1 <- maternal_means_23_G1  %>%
+  mutate(Gen = "1")
+
+maternal_means_23_G2 <- maternal_means_23_G2 %>%
+  mutate(Gen = "2")
+
+# Combine the dataframes
+mat_combined_data_gen <- bind_rows(maternal_means_23_G1, maternal_means_23_G2)
+
+# Create the histogram
+ggplot(mat_combined_data_gen, aes(x = mean_d13C_SEG, fill = Gen)) +
+  geom_histogram(position = "identity", alpha = 0.6, binwidth = 0.2) +
+  labs(title = "Comparison of Recipient Mean SLA: G1 vs G2",
+       x = "d13C",
+       y = "Frequency") +
+  scale_fill_manual(values = c("1" = "blue", "2" = "red")) +
+  theme_minimal()
+
+# Perform t-test
+mat_t_test_result_gen <- t.test(mean_d13C_SEG ~ Gen, data = mat_combined_data_gen)
+
+# Print result
+print(mat_t_test_result_gen)
+```
+
+Check if maternal corolla means are significantly different:
+```{r}
+paternal_means_23_G1 <- paternal_means_23_G1  %>%
+  mutate(Gen = "1")
+
+paternal_means_23_G2 <- paternal_means_23_G2 %>%
+  mutate(Gen = "2")
+
+# Combine the dataframes
+pat_combined_data_gen <- bind_rows(paternal_means_23_G1, paternal_means_23_G2)
+
+# Create the histogram
+ggplot(pat_combined_data_gen, aes(x = mean_d13C_SEG, fill = Gen)) +
+  geom_histogram(position = "identity", alpha = 0.6, binwidth = 0.2) +
+  labs(title = "Comparison of Donor Mean d13C: G1 vs G2",
+       x = "d13C",
+       y = "Frequency") +
+  scale_fill_manual(values = c("1" = "blue", "2" = "red")) +
+  theme_minimal()
+
+# Perform t-test
+pat_t_test_result_gen <- t.test(mean_d13C_SEG ~ Gen, data = pat_combined_data_gen)
+
+# Print result
+print(pat_t_test_result_gen)
+```
+
+***COMPARING PHENOTYPES***
+**d13C**
+*2022 vs 2023*
+
+```{r}
+
+# Convert 'Year' to factor if it's not already
+if (!is.factor(AC_common_22_23_G1$Year)) {
+  AC_common_22_23_G1$Year <- as.factor(AC_common_22_23_G1$Year)
+}
+
+# Create the histogram
+ggplot(AC_common_22_23_G1, aes(x = d13C_SEG, fill = Year)) +
+  geom_histogram(position = "identity", alpha = 0.6, binwidth = 0.2) +
+  labs(title = "Comparison of d13C",
+       x = "d13C",
+       y = "Frequency") +
+  scale_fill_manual(values = c("2022" = "blue", "2023" = "red")) +
+  theme_minimal()
+
+# Perform t-test
+AC_common_22_23_G1_t.test <- t.test(d13C_SEG ~ Year, data = AC_common_22_23_G1)
+
+# Print result
+print(AC_common_22_23_G1_t.test)
+```
+
+*G1 vs G2*
+
+```{r}
+
+# Convert 'Year' to factor if it's not already
+if (!is.factor(AC_common_23_G1_G2$Gen)) {
+  AC_common_23_G1_G2$Gen <- as.factor(AC_common_23_G1_G2$Gen)
+}
+
+# Create the histogram
+ggplot(AC_common_23_G1_G2, aes(x = d13C_SEG, fill = Gen)) +
+  geom_histogram(position = "identity", alpha = 0.6, binwidth = 0.2) +
+  labs(title = "Comparison of d13C",
+       x = "d13C",
+       y = "Frequency") +
+  scale_fill_manual(values = c("G1" = "blue", "G2" = "red")) +
+  theme_minimal()
+
+# Perform t-test
+AC_common_23_G1_G2_t.test <- t.test(d13C_SEG ~ Gen, data = AC_common_23_G1_G2)
+
+# Print result
+print(AC_common_23_G1_G2_t.test)
+```
+###################################################################################################
+
+***COMPARING GENOTYPES***
+**msm_all_SEG**
+*2022 vs 2023*
+
+
+Calculate the skeleton weight mean for maternal and paternal genotypes
+```{r}
+# Calculate the mean corolla diameter for each maternal (Recipient) family for 2022
+maternal_means_22 <- AC_common_22_23_G1_22 %>%
+  group_by(Recipient, Donor) %>%
+  summarise(mean_msm_all = mean(msm_all, na.rm = TRUE))
+
+# Calculate the mean corolla diameter for each paternal (Donor) family for 2022
+paternal_means_22 <- AC_common_22_23_G1_22 %>%
+  group_by(Donor) %>%
+  summarise(mean_msm_all = mean(msm_all, na.rm = TRUE))
+
+# Calculate the mean corolla diameter for each maternal (Recipient) family for 2023 G1
+maternal_means_23_G1 <- AC_common_22_23_G1_23 %>%
+  group_by(Recipient, Donor) %>%
+  summarise(mean_msm_all = mean(msm_all, na.rm = TRUE))
+
+
+# Calculate the mean corolla diameter for each paternal (Donor) family for 2023 G1
+paternal_means_23_G1 <- AC_common_22_23_G1_23 %>%
+  group_by(Donor) %>%
+  summarise(mean_msm_all = mean(msm_all, na.rm = TRUE))
+```
+
+
+
+Check if maternal skeleton weights are significantly different:
+```{r}
+maternal_means_22 <- maternal_means_22 %>%
+  mutate(Year = "2022")
+
+maternal_means_23_G1 <- maternal_means_23_G1 %>%
+  mutate(Year = "2023_G1")
+
+# Combine the dataframes
+mat_combined_data_year <- bind_rows(maternal_means_22, maternal_means_23_G1)
+
+# Create the histogram
+ggplot(mat_combined_data_year, aes(x = mean_msm_all, fill = Year)) +
+  geom_histogram(position = "identity", alpha = 0.6, binwidth = 0.2) +
+  labs(title = "Comparison of Recipient Average Mean Seed Mass: 2022 vs 2023",
+       x = "Mean seed mass",
+       y = "Frequency") +
+  scale_fill_manual(values = c("2022" = "blue", "2023_G1" = "red")) +
+  theme_minimal()
+
+# Perform t-test
+mat_t_test_result_year <- t.test(mean_msm_all ~ Year, data = mat_combined_data_year)
+
+# Print result
+print(mat_t_test_result_year)
+```
+
+###################################################################################################
+
+***COMPARING GENOTYPES***
+**LMA_SEG**
+*2022 vs 2023*
+
+
+Calculate the skeleton weight mean for maternal and paternal genotypes
+```{r}
+# Calculate the mean corolla diameter for each maternal (Recipient) family for 2022
+maternal_means_22 <- AC_common_22_23_G1_22 %>%
+  group_by(Recipient, Donor) %>%
+  summarise(mean_LMA = mean(LMA, na.rm = TRUE))
+
+# Calculate the mean corolla diameter for each paternal (Donor) family for 2022
+paternal_means_22 <- AC_common_22_23_G1_22 %>%
+  group_by(Donor) %>%
+  summarise(mean_LMA = mean(LMA, na.rm = TRUE))
+
+# Calculate the mean corolla diameter for each maternal (Recipient) family for 2023 G1
+maternal_means_23_G1 <- AC_common_22_23_G1_23 %>%
+  group_by(Recipient, Donor) %>%
+  summarise(mean_LMA = mean(LMA, na.rm = TRUE))
+
+
+# Calculate the mean corolla diameter for each paternal (Donor) family for 2023 G1
+paternal_means_23_G1 <- AC_common_22_23_G1_23 %>%
+  group_by(Donor) %>%
+  summarise(mean_LMA = mean(LMA, na.rm = TRUE))
+```
+
+
+
+Check if maternal skeleton weights are significantly different:
+```{r}
+maternal_means_22 <- maternal_means_22 %>%
+  mutate(Year = "2022")
+
+maternal_means_23_G1 <- maternal_means_23_G1 %>%
+  mutate(Year = "2023_G1")
+
+# Combine the dataframes
+mat_combined_data_year <- bind_rows(maternal_means_22, maternal_means_23_G1)
+
+# Create the histogram
+ggplot(mat_combined_data_year, aes(x = mean_LMA, fill = Year)) +
+  geom_histogram(position = "identity", alpha = 0.6, binwidth = 0.2) +
+  labs(title = "Comparison of Recipient Average LMA: 2022 vs 2023",
+       x = "LMA",
+       y = "Frequency") +
+  scale_fill_manual(values = c("2022" = "blue", "2023_G1" = "red")) +
+  theme_minimal()
+
+# Perform t-test
+mat_t_test_result_year <- t.test(mean_LMA ~ Year, data = mat_combined_data_year)
+
+# Print result
+print(mat_t_test_result_year)
+```
+
+
+Now check if paternal corolla means are significantly different:
+```{r}
+paternal_means_22 <- paternal_means_22 %>%
+  mutate(Year = "2022")
+
+paternal_means_23_G1 <- paternal_means_23_G1 %>%
+  mutate(Year = "2023_G1")
+
+# Combine the dataframes
+pat_combined_data_year <- bind_rows(paternal_means_22, paternal_means_23_G1)
+
+# Create the histogram
+ggplot(pat_combined_data_year, aes(x = mean_LMA, fill = Year)) +
+  geom_histogram(position = "identity", alpha = 0.6, binwidth = 0.2) +
+  labs(title = "Comparison of Donor Average LMA: 2022 vs 2023",
+       x = "LMA",
+       y = "Frequency") +
+  scale_fill_manual(values = c("2022" = "blue", "2023_G1" = "red")) +
+  theme_minimal()
+
+# Perform t-test
+pat_t_test_result_year <- t.test(mean_LMA ~ Year, data = pat_combined_data_year)
+
+# Print result
+print(pat_t_test_result_year)
+```
+
+*G1 vs G2*
+Now compare Generation 1 and 2 from AC in 2023
+```{r}
+# Create a dataframe with common "Genotype" values for 2022
+AC_common_23_G1 <- semi_join(AC_23_fit_G1, AC_23_fit_G2, by = "Genotype")
+
+# Create a dataframe with common "Genotype" values for 2022
+AC_common_23_G2 <- semi_join(AC_23_fit_G2, AC_23_fit_G1, by = "Genotype")
+
+# Merge these two dataframes to have one finalized dataset to compare G1 2022 and G1 2023
+AC_common_23_G1_G2 <- full_join(AC_common_23_G1, AC_common_23_G2, by = intersect(names(AC_common_23_G1), names(AC_common_23_G2)))
+
+```
+
+
+Calculate the corolla diameter means for maternal and paternal genotypes
+```{r}
+# Calculate the mean corolla diameter for each maternal (Recipient) family for G1, 2023
+maternal_means_23_G1 <- AC_common_23_G1 %>%
+  group_by(Recipient, Donor) %>%
+  summarise(mean_LMA = mean(LMA, na.rm = TRUE))
+
+# Calculate the mean corolla diameter for each paternal (Donor) family for 2022
+paternal_means_23_G1 <- AC_common_23_G1 %>%
+  group_by(Donor) %>%
+  summarise(mean_LMA = mean(LMA, na.rm = TRUE))
+
+# Calculate the mean corolla diameter for each maternal (Recipient) family for G2, 2023
+maternal_means_23_G2 <- AC_common_23_G2 %>%
+  group_by(Recipient, Donor) %>%
+  summarise(mean_LMA = mean(LMA, na.rm = TRUE))
+
+# Calculate the mean corolla diameter for each paternal (Donor) family for 2023
+paternal_means_23_G2 <- AC_common_23_G2 %>%
+  group_by(Donor) %>%
+  summarise(mean_LMA = mean(LMA, na.rm = TRUE))
+```
+
+
+Check if maternal corolla means are significantly different:
+```{r}
+maternal_means_23_G1 <- maternal_means_23_G1  %>%
+  mutate(Gen = "1")
+
+maternal_means_23_G2 <- maternal_means_23_G2 %>%
+  mutate(Gen = "2")
+
+# Combine the dataframes
+mat_combined_data_gen <- bind_rows(maternal_means_23_G1, maternal_means_23_G2)
+
+# Create the histogram
+ggplot(mat_combined_data_gen, aes(x = mean_LMA, fill = as.factor(Gen))) +
+  geom_histogram(position = "identity", alpha = 0.6, binwidth = 0.1) +
+  labs(title = "Comparison of Recipient Average LMA G1 vs G2",
+       x = "LMA",
+       y = "Frequency") +
+  scale_fill_manual(values = c("1" = "blue", "2" = "red")) +
+  theme_minimal()
+
+# Perform t-test
+mat_t_test_result_gen <- t.test(mean_LMA ~ Gen, data = mat_combined_data_gen)
+
+# Print result
+print(mat_t_test_result_gen)
+```
+
+Check if maternal corolla means are significantly different:
+```{r}
+paternal_means_23_G1 <- paternal_means_23_G1  %>%
+  mutate(Gen = "1")
+
+paternal_means_23_G2 <- paternal_means_23_G2 %>%
+  mutate(Gen = "2")
+
+# Combine the dataframes
+pat_combined_data_gen <- bind_rows(paternal_means_23_G1, paternal_means_23_G2)
+
+# Create the histogram
+ggplot(pat_combined_data_gen, aes(x = mean_LMA, fill = Gen)) +
+  geom_histogram(position = "identity", alpha = 0.6, binwidth = 0.2) +
+  labs(title = "Comparison of Donor Average LMA: G1 vs G2",
+       x = "LMA",
+       y = "Frequency") +
+  scale_fill_manual(values = c("1" = "blue", "2" = "red")) +
+  theme_minimal()
+
+# Perform t-test
+pat_t_test_result_gen <- t.test(mean_LMA ~ Gen, data = pat_combined_data_gen)
+
+# Print result
+print(pat_t_test_result_gen)
+```
+
+***COMPARING PHENOTYPES***
+**d13C**
+*2022 vs 2023*
+
+```{r}
+
+# Convert 'Year' to factor if it's not already
+if (!is.factor(AC_common_22_23_G1$Year)) {
+  AC_common_22_23_G1$Year <- as.factor(AC_common_22_23_G1$Year)
+}
+
+# Create the histogram
+ggplot(AC_common_22_23_G1, aes(x = LMA, fill = Year)) +
+  geom_histogram(position = "identity", alpha = 0.6, binwidth = 0.2) +
+  labs(title = "Comparison of LMA",
+       x = "LMA",
+       y = "Frequency") +
+  scale_fill_manual(values = c("2022" = "blue", "2023" = "red")) +
+  theme_minimal()
+
+# Perform t-test
+AC_common_22_23_G1_t.test <- t.test(LMA ~ Year, data = AC_common_22_23_G1)
+
+# Print result
+print(AC_common_22_23_G1_t.test)
+```
+
+*G1 vs G2*
+
+```{r}
+# Convert 'Year' to factor if it's not already
+if (!is.factor(AC_common_23_G1_G2$Gen)) {
+  AC_common_23_G1_G2$Gen <- as.factor(AC_common_23_G1_G2$Gen)
+}
+
+# Create the histogram
+ggplot(AC_common_23_G1_G2, aes(x = LMA, fill = Gen)) +
+  geom_histogram(position = "identity", alpha = 0.6, binwidth = 0.2) +
+  labs(title = "Comparison of LMA",
+       x = "LMA",
+       y = "Frequency") +
+  scale_fill_manual(values = c("G1" = "blue", "G2" = "red")) +
+  theme_minimal()
+
+# Perform t-test
+AC_common_23_G1_G2_t.test <- t.test(LMA ~ Gen, data = AC_common_23_G1_G2)
+
+# Print result
+print(AC_common_23_G1_G2_t.test)
+```

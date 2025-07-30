@@ -1,0 +1,363 @@
+---
+title: "BO_correlations"
+author: "Helen Payne"
+date: "2024-07-26"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+
+```{r}
+library(tidyverse)
+library(corrplot) #Correlation Matrix
+library(reshape2)
+```
+
+
+```{r}
+# Load and preprocess data
+# Read the CSV file and create 'sample_ID' column
+BO_fit <- read_csv(here::here("data_sheets", "compiled_sheets", "BO_22_23_fit.csv")) %>%
+  rename_at(vars(49), ~"surv_to_fruitpod") %>%
+  mutate(
+    # Construct sample_ID conditionally
+    sample_ID = case_when(
+      is.na(SegPos) ~ paste(Year, Recipient, Gen, str_pad(Transect, width = 3, pad = "0"), Plant_ID, sep = "-"),
+      TRUE ~ paste(Year, Recipient, Gen, str_pad(Transect, width = 3, pad = "0"), SegPos, Plant_ID, sep = "-")
+    ),
+    # Replace leading underscores in sample_ID with hyphens
+    sample_ID = str_replace(sample_ID, "^([^_]*)_", "\\1-")
+  )
+
+BO_fit_22 <- BO_fit %>%
+  filter(Year == "2022")
+
+BO_fit_23_G1 <- BO_fit %>%
+  filter(Year == "2023", Gen == "G1")
+
+BO_fit_23_G2 <- BO_fit %>%
+  filter(Year == "2023", Gen == "G2")
+```
+
+
+```{r}
+
+##BO 22: all individuals
+corrplot(cor(BO_fit_22 %>% dplyr::select(closed_fruits, total_fruits, filled_seeds, est_fecundity, mean_seeds_per_fruit), use="complete.obs"), method = "color", addCoef.col = "black", number.cex = .6, outline = TRUE, tl.col = "red", title = "BO 22 fecundity traits (all individuals)") #ignores NAs
+
+
+##BO 23 G1: all individuals
+corrplot(cor(BO_fit_23_G1 %>% dplyr::select(closed_fruits, total_fruits, filled_seeds, est_fecundity, mean_seeds_per_fruit), use="complete.obs"), method = "color", addCoef.col = "black", number.cex = .6, outline = TRUE, tl.col = "red", title = "BO 23 G1 fecundity traits (all individuals)") #ignores NAs
+
+
+##BO 23 G2: all individuals
+corrplot(cor(BO_fit_23_G2 %>% dplyr::select(closed_fruits, total_fruits, filled_seeds, est_fecundity, mean_seeds_per_fruit), use="complete.obs"), method = "color", addCoef.col = "black", number.cex = .6, outline = TRUE, tl.col = "red", title = "BO 23 G2 fecundity traits (all individuals)") #ignores NAs
+```
+
+```{r}
+##BO 22: Paternal means
+corrplot(cor(BO_fit_22 %>% dplyr::select(est_fecundity, mean_seeds_per_fruit, fl_duration, 
+                                          skel_dryweight_mg, msm_all, corolla_diam_mm, SLA_SEG, d13C), use="complete.obs"), method = "color", addCoef.col = "black", number.cex = .6, outline = TRUE, tl.col = "red", title = "BO 22 all traits (all individuals)") #ignores NAs
+
+##BO 23 G1: Paternal means
+corrplot(cor(BO_fit_23_G1 %>% dplyr::select(est_fecundity, mean_seeds_per_fruit, fl_duration, 
+                                          skel_dryweight_mg, msm_all, corolla_diam_mm, SLA_SEG, d13C), use="complete.obs"), method = "color", addCoef.col = "black", number.cex = .6, outline = TRUE, tl.col = "red", title = "BO 23 G1 all traits (all individuals)") #ignores NAs
+
+##BO 23 G2: Paternal means
+corrplot(cor(BO_fit_23_G2 %>% dplyr::select(est_fecundity, mean_seeds_per_fruit, fl_duration, 
+                                          skel_dryweight_mg, msm_all, corolla_diam_mm, SLA_SEG, d13C), use="complete.obs"), method = "color", addCoef.col = "black", number.cex = .6, outline = TRUE, tl.col = "red", title = "BO 23 G2 all traits (all individuals)") #ignores NAs
+```
+
+
+Comparison of matrices
+```{r}
+# Extract correlation matrices
+cor_matrix_22 <- cor(BO_fit_22 %>% dplyr::select(closed_fruits, total_fruits, filled_seeds, est_fecundity, mean_seeds_per_fruit, fl_duration, skel_dryweight_mg, msm_all, corolla_diam_mm, SLA_SEG, d13C), use = "complete.obs")
+cor_matrix_23_G1 <- cor(BO_fit_23_G1 %>% dplyr::select(closed_fruits, total_fruits, filled_seeds, est_fecundity, mean_seeds_per_fruit, fl_duration, skel_dryweight_mg, msm_all, corolla_diam_mm, SLA_SEG, d13C), use = "complete.obs")
+cor_matrix_23_G2 <- cor(BO_fit_23_G2 %>% dplyr::select(closed_fruits, total_fruits, filled_seeds, est_fecundity, mean_seeds_per_fruit, fl_duration, skel_dryweight_mg, msm_all, corolla_diam_mm, SLA_SEG, d13C), use = "complete.obs")
+
+# Flatten correlation matrices
+cor_22_flat <- as.vector(cor_matrix_22)
+cor_23_G1_flat <- as.vector(cor_matrix_23_G1)
+cor_23_G2_flat <- as.vector(cor_matrix_23_G2)
+
+# Combine into a data frame for comparison
+cor_comparison <- data.frame(
+  Correlation = c(cor_22_flat, cor_23_G1_flat, cor_23_G2_flat),
+  Dataset = rep(c("BO 22", "BO 23 G1", "BO 23 G2"), each = length(cor_22_flat))
+)
+
+# Summary statistics
+cor_comparison %>%
+  group_by(Dataset) %>%
+  summarise(
+    Mean = mean(Correlation, na.rm = TRUE),
+    SD = sd(Correlation, na.rm = TRUE)
+  )
+
+# Melt correlation matrices for ggplot
+melt_cor_matrix <- function(cor_matrix, title) {
+  melted <- melt(cor_matrix)
+  melted$Dataset <- title
+  return(melted)
+}
+
+cor_22_melt <- melt_cor_matrix(cor_matrix_22, "BO 22")
+cor_23_G1_melt <- melt_cor_matrix(cor_matrix_23_G1, "BO 23 G1")
+cor_23_G2_melt <- melt_cor_matrix(cor_matrix_23_G2, "BO 23 G2")
+
+combined_melt <- rbind(cor_22_melt, cor_23_G1_melt, cor_23_G2_melt)
+
+# Plot heatmaps
+ggplot(combined_melt, aes(x = Var1, y = Var2, fill = value)) +
+  geom_tile() +
+  facet_wrap(~Dataset) +
+  scale_fill_gradient2(low = "blue", high = "red", mid = "white", midpoint = 0, limit = c(-1, 1)) +
+  theme_minimal() +
+  labs(title = "Heatmaps of Correlation Matrices", x = "", y = "")
+
+
+# Plot histograms of correlations
+ggplot(cor_comparison, aes(x = Correlation, fill = Dataset)) +
+  geom_histogram(position = "dodge", bins = 30, alpha = 0.5) +
+  labs(title = "Distribution of Correlation Coefficients", x = "Correlation", y = "Frequency") +
+  theme_minimal()
+```
+
+
+
+```{r}
+# Aggregate data by donor
+mean_donor_traits_22 <- BO_fit_22%>%
+  filter(est_fecundity != 0) %>%  # Filter out rows where est_fecundity is zero
+  group_by(Donor) %>%             # Group by donor
+  summarise(
+    closed_fruits = mean(closed_fruits, na.rm = TRUE),
+    total_fruits = mean(total_fruits, na.rm = TRUE),
+    filled_seeds = mean(filled_seeds, na.rm = TRUE),
+    est_fecundity = mean(est_fecundity, na.rm = TRUE),
+    mean_seeds_per_fruit = mean(mean_seeds_per_fruit, na.rm = TRUE),
+    fl_duration = mean(fl_duration, na.rm = TRUE),
+    skel_dryweight_mg = mean(skel_dryweight_mg, na.rm = TRUE),
+    est_fecundity = mean(est_fecundity, na.rm = TRUE),
+    msm_all = mean(msm_all, na.rm = TRUE),
+    corolla_diam_mm = mean(corolla_diam_mm, na.rm = TRUE),
+    SLA_SEG = mean(SLA_SEG, na.rm = TRUE),
+    d13C = mean(d13C, na.rm = TRUE)
+  )
+
+# Aggregate data by donor
+mean_donor_traits_23_G1 <- BO_fit_23_G1%>%
+  filter(est_fecundity != 0) %>%  # Filter out rows where est_fecundity is zero
+  group_by(Donor) %>%             # Group by donor
+  summarise(
+    closed_fruits = mean(closed_fruits, na.rm = TRUE),
+    total_fruits = mean(total_fruits, na.rm = TRUE),
+    filled_seeds = mean(filled_seeds, na.rm = TRUE),
+    est_fecundity = mean(est_fecundity, na.rm = TRUE),
+    mean_seeds_per_fruit = mean(mean_seeds_per_fruit, na.rm = TRUE),
+    fl_duration = mean(fl_duration, na.rm = TRUE),
+    skel_dryweight_mg = mean(skel_dryweight_mg, na.rm = TRUE),
+    est_fecundity = mean(est_fecundity, na.rm = TRUE),
+    msm_all = mean(msm_all, na.rm = TRUE),
+    corolla_diam_mm = mean(corolla_diam_mm, na.rm = TRUE),
+    SLA_SEG = mean(SLA_SEG, na.rm = TRUE),
+    d13C = mean(d13C, na.rm = TRUE)
+  )
+
+# Aggregate data by donor
+mean_donor_traits_23_G2 <- BO_fit_23_G2%>%
+  filter(est_fecundity != 0) %>%  # Filter out rows where est_fecundity is zero
+  group_by(Donor) %>%             # Group by donor
+  summarise(
+    closed_fruits = mean(closed_fruits, na.rm = TRUE),
+    total_fruits = mean(total_fruits, na.rm = TRUE),
+    filled_seeds = mean(filled_seeds, na.rm = TRUE),
+    est_fecundity = mean(est_fecundity, na.rm = TRUE),
+    mean_seeds_per_fruit = mean(mean_seeds_per_fruit, na.rm = TRUE),
+    fl_duration = mean(fl_duration, na.rm = TRUE),
+    skel_dryweight_mg = mean(skel_dryweight_mg, na.rm = TRUE),
+    est_fecundity = mean(est_fecundity, na.rm = TRUE),
+    msm_all = mean(msm_all, na.rm = TRUE),
+    corolla_diam_mm = mean(corolla_diam_mm, na.rm = TRUE),
+    SLA_SEG = mean(SLA_SEG, na.rm = TRUE),
+    d13C = mean(d13C, na.rm = TRUE)
+  )
+```
+
+
+```{r}
+##BO 22: Paternal averages of fitness estimates
+corrplot(cor(mean_donor_traits_22 %>% dplyr::select(est_fecundity, mean_seeds_per_fruit, fl_duration, 
+                                          skel_dryweight_mg, msm_all, corolla_diam_mm, SLA_SEG, d13C), use="complete.obs"), method = "color", addCoef.col = "black", number.cex = .6, outline = TRUE, tl.col = "red", title = "BO 23 G2 fecundity traits (paternal means)") #ignores NAs
+
+##BO 23 G1: Paternal averages of fitness estimates
+corrplot(cor(mean_donor_traits_23_G1 %>% dplyr::select(est_fecundity, mean_seeds_per_fruit, fl_duration, 
+                                          skel_dryweight_mg, msm_all, corolla_diam_mm, SLA_SEG, d13C), use="complete.obs"), method = "color", addCoef.col = "black", number.cex = .6, outline = TRUE, tl.col = "red", title = "BO 23 G2 fecundity traits (paternal means)") #ignores NAs
+
+##BO 23 G2: Paternal averages of fitness estimates
+corrplot(cor(mean_donor_traits_23_G2 %>% dplyr::select(est_fecundity, mean_seeds_per_fruit, fl_duration, 
+                                          skel_dryweight_mg, msm_all, corolla_diam_mm, SLA_SEG, d13C), use="complete.obs"), method = "color", addCoef.col = "black", number.cex = .6, outline = TRUE, tl.col = "red", title = "BO 23 G2 fecundity traits (paternal means)") #ignores NAs
+
+
+#as the number of closed fruits increases, the mean number of seeds per fruit tends to decrease, as total_fruits increases, mean seeds per fruit tends to decrease (and vice versa)
+##This correlation is only apparent when looking at the paternal means
+```
+
+```{r}
+##BO 22: Paternal averages of fitness estimates
+corrplot(cor(mean_donor_traits_22 %>% dplyr::select(closed_fruits, total_fruits, filled_seeds, est_fecundity, mean_seeds_per_fruit, fl_duration, skel_dryweight_mg, msm_all, corolla_diam_mm, SLA_SEG, d13C), use="complete.obs"), method = "color", addCoef.col = "black", number.cex = .6, outline = TRUE, tl.col = "red", title = "BO 22 all traits (paternal means)") #ignores NAs
+
+##BO 23 G1: Paternal averages of fitness estimates
+corrplot(cor(mean_donor_traits_23_G1 %>% dplyr::select(closed_fruits, total_fruits, filled_seeds, est_fecundity, mean_seeds_per_fruit, fl_duration, skel_dryweight_mg, msm_all, corolla_diam_mm, SLA_SEG, d13C), use="complete.obs"), method = "color", addCoef.col = "black", number.cex = .6, outline = TRUE, tl.col = "red", title = "BO 23 G1 all traits (paternal means)") #ignores NAs
+
+##BO 23 G2: Paternal averages of fitness estimates
+corrplot(cor(mean_donor_traits_23_G2 %>% dplyr::select(closed_fruits, total_fruits, filled_seeds, est_fecundity, mean_seeds_per_fruit, fl_duration, skel_dryweight_mg, msm_all, corolla_diam_mm, SLA_SEG, d13C), use="complete.obs"), method = "color", addCoef.col = "black", number.cex = .6, outline = TRUE, tl.col = "red", title = "BO 23 G2 all traits (paternal means)") #ignores NAs
+```
+
+Comparison of matrices
+```{r}
+# Extract correlation matrices
+cor_matrix_22 <- cor(mean_donor_traits_22 %>% dplyr::select(closed_fruits, total_fruits, filled_seeds, est_fecundity, mean_seeds_per_fruit, fl_duration, skel_dryweight_mg, msm_all, corolla_diam_mm, SLA_SEG, d13C), use = "complete.obs")
+cor_matrix_23_G1 <- cor(mean_donor_traits_23_G1 %>% dplyr::select(closed_fruits, total_fruits, filled_seeds, est_fecundity, mean_seeds_per_fruit, fl_duration, skel_dryweight_mg, msm_all, corolla_diam_mm, SLA_SEG, d13C), use = "complete.obs")
+cor_matrix_23_G2 <- cor(mean_donor_traits_23_G2 %>% dplyr::select(closed_fruits, total_fruits, filled_seeds, est_fecundity, mean_seeds_per_fruit, fl_duration, skel_dryweight_mg, msm_all, corolla_diam_mm, SLA_SEG, d13C), use = "complete.obs")
+
+# Flatten correlation matrices
+cor_22_flat <- as.vector(cor_matrix_22)
+cor_23_G1_flat <- as.vector(cor_matrix_23_G1)
+cor_23_G2_flat <- as.vector(cor_matrix_23_G2)
+
+# Combine into a data frame for comparison
+cor_comparison <- data.frame(
+  Correlation = c(cor_22_flat, cor_23_G1_flat, cor_23_G2_flat),
+  Dataset = rep(c("BO 22", "BO 23 G1", "BO 23 G2"), each = length(cor_22_flat))
+)
+
+# Summary statistics
+cor_comparison %>%
+  group_by(Dataset) %>%
+  summarise(
+    Mean = mean(Correlation, na.rm = TRUE),
+    SD = sd(Correlation, na.rm = TRUE)
+  )
+
+# Melt correlation matrices for ggplot
+melt_cor_matrix <- function(cor_matrix, title) {
+  melted <- melt(cor_matrix)
+  melted$Dataset <- title
+  return(melted)
+}
+
+cor_22_melt <- melt_cor_matrix(cor_matrix_22, "BO 22")
+cor_23_G1_melt <- melt_cor_matrix(cor_matrix_23_G1, "BO 23 G1")
+cor_23_G2_melt <- melt_cor_matrix(cor_matrix_23_G2, "BO 23 G2")
+
+combined_melt <- rbind(cor_22_melt, cor_23_G1_melt, cor_23_G2_melt)
+
+# Plot heatmaps
+ggplot(combined_melt, aes(x = Var1, y = Var2, fill = value)) +
+  geom_tile() +
+  facet_wrap(~Dataset) +
+  scale_fill_gradient2(low = "blue", high = "red", mid = "white", midpoint = 0, limit = c(-1, 1)) +
+  theme_minimal() +
+  labs(title = "Heatmaps of Correlation Matrices", x = "", y = "")
+
+
+# Plot histograms of correlations
+ggplot(cor_comparison, aes(x = Correlation, fill = Dataset)) +
+  geom_histogram(position = "dodge", bins = 30, alpha = 0.5) +
+  labs(title = "Distribution of Correlation Coefficients", x = "Correlation", y = "Frequency") +
+  theme_minimal()
+```
+
+
+```{r}
+# Load the required libraries
+library(corrplot)
+library(dplyr)
+
+# Set up a 1x3 layout for the correlation plots with space for the overall title
+par(mfrow = c(1, 3), oma = c(0, 0, 3, 0))  # Adjust oma to leave space for the title
+
+# Define new trait names
+trait_names <- c("Estimated Fecundity", "Mean Seeds Per Fruit", "Flowering Duration", 
+                 "Dry Weight", "Mean Seed Mass", "Corolla Diameter", "SLA", "δ13C")
+
+# Create the correlation matrix
+cor_matrix <- cor(mean_donor_traits_22 %>%
+                  dplyr::select(est_fecundity, mean_seeds_per_fruit, fl_duration, 
+                                skel_dryweight_mg, msm_all, corolla_diam_mm, SLA_SEG, d13C), 
+                  use = "complete.obs")
+
+# Set new column and row names
+colnames(cor_matrix) <- trait_names
+rownames(cor_matrix) <- trait_names
+
+# First correlation plot (BO 22) with renamed traits
+BO_22_corr_donor <- corrplot(
+  cor_matrix,                             # Use the renamed correlation matrix
+  method = "color", 
+  addCoef.col = "black", 
+  number.cex = 0.8, 
+  tl.col = "black", 
+  tl.srt = 45, 
+  col = colorRampPalette(c("red", "white", "blue"))(200), 
+  cl.lim = c(-1, 1), 
+  outline = TRUE, 
+  mar = c(0, 0, 2, 0), 
+  title = "BO 22 Paternal Averages"
+)
+
+
+# Create the correlation matrix
+cor_matrix <- cor(mean_donor_traits_23_G1 %>%
+                  dplyr::select(est_fecundity, mean_seeds_per_fruit, fl_duration, 
+                                skel_dryweight_mg, msm_all, corolla_diam_mm, SLA_SEG, d13C), 
+                  use = "complete.obs")
+
+# Set new column and row names
+colnames(cor_matrix) <- trait_names
+rownames(cor_matrix) <- trait_names
+
+# First correlation plot (BO 22) with renamed traits
+BO_23_G1_corr_donor <- corrplot(
+  cor_matrix,                             # Use the renamed correlation matrix
+  method = "color", 
+  addCoef.col = "black", 
+  number.cex = 0.8, 
+  tl.col = "black", 
+  tl.srt = 45, 
+  col = colorRampPalette(c("red", "white", "blue"))(200), 
+  cl.lim = c(-1, 1), 
+  outline = TRUE, 
+  mar = c(0, 0, 2, 0), 
+  title = "BO 23 G2 Paternal Averages"
+)
+
+# Create the correlation matrix
+cor_matrix <- cor(mean_donor_traits_23_G2 %>%
+                  dplyr::select(est_fecundity, mean_seeds_per_fruit, fl_duration, 
+                                skel_dryweight_mg, msm_all, corolla_diam_mm, SLA_SEG, d13C), 
+                  use = "complete.obs")
+
+# Set new column and row names
+colnames(cor_matrix) <- trait_names
+rownames(cor_matrix) <- trait_names
+
+# First correlation plot (BO 22) with renamed traits
+BO_23_G2_corr_donor <- corrplot(
+  cor_matrix,                             # Use the renamed correlation matrix
+  method = "color", 
+  addCoef.col = "black", 
+  number.cex = 0.8, 
+  tl.col = "black", 
+  tl.srt = 45, 
+  col = colorRampPalette(c("red", "white", "blue"))(200), 
+  cl.lim = c(-1, 1), 
+  outline = TRUE, 
+  mar = c(0, 0, 2, 0), 
+  title = "BO 23 G2 Paternal Averages"
+)
+
+```

@@ -1,0 +1,43 @@
+field,description
+positionID,"Unique identifier corresponding to the row and exact position (e.g., 100-0.8) of a given seed at a given site"
+packID,"Unique identifier (for a given site in 2014) corresponding to coin envelope containing 5 seeds planted at a given group location (e.g., 100-1); only useful when randomizing envelopes and entering seed mass data"
+row,Planting row; first digit corresponds to plot number
+group.position,"Meter position along a given row (1, 3, 5, etc.) where five seeds from a single coin envelope were planted 0.1 m apart"
+position,Exact meter position within each group.position where a single seed was planted (ranges from group.position - 0.2 m to group.position + 0.2 m)
+maternalID,Unique identifier corresponding to dam
+paternalID,Unique identifier corresponding to sire
+planting.notes,Notes taken while planting seeds in October-November 2014
+presence1,"Present during census 1 (1 = yes; 0 = no); note that across all Presence columns, there may be inconsistencies if a plant was not deteted in a middle census; there are also sometimes inconsistencies in other data columns, such that there are missing data when there should not be; see manual for details"
+leafnumber1,Number of leaves at least partially unfolding on plant during census 1
+notes1,Notes taken during 1st census in 2015
+presence2,Present during census 2 (1 = yes; 0 = no)
+leafnumber2,Number of leaves at least partially unfolding on plant during census 2
+notes2,Notes taken during 2nd census in 2015
+presence3,Present during census 3 (1 = yes; 0 = no)
+leafnumber3,Number of leaves at least partially unfolding on plant during census 3
+notes3,Notes taken during 3rd census in 2015
+presence4,Present during census 4 (1 = yes; 0 = no)
+branch4,Number of branches with at least 1 true leaf during census 4
+flowering4,Flowering before or during census 4 (1 = yes; 0 = no)
+munched4,"Evidence of stem herbivory present (1 = yes; 0 = no) during census 4; note that during other censuses, this was often recorded in notes column"
+notes4,Notes taken during 4th census in 2015
+presence5,Present during census 5 (1 = yes; 0 = no)
+flowering5,Flowering before or during census 5 (1 = yes; 0 = no)
+munched5,"Evidence of stem herbivory present (1 = yes; 0 = no) during census 5; note that during other censuses, this was often recorded in notes column"
+notes5,Notes taken during 5th census in 2015
+presence6,Present during census 6 (1 = yes; 0 = no)
+notes6,Notes taken during 6th census in 2015
+presence7,Present during census 7 (1 = yes; 0 = no)
+notes7,Notes taken during 7th census in 2015
+notes8,Notes taken during 8th census in 2015; note that census 8 was not a true census in which presence was recorded
+presence9,Present during census 9 (1 = yes; 0 = no)
+flowering9,Flowering before or during census 9 (1 = yes; 0 = no)
+crispy.pods9,Total number of mature (crispy) pods collected off of plant
+green.pods9,Total number of immature (green) pods collected off of plant
+ground.pods9,Total number of pods collected off of ground near plant; note that these pods may contain seeds of questionable quality
+pods.on.plant9,Total number of pods and-or pedicels remaining on plant
+seed.ct,Total number of seeds in all mature pods collected from plant
+green.seed.ct,Total number of seeds from all green pods collected from plant
+ground.seed.ct,Total number of seeds from all pods collected off of the ground
+notes9,Notes taken during 9th census in 2015
+final.notes,Final notes taken while checking data for inconsistencies

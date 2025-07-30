@@ -1,0 +1,1600 @@
+---
+title: "AC_genotypic_correlations"
+author: "Helen Payne"
+date: "2024-10-30"
+output: html_document
+---
+
+
+```{r}
+#load necessary libraries
+library(tidyverse)
+library(corrplot) #Correlation Matrix
+library(reshape2)
+```
+
+
+```{r}
+### Load and preprocess data
+## Data for fitness plants only
+# Read the CSV file and create 'sample_ID' column
+AC_fit <- read_csv(here::here("data_sheets", "compiled_sheets", "AC_22_23_fit.csv")) %>%
+  rename_at(vars(48), ~"surv_to_fruitpod") %>% #rename this column which was miss spelled
+  mutate(
+    # Construct sample_ID conditionally
+    sample_ID = case_when(
+      is.na(SegPos) ~ paste(Year, Recipient, Gen, str_pad(Transect, width = 3, pad = "0"), Plant_ID, sep = "-"),
+      TRUE ~ paste(Year, Recipient, Gen, str_pad(Transect, width = 3, pad = "0"), SegPos, Plant_ID, sep = "-")
+    ),
+    # Replace leading underscores in sample_ID with hyphens
+    sample_ID = str_replace(sample_ID, "^([^_]*)_", "\\1-")
+  )
+
+# Read in data from non-fitness plants- this is to get survival data from
+AC_22_23_full <- read_csv(here::here("data_sheets", "compiled_sheets", "AC_22_23_full.csv"))
+
+#create the variable "prop_surv_to_flower"
+AC_22_23_full <- AC_22_23_full %>%
+  group_by(Year, Gen, Transect, Sequence, Donor, Recipient, SegPos) %>%
+  mutate(prop_surv_to_flower = mean(surv_to_flower, na.rm = TRUE)) %>%
+  ungroup()  # Remove grouping
+
+#select for certain columns
+AC_prop_sample <- AC_22_23_full %>%
+  dplyr::select(c(Year, Gen, Transect, Sequence, Donor, Recipient, SegPos, prop_surv_to_flower))  %>%
+    distinct()
+
+#add "prop_surv_to_flower" based on the columns listed
+AC_fit <- AC_fit %>%
+  left_join(AC_prop_sample %>% dplyr::select(Year, Gen, Transect, Sequence, Donor, Recipient, SegPos, prop_surv_to_flower),
+            by = c("Year", "Gen", "Transect", "Sequence", "Donor", "Recipient", "SegPos"))
+
+# Create the new column for "est_fitness" and rename "prop_surv_to_flower" to "survival"
+AC_fit <- AC_fit %>%
+  mutate(est_fitness = prop_surv_to_flower * est_fecundity) %>%
+  mutate(est_fitness = replace_na(est_fitness, 0)) %>%
+  rename(survival = prop_surv_to_flower)
+
+#isolate AC 2022
+AC_fit_22 <- AC_fit %>%
+  filter(Year == "2022")
+
+#isolate AC 2023 G1
+AC_fit_23_G1 <- AC_fit %>%
+  filter(Year == "2023", Gen == "G1")
+
+#isolate AC 2023 G2
+AC_fit_23_G2 <- AC_fit %>%
+  filter(Year == "2023", Gen == "G2")
+
+```
+
+
+
+```{r}
+##Obtain paternal genotypic values - this is what we are interested in
+# Aggregate data by donor
+AC_mean_donor_traits_22 <- AC_fit_22%>%
+  group_by(Donor) %>%             # Group by donor
+  summarise(
+    closed_fruits = mean(closed_fruits, na.rm = TRUE),
+    total_fruits = mean(total_fruits, na.rm = TRUE),
+    filled_seeds = mean(filled_seeds, na.rm = TRUE),
+    mean_seeds_per_fruit = mean(mean_seeds_per_fruit, na.rm = TRUE),
+    fl_duration = mean(fl_duration, na.rm = TRUE),
+    skel_dryweight_mg = mean(skel_dryweight_mg, na.rm = TRUE),
+    msm_all = mean(msm_all, na.rm = TRUE),
+    corolla_diam_mm_SEG = mean(corolla_diam_mm_SEG, na.rm = TRUE),
+    SLA_SEG = mean(SLA_SEG, na.rm = TRUE),
+    d13C_SEG = mean(d13C_SEG, na.rm = TRUE),
+    est_fecundity = mean(est_fecundity, na.rm = TRUE),
+    survival = mean(survival, na.rm = TRUE),
+    est_fitness = mean(est_fitness, na.rm = TRUE)
+  )
+
+# Aggregate data by donor
+AC_mean_donor_traits_23_G1 <- AC_fit_23_G1%>%
+  group_by(Donor) %>%             # Group by donor
+  summarise(
+    closed_fruits = mean(closed_fruits, na.rm = TRUE),
+    total_fruits = mean(total_fruits, na.rm = TRUE),
+    filled_seeds = mean(filled_seeds, na.rm = TRUE),
+    mean_seeds_per_fruit = mean(mean_seeds_per_fruit, na.rm = TRUE),
+    fl_duration = mean(fl_duration, na.rm = TRUE),
+    skel_dryweight_mg = mean(skel_dryweight_mg, na.rm = TRUE),
+    msm_all = mean(msm_all, na.rm = TRUE),
+    corolla_diam_mm_SEG = mean(corolla_diam_mm_SEG, na.rm = TRUE),
+    SLA_SEG = mean(SLA_SEG, na.rm = TRUE),
+    d13C_SEG = mean(d13C_SEG, na.rm = TRUE),
+    est_fecundity = mean(est_fecundity, na.rm = TRUE),
+    survival = mean(survival, na.rm = TRUE),
+    est_fitness = mean(est_fitness, na.rm = TRUE)
+  )
+
+# Aggregate data by donor
+AC_mean_donor_traits_23_G2 <- AC_fit_23_G2%>%
+  group_by(Donor) %>%             # Group by donor
+  summarise(
+    closed_fruits = mean(closed_fruits, na.rm = TRUE),
+    total_fruits = mean(total_fruits, na.rm = TRUE),
+    filled_seeds = mean(filled_seeds, na.rm = TRUE),
+    mean_seeds_per_fruit = mean(mean_seeds_per_fruit, na.rm = TRUE),
+    fl_duration = mean(fl_duration, na.rm = TRUE),
+    skel_dryweight_mg = mean(skel_dryweight_mg, na.rm = TRUE),
+    msm_all = mean(msm_all, na.rm = TRUE),
+    corolla_diam_mm_SEG = mean(corolla_diam_mm_SEG, na.rm = TRUE),
+    SLA_SEG = mean(SLA_SEG, na.rm = TRUE),
+    d13C_SEG = mean(d13C_SEG, na.rm = TRUE),
+    est_fecundity = mean(est_fecundity, na.rm = TRUE),
+    survival = mean(survival, na.rm = TRUE),
+    est_fitness = mean(est_fitness, na.rm = TRUE)
+  )
+```
+
+
+```{r}
+###Bivariate Analysis
+##AC 22: Paternal averages of fitness estimates
+corrplot(cor(AC_mean_donor_traits_22 %>% dplyr::select(mean_seeds_per_fruit, fl_duration, skel_dryweight_mg, msm_all, corolla_diam_mm_SEG, SLA_SEG, d13C_SEG, est_fecundity, survival, est_fitness), use="complete.obs"), method = "color", addCoef.col = "black", number.cex = .6, outline = TRUE, tl.col = "red", title = "AC 22 G1 (paternal genotypic values)") #ignores NAs
+
+##AC 23 G1: Paternal averages of fitness estimates
+corrplot(cor(AC_mean_donor_traits_23_G1 %>% dplyr::select(mean_seeds_per_fruit, fl_duration, skel_dryweight_mg, msm_all, corolla_diam_mm_SEG, SLA_SEG, d13C_SEG, est_fecundity, survival, est_fitness), use="complete.obs"), method = "color", addCoef.col = "black", number.cex = .6, outline = TRUE, tl.col = "red", title = "AC 23 G1 (paternal genotypic values)") #ignores NAs
+
+##AC 23 G2: Paternal averages of fitness estimates
+corrplot(cor(AC_mean_donor_traits_23_G2 %>% dplyr::select(mean_seeds_per_fruit, fl_duration, skel_dryweight_mg, msm_all, corolla_diam_mm_SEG, SLA_SEG, d13C_SEG, est_fecundity, survival, est_fitness), use="complete.obs"), method = "color", addCoef.col = "black", number.cex = .6, outline = TRUE, tl.col = "red", title = "AC 23 G2 (paternal genotypic values)") #ignores NAs
+
+```
+
+```{r}
+#Testing significance of trait correlations
+# Select relevant traits
+AC_22_trait_data <- AC_mean_donor_traits_22 %>% dplyr::select(mean_seeds_per_fruit, fl_duration, 
+                                                        skel_dryweight_mg, msm_all, corolla_diam_mm_SEG, 
+                                                        SLA_SEG, d13C_SEG, est_fecundity, survival, est_fitness)
+
+# Load psych package for correlation matrix with significance testing
+#install.packages("psych")
+library(psych)
+
+# Generate correlation matrix with p-values
+cor_matrix <- corr.test(AC_22_trait_data, method = "pearson")
+print(cor_matrix$r)  # Correlation coefficients
+print(cor_matrix$p)  # p-values for correlations
+
+# Adjust p-values using the FDR method to reduce Type 1 errors
+adjusted_pvalues <- p.adjust(cor_matrix$p, method = "fdr")
+adjusted_pvalues
+
+# Mask non-significant correlations by setting them to NA
+sig_cor_matrix <- cor_matrix$r
+sig_cor_matrix[cor_matrix$p > 0.05] <- NA  # Set non-significant correlations to NA
+
+# Plot the correlation matrix with only significant values
+corrplot(sig_cor_matrix, method = "color", addCoef.col = "black", number.cex = 0.7,
+         outline = TRUE, tl.col = "black", title = "Significant Trait Correlations",
+         na.label = "-", na.label.col = "black")  # Use "-" for NA values, in black color
+
+```
+
+```{r}
+#Testing significance of trait correlations
+# Select relevant traits
+AC_23_G1_trait_data <- AC_mean_donor_traits_23_G1 %>% dplyr::select(mean_seeds_per_fruit, fl_duration, 
+                                                        skel_dryweight_mg, msm_all, corolla_diam_mm_SEG, 
+                                                        SLA_SEG, d13C_SEG, est_fecundity, survival, est_fitness)
+
+# Load psych package for correlation matrix with significance testing
+#install.packages("psych")
+library(psych)
+
+# Generate correlation matrix with p-values
+cor_matrix <- corr.test(AC_23_G1_trait_data, method = "pearson")
+print(cor_matrix$r)  # Correlation coefficients
+print(cor_matrix$p)  # p-values for correlations
+
+# Adjust p-values using the FDR method to reduce Type 1 errors
+adjusted_pvalues <- p.adjust(cor_matrix$p, method = "fdr")
+adjusted_pvalues
+
+# Mask non-significant correlations by setting them to NA
+sig_cor_matrix <- cor_matrix$r
+sig_cor_matrix[cor_matrix$p > 0.05] <- NA  # Set non-significant correlations to NA
+
+# Plot the correlation matrix with only significant values
+corrplot(sig_cor_matrix, method = "color", addCoef.col = "black", number.cex = 0.7,
+         outline = TRUE, tl.col = "black", title = "Significant Trait Correlations",
+         na.label = "-", na.label.col = "black")  # Use "-" for NA values, in black color
+
+```
+
+
+```{r}
+#Testing significance of trait correlations
+# Select relevant traits
+AC_23_G2_trait_data <- AC_mean_donor_traits_23_G2 %>% dplyr::select(mean_seeds_per_fruit, fl_duration, 
+                                                        skel_dryweight_mg, msm_all, corolla_diam_mm_SEG, 
+                                                        SLA_SEG, d13C_SEG, est_fecundity, survival, est_fitness)
+
+# Load psych package for correlation matrix with significance testing
+#install.packages("psych")
+library(psych)
+
+# Generate correlation matrix with p-values
+cor_matrix <- corr.test(AC_23_G2_trait_data, method = "pearson")
+print(cor_matrix$r)  # Correlation coefficients
+print(cor_matrix$p)  # p-values for correlations
+
+# Adjust p-values using the FDR method to reduce Type 1 errors
+adjusted_pvalues <- p.adjust(cor_matrix$p, method = "fdr")
+adjusted_pvalues
+
+# Mask non-significant correlations by setting them to NA
+sig_cor_matrix <- cor_matrix$r
+sig_cor_matrix[cor_matrix$p > 0.05] <- NA  # Set non-significant correlations to NA
+
+# Plot the correlation matrix, displaying "-" for non-significant values
+corrplot(sig_cor_matrix, method = "color", addCoef.col = "black", number.cex = 0.7,
+         outline = TRUE, tl.col = "black", title = "Significant Trait Correlations",
+         na.label = "-", na.label.col = "black")  # Use "-" for NA values, in black color
+
+```
+
+```{r}
+
+#Bivariate correlations for significant traits for AC 2022 G1
+
+create_covariance_plot_real_data <- function(data, trait1, trait2, title = "Covariance Ellipse Plot") {
+  # Extract the two traits from the data and rename them for consistency
+  data_df <- data %>% dplyr::select(!!sym(trait1), !!sym(trait2)) %>% na.omit()
+  colnames(data_df) <- c("Trait1", "Trait2")
+  
+  # Plot using ggplot2
+  plot <- ggplot(data_df, aes(x = Trait1, y = Trait2)) +
+    geom_point(alpha = 0.4) +  # Plot actual data points
+    stat_ellipse(level = 0.68, color = "red", size = 1) +  # 68% CI ellipse
+    stat_ellipse(level = 0.95, color = "orange", size = 1) +  # 95% CI ellipse
+    labs(title = title, x = trait1, y = trait2) +
+    theme_minimal()
+  
+  return(plot)
+}
+
+# Now create your plot using the cleaned data
+plot_corolla_x_mean_seeds <- create_covariance_plot_real_data(AC_mean_donor_traits_22, 
+                                                              "corolla_diam_mm_SEG", 
+                                                              "mean_seeds_per_fruit", 
+                                                              title = "Covariance Plot: Corolla Diameter vs Mean Seeds Per Fruit")
+
+# Display the plot
+print(plot_corolla_x_mean_seeds)
+
+```
+
+```{r}
+
+#Bivariate correlations for significant traits for AC 2023 G1
+
+create_covariance_plot_real_data <- function(data, trait1, trait2, title = "Covariance Ellipse Plot") {
+  # Extract the two traits from the data and rename them for consistency
+  data_df <- data %>% dplyr::select(!!sym(trait1), !!sym(trait2)) %>% na.omit()
+  colnames(data_df) <- c("Trait1", "Trait2")
+  
+  # Plot using ggplot2
+  plot <- ggplot(data_df, aes(x = Trait1, y = Trait2)) +
+    geom_point(alpha = 0.4) +  # Plot actual data points
+    stat_ellipse(level = 0.68, color = "red", size = 1) +  # 68% CI ellipse
+    stat_ellipse(level = 0.95, color = "orange", size = 1) +  # 95% CI ellipse
+    labs(title = title, x = trait1, y = trait2) +
+    theme_minimal()
+  
+  return(plot)
+}
+
+# Now create your plot using the cleaned data
+plot_msm_x_mean_seeds <- create_covariance_plot_real_data(AC_mean_donor_traits_23_G1, 
+                                                              "msm_all", 
+                                                              "mean_seeds_per_fruit", 
+                                                              title = "Covariance Plot: Mean seed mass (mg) vs Mean Seeds Per Fruit")
+
+# Display the plot
+print(plot_msm_x_mean_seeds)
+
+# Now create your plot using the cleaned data
+plot_msm_x_sla <- create_covariance_plot_real_data(AC_mean_donor_traits_23_G1, 
+                                                              "msm_all", 
+                                                              "SLA_SEG", 
+                                                              title = "Covariance Plot: Mean seed mass (mg) vs SLA")
+
+# Display the plot
+print(plot_msm_x_sla)
+```
+
+
+```{r}
+
+#Bivariate correlations for significant traits for AC 2023 G2
+
+create_covariance_plot_real_data <- function(data, trait1, trait2, title = "Covariance Ellipse Plot") {
+  # Extract the two traits from the data and rename them for consistency
+  data_df <- data %>% dplyr::select(!!sym(trait1), !!sym(trait2)) %>% na.omit()
+  colnames(data_df) <- c("Trait1", "Trait2")
+  
+  # Plot using ggplot2
+  plot <- ggplot(data_df, aes(x = Trait1, y = Trait2)) +
+    geom_point(alpha = 0.4) +  # Plot actual data points
+    stat_ellipse(level = 0.68, color = "red", size = 1) +  # 68% CI ellipse
+    stat_ellipse(level = 0.95, color = "orange", size = 1) +  # 95% CI ellipse
+    labs(title = title, x = trait1, y = trait2) +
+    theme_minimal()
+  
+  return(plot)
+}
+
+# Now create your plot using the cleaned data
+plot_msm_x_mean_seeds <- create_covariance_plot_real_data(AC_mean_donor_traits_23_G2, 
+                                                              "msm_all", 
+                                                              "mean_seeds_per_fruit", 
+                                                              title = "Covariance Plot: Mean seed mass (mg) vs Mean Seeds Per Fruit")
+
+# Display the plot
+print(plot_msm_x_mean_seeds)
+
+# Now create your plot using the cleaned data
+plot_msm_x_sla <- create_covariance_plot_real_data(AC_mean_donor_traits_23_G2, 
+                                                              "msm_all", 
+                                                              "SLA_SEG", 
+                                                              title = "Covariance Plot: Mean seed mass (mg) vs SLA")
+
+# Display the plot
+print(plot_msm_x_sla)
+```
+
+
+```{r}
+#Fitness Landscapes for AC 2022 G1
+
+
+# List of traits to use in pairwise combinations
+traits <- c("SLA_SEG", "mean_seeds_per_fruit", "msm_all")
+
+# Generate all possible pairwise combinations of the traits
+trait_combinations <- combn(traits, 2, simplify = FALSE)
+
+# Show the trait combinations
+print(trait_combinations)
+
+# Function to fit model and create grid for pairwise traits
+create_fitness_landscape <- function(trait1, trait2, data, fitness_var = "est_fitness") {
+  
+  # Fit a linear model using the two traits to predict fitness
+  formula <- as.formula(paste(fitness_var, "~", trait1, "+", trait2))
+  model <- lm(formula, data = data)
+  
+  # Create a grid of values for the two traits
+  trait1_range <- seq(min(data[[trait1]], na.rm = TRUE), max(data[[trait1]], na.rm = TRUE), length.out = 100)
+  trait2_range <- seq(min(data[[trait2]], na.rm = TRUE), max(data[[trait2]], na.rm = TRUE), length.out = 100)
+  
+  # Create a data frame with all combinations of the two traits
+  grid <- expand.grid(trait1 = trait1_range, trait2 = trait2_range)
+  colnames(grid) <- c(trait1, trait2)
+  
+  # Predict fitness for each combination of traits
+  grid$predicted_fitness <- predict(model, newdata = grid)
+  
+  # Return the grid and the model
+  return(list(grid = grid, model = model))
+}
+
+
+# Function to plot a fitness landscape
+plot_fitness_landscape <- function(grid, trait1, trait2) {
+  ggplot(grid, aes_string(x = trait1, y = trait2, z = "predicted_fitness")) +
+    geom_contour_filled() +
+    labs(title = paste(),
+         x = trait1, y = trait2, fill = "Fitness") +
+    theme_minimal()
+}
+
+# Create a list to store the plots
+fitness_plots <- list()
+
+# Loop through each trait combination, create the fitness landscape, and store the plot
+for (combo in trait_combinations) {
+  trait1 <- combo[1]
+  trait2 <- combo[2]
+  
+  # Create the fitness landscape
+  fitness_landscape <- create_fitness_landscape(trait1, trait2, data = AC_mean_donor_traits_22)
+  
+  # Create the plot
+  plot <- plot_fitness_landscape(fitness_landscape$grid, trait1, trait2)
+  
+  # Store the plot
+  fitness_plots[[paste(trait1, trait2, sep = "_vs_")]] <- plot
+}
+
+
+
+# Combine all plots into a single figure
+combined_plot <- plot_grid(plotlist = fitness_plots, ncol = 2)
+
+# Display the combined plot
+print(combined_plot)
+
+
+ggsave("fitness_landscapes.png", combined_plot, width = 12, height = 10)
+
+
+```
+
+
+```{r}
+#Fitness Landscapes for AC 2023 G1
+
+# List of traits to use in pairwise combinations
+traits <- c("SLA_SEG", "mean_seeds_per_fruit", "msm_all")
+
+
+create_fitness_landscape <- function(trait1, trait2, data, fitness_var = "est_fitness") {
+  
+  # Filter out rows with NA or infinite values in the relevant columns
+  data_filtered <- data %>%
+    dplyr::filter(!is.na(.data[[trait1]]), !is.na(.data[[trait2]]),
+                  is.finite(.data[[trait1]]), is.finite(.data[[trait2]]))
+  
+  # Check if there is sufficient data after filtering
+  if (nrow(data_filtered) < 2) {
+    warning(paste("Not enough valid data for traits:", trait1, "and", trait2))
+    return(NULL)
+  }
+  
+  # Fit a linear model using the two traits to predict fitness
+  formula <- as.formula(paste(fitness_var, "~", trait1, "+", trait2))
+  model <- lm(formula, data = data_filtered)
+  
+  # Create a grid of values for the two traits
+  trait1_range <- seq(min(data_filtered[[trait1]], na.rm = TRUE), 
+                      max(data_filtered[[trait1]], na.rm = TRUE), length.out = 100)
+  trait2_range <- seq(min(data_filtered[[trait2]], na.rm = TRUE), 
+                      max(data_filtered[[trait2]], na.rm = TRUE), length.out = 100)
+  
+  # Create a data frame with all combinations of the two traits
+  grid <- expand.grid(trait1 = trait1_range, trait2 = trait2_range)
+  colnames(grid) <- c(trait1, trait2)
+  
+  # Predict fitness for each combination of traits
+  grid$predicted_fitness <- predict(model, newdata = grid)
+  
+  # Return the grid and the model
+  return(list(grid = grid, model = model))
+}
+
+
+# Loop through each trait combination, create the fitness landscape, and store the plot
+for (combo in trait_combinations) {
+  trait1 <- combo[1]
+  trait2 <- combo[2]
+  
+  # Create the fitness landscape
+  fitness_landscape <- create_fitness_landscape(trait1, trait2, data = AC_mean_donor_traits_23_G1)
+  
+  # Proceed only if the landscape was successfully created
+  if (!is.null(fitness_landscape)) {
+    # Create the plot
+    plot <- plot_fitness_landscape(fitness_landscape$grid, trait1, trait2)
+    
+    # Store the plot
+    fitness_plots[[paste(trait1, trait2, sep = "_vs_")]] <- plot
+  }
+}
+
+
+# Combine all plots into a single figure
+combined_plot <- plot_grid(plotlist = fitness_plots, ncol = 2)
+
+# Display the combined plot
+print(combined_plot)
+
+
+ggsave("fitness_landscapes.png", combined_plot, width = 12, height = 10)
+
+
+
+```
+
+```{r}
+#Fitness Landscapes for AC 2023 G2
+
+# Define the four traits for pairwise combinations
+traits <- c("SLA_SEG", "mean_seeds_per_fruit", "msm_all", "fl_duration")
+
+# Create all pairwise combinations for traits with fixed pairs
+trait_pairs <- combn(traits, 2, simplify = FALSE)
+
+# Function to create the fitness landscape with four traits, with two held constant
+create_fitness_landscape <- function(trait1, trait2, trait3, trait4, data, fitness_var = "est_fitness") {
+  
+  # Filter out rows with NA or infinite values in the relevant columns
+  data_filtered <- data %>%
+    dplyr::filter(!is.na(.data[[trait1]]), !is.na(.data[[trait2]]),
+                  !is.na(.data[[trait3]]), !is.na(.data[[trait4]]),
+                  is.finite(.data[[trait1]]), is.finite(.data[[trait2]]),
+                  is.finite(.data[[trait3]]), is.finite(.data[[trait4]]))
+  
+  # Check if there is sufficient data after filtering
+  if (nrow(data_filtered) < 2) {
+    warning(paste("Not enough valid data for traits:", trait1, trait2, trait3, "and", trait4))
+    return(NULL)
+  }
+  
+  # Fit a linear model using the four traits to predict fitness
+  formula <- as.formula(paste(fitness_var, "~", trait1, "+", trait2, "+", trait3, "+", trait4))
+  model <- lm(formula, data = data_filtered)
+  
+  # Create a grid of values for the two main traits and hold the other two at their mean values
+  trait1_range <- seq(min(data_filtered[[trait1]], na.rm = TRUE), 
+                      max(data_filtered[[trait1]], na.rm = TRUE), length.out = 100)
+  trait2_range <- seq(min(data_filtered[[trait2]], na.rm = TRUE), 
+                      max(data_filtered[[trait2]], na.rm = TRUE), length.out = 100)
+  
+  # Set fixed values for the other two traits
+  trait3_fixed <- mean(data_filtered[[trait3]], na.rm = TRUE)
+  trait4_fixed <- mean(data_filtered[[trait4]], na.rm = TRUE)
+  
+  # Create a data frame with all combinations of the two main traits and fixed values for the others
+  grid <- expand.grid(trait1 = trait1_range, trait2 = trait2_range)
+  colnames(grid) <- c(trait1, trait2)
+  grid[[trait3]] <- trait3_fixed
+  grid[[trait4]] <- trait4_fixed
+  
+  # Predict fitness for each combination of traits
+  grid$predicted_fitness <- predict(model, newdata = grid)
+  
+  # Return the grid and the model
+  return(list(grid = grid, model = model))
+}
+
+# Loop through each combination of two traits, fixing the other two, and generate plots
+fitness_plots <- list()
+for (pair in trait_pairs) {
+  # Set trait1 and trait2 as the current pair, and hold the other two traits constant
+  trait1 <- pair[1]
+  trait2 <- pair[2]
+  other_traits <- setdiff(traits, pair)
+  trait3 <- other_traits[1]
+  trait4 <- other_traits[2]
+  
+  # Create the fitness landscape with the two main traits and the other two held constant
+  fitness_landscape <- create_fitness_landscape(trait1, trait2, trait3, trait4, data = AC_mean_donor_traits_23_G2)
+  
+  # Proceed only if the landscape was successfully created
+  if (!is.null(fitness_landscape)) {
+    # Create the plot
+    plot <- ggplot(fitness_landscape$grid, aes_string(x = trait1, y = trait2, z = "predicted_fitness")) +
+      geom_contour_filled() +
+      labs(title = paste(),
+           x = trait1, y = trait2, fill = "Fitness") +
+      theme_minimal()
+    
+    # Store the plot
+    fitness_plots[[paste(trait1, trait2, "vs_fixed", trait3, trait4, sep = "_")]] <- plot
+  }
+}
+
+# Combine all plots into a single figure
+combined_plot <- cowplot::plot_grid(plotlist = fitness_plots, ncol = 2)
+
+# Display the combined plot
+print(combined_plot)
+
+# Save the combined plot
+ggsave("fitness_landscapes_four_traits_combined.png", combined_plot, width = 12, height = 10)
+
+```
+
+```{r}
+# Load necessary libraries
+library(psych)     # For data cleaning and correlation analysis
+library(FactoMineR) # For PCA analysis
+library(factoextra) # For visualization
+
+# Define the traits for analysis
+traits <- c("SLA_SEG", "mean_seeds_per_fruit", "msm_all", "fl_duration", "d13C_SEG", "corolla_diam_mm_SEG", "est_fitness")
+
+# Step 1: Select specified traits and remove rows with NA values
+AC_mean_donor_traits_22 <- AC_mean_donor_traits_22 %>%
+  dplyr::select(all_of(traits)) %>%  # Use actual trait names from the 'traits' vector
+  na.omit()  # Remove rows containing NA values in these columns
+
+# Step 2: Scale the data (optional, but recommended if traits are on different scales)
+AC_mean_donor_traits_22_scaled <- scale(AC_mean_donor_traits_22) #The scale function in R is used for standardizing data, primarily by centering (subtracting the mean) and scaling (dividing by the standard deviation).
+
+# Step 3: Run PCA on the scaled data
+pca_results <- PCA(AC_mean_donor_traits_22_scaled, scale.unit = TRUE, ncp = 5, graph = FALSE)
+
+# Step 4: Summary of PCA results
+print(pca_results)  # Displays eigenvalues and variance explained
+
+# Step 5: Plot the PCA results
+# Scree plot
+fviz_screeplot(pca_results, addlabels = TRUE, ylim = c(0, 50))
+
+# Step 6: Visualize variable contributions
+fviz_pca_var(pca_results, col.var = "contrib", gradient.cols = c("blue", "yellow", "red"),
+             repel = TRUE, title = "AC 2022")
+
+# Step 7: Visualize individuals if desired
+fviz_pca_ind(pca_results, geom.ind = "point", col.ind = "cos2", 
+             gradient.cols = c("blue", "green", "red"), repel = TRUE,
+             title = "AC 2022")
+
+# Step 8: Get the principal components and correlations with traits
+pca_var <- get_pca_var(pca_results)  # Access loadings and coordinates
+print(pca_var$cor)  # Correlations between traits and principal components
+
+```
+
+```{r}
+# Define the traits for analysis
+traits <- c("SLA_SEG", "mean_seeds_per_fruit", "msm_all", "fl_duration", "d13C_SEG", "corolla_diam_mm_SEG", "est_fitness")
+
+# Step 1: Select specified traits and remove rows with NA values
+AC_mean_donor_traits_23_G1 <- AC_mean_donor_traits_23_G1 %>%
+  dplyr::select(all_of(traits)) %>%  # Use actual trait names from the 'traits' vector
+  na.omit()  # Remove rows containing NA values in these columns
+
+# Step 2: Scale the data (optional, but recommended if traits are on different scales)
+AC_mean_donor_traits_23_G1_scaled <- scale(AC_mean_donor_traits_23_G1) #The scale function in R is used for standardizing data, primarily by centering (subtracting the mean) and scaling (dividing by the standard deviation).
+
+# Step 3: Run PCA on the scaled data
+pca_results <- PCA(AC_mean_donor_traits_23_G1_scaled, scale.unit = TRUE, ncp = 5, graph = FALSE)
+
+# Step 4: Summary of PCA results
+print(pca_results)  # Displays eigenvalues and variance explained
+
+# Step 5: Plot the PCA results
+# Scree plot
+fviz_screeplot(pca_results, addlabels = TRUE, ylim = c(0, 50))
+
+# Step 6: Visualize variable contributions
+fviz_pca_var(pca_results, col.var = "contrib", gradient.cols = c("blue", "yellow", "red"),
+             repel = TRUE, title = "AC 2023 G1")
+
+# Step 7: Visualize individuals if desired
+fviz_pca_ind(pca_results, geom.ind = "point", col.ind = "cos2", 
+             gradient.cols = c("blue", "green", "red"), repel = TRUE,
+             title = "AC 2023 G1")
+
+# Step 8: Get the principal components and correlations with traits
+pca_var <- get_pca_var(pca_results)  # Access loadings and coordinates
+print(pca_var$cor)  # Correlations between traits and principal components
+
+```
+
+```{r}
+# Define the traits for analysis
+traits <- c("SLA_SEG", "mean_seeds_per_fruit", "msm_all", "fl_duration", "d13C_SEG", "corolla_diam_mm_SEG", "est_fitness")
+
+# Step 1: Select specified traits and remove rows with NA values
+AC_mean_donor_traits_23_G2 <- AC_mean_donor_traits_23_G2 %>%
+  dplyr::select(all_of(traits)) %>%  # Use actual trait names from the 'traits' vector
+  na.omit()  # Remove rows containing NA values in these columns
+
+# Step 2: Scale the data (optional, but recommended if traits are on different scales)
+AC_mean_donor_traits_23_G2_scaled <- scale(AC_mean_donor_traits_23_G2) #The scale function in R is used for standardizing data, primarily by centering (subtracting the mean) and scaling (dividing by the standard deviation).
+
+# Step 3: Run PCA on the scaled data
+pca_results <- PCA(AC_mean_donor_traits_23_G2_scaled, scale.unit = TRUE, ncp = 5, graph = FALSE)
+
+# Step 4: Summary of PCA results
+print(pca_results)  # Displays eigenvalues and variance explained
+
+# Step 5: Plot the PCA results
+# Scree plot
+fviz_screeplot(pca_results, addlabels = TRUE, ylim = c(0, 50))
+
+# Step 6: Visualize variable contributions
+fviz_pca_var(pca_results, col.var = "contrib", gradient.cols = c("blue", "yellow", "red"),
+             repel = TRUE, title = "AC 2023 G2")
+
+# Step 7: Visualize individuals if desired
+fviz_pca_ind(pca_results, geom.ind = "point", col.ind = "cos2", 
+             gradient.cols = c("blue", "green", "red"), repel = TRUE,
+             title = "AC 2023 G2")
+
+# Step 8: Get the principal components and correlations with traits
+pca_var <- get_pca_var(pca_results)  # Access loadings and coordinates
+print(pca_var$cor)  # Correlations between traits and principal components
+
+```
+
+##**********************************Partial Correlation Coefficient *************************************##
+```{r}
+
+###AC 2022 G1###
+
+# Load necessary packages
+library(dplyr)
+library(ppcor)
+library(corrplot)
+
+
+# Calculate partial correlation matrix
+partial_cor_matrix <- pcor(AC_mean_donor_traits_22)$estimate
+print("Partial Correlation Matrix:")
+print(partial_cor_matrix)
+
+# Get p-values for each partial correlation
+p_values <- pcor(AC_mean_donor_traits_22)$p.value
+print("P-values:")
+print(p_values)
+
+# Visualize partial correlation matrix
+corrplot(partial_cor_matrix, method = "circle", type = "upper", 
+         tl.col = "black", tl.cex = 0.8)
+
+
+# Display only significant partial correlations (e.g., p-value < 0.05)
+significant_correlations <- partial_cor_matrix * (p_values < 0.05)
+print(significant_correlations)
+
+
+###AC 2023 G1###
+
+# Calculate partial correlation matrix
+partial_cor_matrix <- pcor(AC_mean_donor_traits_23_G1)$estimate
+print(partial_cor_matrix)
+
+# Get p-values for each partial correlation
+p_values <- pcor(AC_mean_donor_traits_23_G1)$p.value
+print(p_values)
+
+# Visualize partial correlation matrix
+corrplot(partial_cor_matrix, method = "circle", type = "upper", 
+         tl.col = "black", tl.cex = 0.8)
+
+
+# Display only significant partial correlations (e.g., p-value < 0.05)
+significant_correlations <- partial_cor_matrix * (p_values < 0.05)
+print(significant_correlations)
+
+
+###AC 2023 G2###
+
+# Calculate partial correlation matrix
+partial_cor_matrix <- pcor(AC_mean_donor_traits_23_G2)$estimate
+print(partial_cor_matrix)
+
+# Get p-values for each partial correlation
+p_values <- pcor(AC_mean_donor_traits_23_G2)$p.value
+print(p_values)
+
+# Visualize partial correlation matrix
+corrplot(partial_cor_matrix, method = "circle", type = "upper", 
+         tl.col = "black", tl.cex = 0.8)
+
+
+# Display only significant partial correlations (e.g., p-value < 0.05)
+significant_correlations <- partial_cor_matrix * (p_values < 0.05)
+print(significant_correlations)
+```
+
+
+#############################################################################################
+################################# Va and h2 AC G1 2022 ###################################### #############################################################################################
+```{r}
+library(lme4)
+# Fit a mixed model with trait as response and random effect of individual
+model <- lmer(est_fitness ~ 1 + (1|Donor), data = AC_fit_22)
+model <- lmer(est_fitness ~ 1 + (1|Donor) + (1|Transect) , data = AC_fit_22)
+
+# Extract variance components
+V_A <- as.numeric(VarCorr(model)$Donor)  # Additive genetic variance
+V_P <- V_A + attr(VarCorr(model), "sc")^2    # Total phenotypic variance (add V_E)
+
+# Narrow-sense heritability
+h2 <- V_A / V_P
+h2
+V_A
+
+```
+
+```{r}
+# Fit a model for each trait and extract variance components
+library(lme4)
+
+# Example for est_fitness (modify for other traits)
+model <- lmer(est_fitness ~ 1 + (1|Donor) + (1|Transect), data = AC_fit_22)
+
+# Extract additive genetic variance (V_A) and residual variance
+V_A_pat <- as.numeric(VarCorr(model)$Donor)
+
+# Multiply by 4 to get the full additive genetic variance
+V_A <- 4 * V_A_pat
+
+# Total phenotypic variance (V_P)
+V_P <- V_A + attr(VarCorr(model), "sc")^2  # Add residual variance
+
+# Standardized V_A
+mean_trait <- mean(AC_fit_22$est_fitness, na.rm = TRUE)
+V_A_standardized <- V_A / mean_trait^2
+V_A_standardized #0.775
+
+# Calculate heritability
+h2 <- V_A / V_P
+h2 #0.2855228
+
+# Coefficient of additive genetic variation
+CV_A <- (sqrt(V_A) / mean_trait) * 100
+CV_A #88.04718
+```
+
+```{r}
+# Fit mixed model
+model <- lmer(log(SLA_SEG) ~ 1 + (1|Donor) + (1|Transect), data = AC_fit_22_clean)
+
+# Extract variance components
+V_A_pat <- as.numeric(VarCorr(model)$Donor)
+V_T_pat <- as.numeric(VarCorr(model)$Transect)
+V_A <- 4 * V_A_pat  # Full additive genetic variance
+V_T <- V_T_pat      # Transect variance
+
+# Total phenotypic variance
+V_P <- V_A + V_T + attr(VarCorr(model), "sc")^2
+
+# Heritability and other metrics
+mean_trait <- mean(log(AC_fit_22$SLA_SEG), na.rm = TRUE)
+h2 <- V_A / V_P
+V_A_standardized <- V_A / mean_trait^2
+CV_A <- (sqrt(V_A) / exp(mean_trait)) * 100
+
+# Results
+list(
+  Heritability = h2,
+  Standardized_VA = V_A_standardized,
+  CV_A = CV_A
+)
+```
+
+
+```{r}
+# Fit a model for each trait and extract variance components
+library(lme4)
+
+# Remove rows with NA
+AC_fit_22_clean <- AC_fit_22 %>% 
+  dplyr::filter(!is.na(d13C_SEG))
+
+# Example for est_fitness (modify for other traits)
+model <- lmer(d13C_SEG ~ 1 + (1|Donor) + (1|Transect), data = AC_fit_22_clean)
+
+# Extract additive genetic variance (V_A) and residual variance
+V_A_pat <- as.numeric(VarCorr(model)$Donor)
+
+# Multiply by 4 to get the full additive genetic variance
+V_A <- 4 * V_A_pat
+
+# Total phenotypic variance (V_P)
+V_P <- V_A + attr(VarCorr(model), "sc")^2  # Add residual variance
+
+# Standardized V_A
+mean_trait <- mean(AC_fit_22$d13C_SEG, na.rm = TRUE)
+V_A_standardized <- V_A / mean_trait^2
+V_A_standardized #0.0006085963
+
+# Calculate heritability
+h2 <- V_A / V_P
+h2 #0.6045464
+
+# Coefficient of additive genetic variation
+CV_A <- (sqrt(V_A) / mean_trait) * 100
+CV_A #2.466975
+```
+
+```{r}
+# Fit a model for each trait and extract variance components
+library(lme4)
+
+# Remove rows with NA
+AC_fit_22_clean <- AC_fit_22 %>% 
+  dplyr::filter(!is.na(SLA_SEG))
+
+# Example for est_fitness (modify for other traits)
+model <- lmer(SLA_SEG ~ 1 + (1|Donor) + (1|Transect), data = AC_fit_22_clean)
+
+# Extract additive genetic variance (V_A) and residual variance
+V_A_pat <- as.numeric(VarCorr(model)$Donor)
+
+# Multiply by 4 to get the full additive genetic variance
+V_A <- 4 * V_A_pat
+
+# Total phenotypic variance (V_P)
+V_P <- V_A + attr(VarCorr(model), "sc")^2  # Add residual variance
+
+# Standardized V_A
+mean_trait <- mean(AC_fit_22$SLA_SEG, na.rm = TRUE)
+V_A_standardized <- V_A / mean_trait^2
+V_A_standardized #0.001335281
+
+# Calculate heritability
+h2 <- V_A / V_P
+h2 #0.01791747
+
+# Coefficient of additive genetic variation
+CV_A <- (sqrt(V_A) / mean_trait) * 100
+CV_A #3.392957
+```
+
+```{r}
+# Fit a model for each trait and extract variance components
+library(lme4)
+
+# Remove rows with NA
+AC_fit_22_clean <- AC_fit_22 %>% 
+  dplyr::filter(!is.na(mean_seeds_per_fruit))
+
+# Example for est_fitness (modify for other traits)
+model <- lmer(mean_seeds_per_fruit ~ 1 + (1|Donor) + (1|Transect), data = AC_fit_22_clean)
+
+# Extract additive genetic variance (V_A) and residual variance
+V_A_pat <- as.numeric(VarCorr(model)$Donor)
+
+# Multiply by 4 to get the full additive genetic variance
+V_A <- 4 * V_A_pat
+
+# Total phenotypic variance (V_P)
+V_P <- V_A + attr(VarCorr(model), "sc")^2  # Add residual variance
+
+# Standardized V_A
+mean_trait <- mean(AC_fit_22$mean_seeds_per_fruit, na.rm = TRUE)
+V_A_standardized <- V_A / mean_trait^2
+V_A_standardized #0.0741139
+
+# Calculate heritability
+h2 <- V_A / V_P
+h2 #0.1757213
+
+# Coefficient of additive genetic variation
+CV_A <- (sqrt(V_A) / mean_trait) * 100
+CV_A #27.22387
+```
+
+```{r}
+# Fit a model for each trait and extract variance components
+library(lme4)
+
+# Remove rows with NA
+AC_fit_22_clean <- AC_fit_22 %>% 
+  dplyr::filter(!is.na(msm_all))
+
+# Example for est_fitness (modify for other traits)
+model <- lmer(msm_all ~ 1 + (1|Donor) + (1|Transect), data = AC_fit_22_clean)
+
+# Extract additive genetic variance (V_A) and residual variance
+V_A_pat <- as.numeric(VarCorr(model)$Donor)
+
+# Multiply by 4 to get the full additive genetic variance
+V_A <- 4 * V_A_pat
+
+# Total phenotypic variance (V_P)
+V_P <- V_A + attr(VarCorr(model), "sc")^2  # Add residual variance
+
+# Standardized V_A
+mean_trait <- mean(AC_fit_22$msm_all, na.rm = TRUE)
+V_A_standardized <- V_A / mean_trait^2
+V_A_standardized #0.03204393
+
+# Calculate heritability
+h2 <- V_A / V_P
+h2 #0.2702995
+
+# Coefficient of additive genetic variation
+CV_A <- (sqrt(V_A) / mean_trait) * 100
+CV_A #17.90082
+```
+
+```{r}
+# Fit a model for each trait and extract variance components
+library(lme4)
+
+# Remove rows with NA
+AC_fit_22_clean <- AC_fit_22 %>% 
+  dplyr::filter(!is.na(corolla_diam_mm_SEG))
+
+# Example for est_fitness (modify for other traits)
+model <- lmer(corolla_diam_mm_SEG ~ 1 + (1|Donor) + (1|Transect), data = AC_fit_22_clean)
+
+# Extract additive genetic variance (V_A) and residual variance
+V_A_pat <- as.numeric(VarCorr(model)$Donor)
+
+# Multiply by 4 to get the full additive genetic variance
+V_A <- 4 * V_A_pat
+
+# Total phenotypic variance (V_P)
+V_P <- V_A + attr(VarCorr(model), "sc")^2  # Add residual variance
+
+# Standardized V_A
+mean_trait <- mean(AC_fit_22$corolla_diam_mm_SEG, na.rm = TRUE)
+V_A_standardized <- V_A / mean_trait^2
+V_A_standardized #0.008735024
+
+# Calculate heritability
+h2 <- V_A / V_P
+h2 #0.3800153
+
+# Coefficient of additive genetic variation
+CV_A <- (sqrt(V_A) / mean_trait) * 100
+CV_A #9.346135
+```
+
+
+```{r}
+# Fit a model for each trait and extract variance components
+library(lme4)
+
+# Remove rows with NA
+AC_fit_22_clean <- AC_fit_22 %>% 
+  dplyr::filter(!is.na(skel_dryweight_mg))
+
+# Example for est_fitness (modify for other traits)
+model <- lmer(skel_dryweight_mg ~ 1 + (1|Donor)+ (1|Transect), data = AC_fit_22_clean)
+
+# Extract additive genetic variance (V_A) and residual variance
+V_A_pat <- as.numeric(VarCorr(model)$Donor)
+
+# Multiply by 4 to get the full additive genetic variance
+V_A <- 4 * V_A_pat
+
+# Total phenotypic variance (V_P)
+V_P <- V_A + attr(VarCorr(model), "sc")^2  # Add residual variance
+
+# Standardized V_A
+mean_trait <- mean(AC_fit_22$skel_dryweight_mg, na.rm = TRUE)
+V_A_standardized <- V_A / mean_trait^2
+V_A_standardized #0.4779331
+
+# Calculate heritability
+h2 <- V_A / V_P
+h2 #0.2417833
+
+# Coefficient of additive genetic variation
+CV_A <- (sqrt(V_A) / mean_trait) * 100
+CV_A #69.1327
+```
+
+```{r}
+# Fit a model for each trait and extract variance components
+library(lme4)
+
+# Remove rows with NA
+AC_fit_22_clean <- AC_fit_22 %>% 
+  dplyr::filter(!is.na(survival))
+
+# Example for est_fitness (modify for other traits)
+model <- lmer(survival ~ 1 + (1|Donor)+ (1|Transect), data = AC_fit_22_clean)
+
+# Extract additive genetic variance (V_A) and residual variance
+V_A_pat <- as.numeric(VarCorr(model)$Donor)
+
+# Multiply by 4 to get the full additive genetic variance
+V_A <- 4 * V_A_pat
+
+# Total phenotypic variance (V_P)
+V_P <- V_A + attr(VarCorr(model), "sc")^2  # Add residual variance
+
+# Standardized V_A
+mean_trait <- mean(AC_fit_22$survival, na.rm = TRUE)
+V_A_standardized <- V_A / mean_trait^2
+V_A_standardized #0.1058279
+
+# Calculate heritability
+h2 <- V_A / V_P
+h2 #0.6646108
+
+# Coefficient of additive genetic variation
+CV_A <- (sqrt(V_A) / mean_trait) * 100
+CV_A #32.53121
+```
+
+```{r}
+# Fit a model for each trait and extract variance components
+library(lme4)
+
+# Remove rows with NA
+AC_fit_22_clean <- AC_fit_22 %>% 
+  dplyr::filter(!is.na(est_fecundity))
+
+# Example for est_fitness (modify for other traits)
+model <- lmer(est_fecundity ~ 1 + (1|Donor)+ (1|Transect), data = AC_fit_22_clean)
+
+# Extract additive genetic variance (V_A) and residual variance
+V_A_pat <- as.numeric(VarCorr(model)$Donor)
+
+# Multiply by 4 to get the full additive genetic variance
+V_A <- 4 * V_A_pat
+
+# Total phenotypic variance (V_P)
+V_P <- V_A + attr(VarCorr(model), "sc")^2  # Add residual variance
+
+# Standardized V_A
+mean_trait <- mean(AC_fit_22$est_fecundity, na.rm = TRUE)
+V_A_standardized <- V_A / mean_trait^2
+V_A_standardized #0.3895064
+
+# Calculate heritability
+h2 <- V_A / V_P
+h2 #0.1978479
+
+# Coefficient of additive genetic variation
+CV_A <- (sqrt(V_A) / mean_trait) * 100
+CV_A #62.41045
+```
+
+############################################################################################
+################################ Va and h2 AC G1 2023 ###################################### ############################################################################################
+
+
+```{r}
+# Fit a model for each trait and extract variance components
+library(lme4)
+
+# Example for est_fitness (modify for other traits)
+model <- lmer(est_fitness ~ 1 + (1|Donor) + (1|Transect), data = AC_fit_23_G1)
+
+# Extract additive genetic variance (V_A) and residual variance
+V_A_pat <- as.numeric(VarCorr(model)$Donor)
+
+# Multiply by 4 to get the full additive genetic variance
+V_A <- 4 * V_A_pat
+
+# Total phenotypic variance (V_P)
+V_P <- V_A + attr(VarCorr(model), "sc")^2  # Add residual variance
+
+# Standardized V_A
+mean_trait <- mean(AC_fit_23_G1$est_fitness, na.rm = TRUE)
+V_A_standardized <- V_A / mean_trait^2
+V_A_standardized #0.1122783
+
+# Calculate heritability
+h2 <- V_A / V_P
+h2 #0.04393028
+
+# Coefficient of additive genetic variation
+CV_A <- (sqrt(V_A) / mean_trait) * 100
+CV_A #33.50795
+```
+
+```{r}
+# Fit a model for each trait and extract variance components
+library(lme4)
+
+# Remove rows with NA
+AC_fit_23_G1_clean <- AC_fit_23_G1 %>% 
+  dplyr::filter(!is.na(d13C_SEG))
+
+# Example for est_fitness (modify for other traits)
+model <- lmer(d13C_SEG ~ 1 + (1|Donor) + (1|Transect), data = AC_fit_23_G1_clean)
+
+# Extract additive genetic variance (V_A) and residual variance
+V_A_pat <- as.numeric(VarCorr(model)$Donor)
+
+# Multiply by 4 to get the full additive genetic variance
+V_A <- 4 * V_A_pat
+
+# Total phenotypic variance (V_P)
+V_P <- V_A + attr(VarCorr(model), "sc")^2  # Add residual variance
+
+# Standardized V_A
+mean_trait <- mean(AC_fit_23_G1$d13C_SEG, na.rm = TRUE)
+V_A_standardized <- V_A / mean_trait^2
+V_A_standardized #0.003307483
+
+# Calculate heritability
+h2 <- V_A / V_P
+h2 #0.2354254
+
+# Coefficient of additive genetic variation
+CV_A <- (sqrt(V_A) / mean_trait) * 100
+CV_A #5.751072
+```
+
+```{r}
+# Fit a model for each trait and extract variance components
+library(lme4)
+
+# Remove rows with NA
+AC_fit_23_G1_clean <- AC_fit_23_G1 %>% 
+  dplyr::filter(!is.na(SLA_SEG))
+
+# Example for est_fitness (modify for other traits)
+model <- lmer(SLA_SEG ~ 1 + (1|Donor) + (1|Transect), data = AC_fit_23_G1_clean)
+
+# Extract additive genetic variance (V_A) and residual variance
+V_A_pat <- as.numeric(VarCorr(model)$Donor)
+
+# Multiply by 4 to get the full additive genetic variance
+V_A <- 4 * V_A_pat
+
+# Total phenotypic variance (V_P)
+V_P <- V_A + attr(VarCorr(model), "sc")^2  # Add residual variance
+
+# Standardized V_A
+mean_trait <- mean(AC_fit_23_G1$SLA_SEG, na.rm = TRUE)
+V_A_standardized <- V_A / mean_trait^2
+V_A_standardized #0.03578464
+
+# Calculate heritability
+h2 <- V_A / V_P
+h2 #0.06044008
+
+# Coefficient of additive genetic variation
+CV_A <- (sqrt(V_A) / mean_trait) * 100
+CV_A #18.91683
+```
+
+```{r}
+# Fit a model for each trait and extract variance components
+library(lme4)
+
+# Remove rows with NA
+AC_fit_23_G1_clean <- AC_fit_23_G1 %>% 
+  dplyr::filter(!is.na(mean_seeds_per_fruit))
+
+# Example for est_fitness (modify for other traits)
+model <- lmer(mean_seeds_per_fruit ~ 1 + (1|Donor), data = AC_fit_23_G1_clean)
+
+# Extract additive genetic variance (V_A) and residual variance
+V_A_pat <- as.numeric(VarCorr(model)$Donor)
+
+# Multiply by 4 to get the full additive genetic variance
+V_A <- 4 * V_A_pat
+
+# Total phenotypic variance (V_P)
+V_P <- V_A + attr(VarCorr(model), "sc")^2  # Add residual variance
+
+# Standardized V_A
+mean_trait <- mean(AC_fit_23_G1$mean_seeds_per_fruit, na.rm = TRUE)
+V_A_standardized <- V_A / mean_trait^2
+V_A_standardized #0.007844025
+
+# Calculate heritability
+h2 <- V_A / V_P
+h2 #0.01328461
+
+# Coefficient of additive genetic variation
+CV_A <- (sqrt(V_A) / mean_trait) * 100
+CV_A #8.85665
+```
+
+
+```{r}
+# Fit a model for each trait and extract variance components
+library(lme4)
+
+# Remove rows with NA
+AC_fit_23_G1_clean <- AC_fit_23_G1 %>% 
+  dplyr::filter(!is.na(corolla_diam_mm_SEG))
+
+# Example for est_fitness (modify for other traits)
+model <- lmer(corolla_diam_mm_SEG ~ 1 + (1|Donor) + (1|Transect), data = AC_fit_23_G1_clean)
+
+# Extract additive genetic variance (V_A) and residual variance
+V_A_pat <- as.numeric(VarCorr(model)$Donor)
+
+# Multiply by 4 to get the full additive genetic variance
+V_A <- 4 * V_A_pat
+
+# Total phenotypic variance (V_P)
+V_P <- V_A + attr(VarCorr(model), "sc")^2  # Add residual variance
+
+# Standardized V_A
+mean_trait <- mean(AC_fit_23_G1$corolla_diam_mm_SEG, na.rm = TRUE)
+V_A_standardized <- V_A / mean_trait^2
+V_A_standardized #0.008737214
+
+# Calculate heritability
+h2 <- V_A / V_P
+h2 #0.3469126
+
+# Coefficient of additive genetic variation
+CV_A <- (sqrt(V_A) / mean_trait) * 100
+CV_A #9.347307
+```
+
+
+```{r}
+# Fit a model for each trait and extract variance components
+library(lme4)
+
+# Remove rows with NA
+AC_fit_23_G1_clean <- AC_fit_23_G1 %>% 
+  dplyr::filter(!is.na(skel_dryweight_mg))
+
+# Example for est_fitness (modify for other traits)
+model <- lmer(skel_dryweight_mg ~ 1 + (1|Donor)+ (1|Transect), data = AC_fit_23_G1_clean)
+
+# Extract additive genetic variance (V_A) and residual variance
+V_A_pat <- as.numeric(VarCorr(model)$Donor)
+
+# Multiply by 4 to get the full additive genetic variance
+V_A <- 4 * V_A_pat
+
+# Total phenotypic variance (V_P)
+V_P <- V_A + attr(VarCorr(model), "sc")^2  # Add residual variance
+
+# Standardized V_A
+mean_trait <- mean(AC_fit_23_G1$skel_dryweight_mg, na.rm = TRUE)
+V_A_standardized <- V_A / mean_trait^2
+V_A_standardized #0.01076377
+
+# Calculate heritability
+h2 <- V_A / V_P
+h2 #0.007111499
+
+# Coefficient of additive genetic variation
+CV_A <- (sqrt(V_A) / mean_trait) * 100
+CV_A #10.37486
+```
+
+
+############################################################################################
+################################ Va and h2 AC G2 2023 ###################################### ############################################################################################
+
+
+```{r}
+# Fit a model for each trait and extract variance components
+library(lme4)
+
+# Remove rows with NA
+AC_fit_23_G2_clean <- AC_fit_23_G2 %>% 
+  dplyr::filter(!is.na(d13C_SEG))
+
+# Example for est_fitness (modify for other traits)
+model <- lmer(d13C_SEG ~ 1 + (1|Donor) + (1|Transect), data = AC_fit_23_G2_clean)
+
+# Extract additive genetic variance (V_A) and residual variance
+V_A_pat <- as.numeric(VarCorr(model)$Donor)
+
+# Multiply by 4 to get the full additive genetic variance
+V_A <- 4 * V_A_pat
+
+# Total phenotypic variance (V_P)
+V_P <- V_A + attr(VarCorr(model), "sc")^2  # Add residual variance
+
+# Standardized V_A
+mean_trait <- mean(AC_fit_23_G2$d13C_SEG, na.rm = TRUE)
+V_A_standardized <- V_A / mean_trait^2
+V_A_standardized #9.13158e-05
+
+# Calculate heritability
+h2 <- V_A / V_P
+h2 #0.2262372
+
+# Coefficient of additive genetic variation
+CV_A <- (sqrt(V_A) / mean_trait) * 100
+CV_A #-0.955593
+```
+
+```{r}
+# Fit a model for each trait and extract variance components
+library(lme4)
+
+# Remove rows with NA
+AC_fit_23_G1_clean <- AC_fit_23_G1 %>% 
+  dplyr::filter(!is.na(SLA_SEG))
+
+# Example for est_fitness (modify for other traits)
+model <- lmer(SLA_SEG ~ 1 + (1|Donor) + (1|Transect), data = AC_fit_23_G1_clean)
+
+# Extract additive genetic variance (V_A) and residual variance
+V_A_pat <- as.numeric(VarCorr(model)$Donor)
+
+# Multiply by 4 to get the full additive genetic variance
+V_A <- 4 * V_A_pat
+
+# Total phenotypic variance (V_P)
+V_P <- V_A + attr(VarCorr(model), "sc")^2  # Add residual variance
+
+# Standardized V_A
+mean_trait <- mean(AC_fit_23_G1$SLA_SEG, na.rm = TRUE)
+V_A_standardized <- V_A / mean_trait^2
+V_A_standardized #0.00433026
+
+# Calculate heritability
+h2 <- V_A / V_P
+h2 #0.06044008
+
+# Coefficient of additive genetic variation
+CV_A <- (sqrt(V_A) / mean_trait) * 100
+CV_A #6.580471
+```
+
+```{r}
+# Fit a model for each trait and extract variance components
+library(lme4)
+
+# Remove rows with NA
+AC_fit_23_G2_clean <- AC_fit_23_G2 %>% 
+  dplyr::filter(!is.na(msm_all))
+
+# Example for est_fitness (modify for other traits)
+model <- lmer(msm_all ~ 1 + (1|Donor) + (1|Transect), data = AC_fit_23_G2_clean)
+
+# Extract additive genetic variance (V_A) and residual variance
+V_A_pat <- as.numeric(VarCorr(model)$Donor)
+
+# Multiply by 4 to get the full additive genetic variance
+V_A <- 4 * V_A_pat
+
+# Total phenotypic variance (V_P)
+V_P <- V_A + attr(VarCorr(model), "sc")^2  # Add residual variance
+
+# Standardized V_A
+mean_trait <- mean(AC_fit_23_G2$msm_all, na.rm = TRUE)
+V_A_standardized <- V_A / mean_trait^2
+V_A_standardized #0.03393078
+
+# Calculate heritability
+h2 <- V_A / V_P
+h2 #0.1571871
+
+# Coefficient of additive genetic variation
+CV_A <- (sqrt(V_A) / mean_trait) * 100
+CV_A #18.42031
+```
+
+
+```{r}
+# Fit a model for each trait and extract variance components
+library(lme4)
+
+# Remove rows with NA
+AC_fit_23_G2_clean <- AC_fit_23_G2 %>% 
+  dplyr::filter(!is.na(corolla_diam_mm_SEG))
+
+# Example for est_fitness (modify for other traits)
+model <- lmer(corolla_diam_mm_SEG ~ 1 + (1|Donor) + (1|Transect), data = AC_fit_23_G2_clean)
+
+# Extract additive genetic variance (V_A) and residual variance
+V_A_pat <- as.numeric(VarCorr(model)$Donor)
+
+# Multiply by 4 to get the full additive genetic variance
+V_A <- 4 * V_A_pat
+
+# Total phenotypic variance (V_P)
+V_P <- V_A + attr(VarCorr(model), "sc")^2  # Add residual variance
+
+# Standardized V_A
+mean_trait <- mean(AC_fit_23_G2$corolla_diam_mm_SEG, na.rm = TRUE)
+V_A_standardized <- V_A / mean_trait^2
+V_A_standardized #0.004143328
+
+# Calculate heritability
+h2 <- V_A / V_P
+h2 #0.1574274
+
+# Coefficient of additive genetic variation
+CV_A <- (sqrt(V_A) / mean_trait) * 100
+CV_A #6.436869
+```
+
+
+```{r}
+# Fit a model for each trait and extract variance components
+library(lme4)
+
+# Remove rows with NA
+AC_fit_23_G2_clean <- AC_fit_23_G2 %>% 
+  dplyr::filter(!is.na(skel_dryweight_mg))
+
+# Example for est_fitness (modify for other traits)
+model <- lmer(skel_dryweight_mg ~ 1 + (1|Donor)+ (1|Transect), data = AC_fit_23_G2_clean)
+
+# Extract additive genetic variance (V_A) and residual variance
+V_A_pat <- as.numeric(VarCorr(model)$Donor)
+
+# Multiply by 4 to get the full additive genetic variance
+V_A <- 4 * V_A_pat
+
+# Total phenotypic variance (V_P)
+V_P <- V_A + attr(VarCorr(model), "sc")^2  # Add residual variance
+
+# Standardized V_A
+mean_trait <- mean(AC_fit_23_G2$skel_dryweight_mg, na.rm = TRUE)
+V_A_standardized <- V_A / mean_trait^2
+V_A_standardized #0.1575678
+
+# Calculate heritability
+h2 <- V_A / V_P
+h2 #0.08345647
+
+# Coefficient of additive genetic variation
+CV_A <- (sqrt(V_A) / mean_trait) * 100
+CV_A #39.69482
+```
+
+```{r}
+# Fit a model for each trait and extract variance components
+library(lme4)
+
+# Remove rows with NA
+AC_fit_23_G2_clean <- AC_fit_23_G2 %>% 
+  dplyr::filter(!is.na(survival))
+
+# Example for est_fitness (modify for other traits)
+model <- lmer(survival ~ 1 + (1|Donor)+ (1|Transect), data = AC_fit_23_G2_clean)
+
+# Extract additive genetic variance (V_A) and residual variance
+V_A_pat <- as.numeric(VarCorr(model)$Donor)
+
+# Multiply by 4 to get the full additive genetic variance
+V_A <- 4 * V_A_pat
+
+# Total phenotypic variance (V_P)
+V_P <- V_A + attr(VarCorr(model), "sc")^2  # Add residual variance
+
+# Standardized V_A
+mean_trait <- mean(AC_fit_23_G2$survival, na.rm = TRUE)
+V_A_standardized <- V_A / mean_trait^2
+V_A_standardized #0.005496897
+
+# Calculate heritability
+h2 <- V_A / V_P
+h2 #0.02257226
+
+# Coefficient of additive genetic variation
+CV_A <- (sqrt(V_A) / mean_trait) * 100
+CV_A #7.414106
+```
+
+```{r}
+
+AC_fit_22_test <- AC_fit_22 %>% 
+  dplyr::filter(!is.na(skel_dryweight_mg_SEG))
+
+model <- lmer(est_fitness ~ (1|Donor) + skel_dryweight_mg_SEG, data = AC_fit_22_test)
+
+model2 <- lmer(est_fitness ~ (1|Donor) + (1|Transect) + skel_dryweight_mg_SEG, data = AC_fit_22_test)
+
+model3 <- lmer(est_fitness ~ 1 + (1|Donor) + (1|Transect), data = AC_fit_22_test)
+
+anova(model3, model2)
+
+summary(model3)
+
+```
+
+
+```{r}
+# Fit a model for each trait and extract variance components
+library(lme4)
+
+# Remove rows with NA
+AC_fit_23_G2_clean <- AC_fit_23_G2 %>% 
+  dplyr::filter(!is.na(est_fecundity))
+
+# Example for est_fitness (modify for other traits)
+model <- lmer(est_fecundity ~ 1 + (1|Donor)+ (1|Transect), data = AC_fit_23_G2_clean)
+
+# Extract additive genetic variance (V_A) and residual variance
+V_A_pat <- as.numeric(VarCorr(model)$Donor)
+
+# Multiply by 4 to get the full additive genetic variance
+V_A <- 4 * V_A_pat
+
+# Total phenotypic variance (V_P)
+V_P <- V_A + attr(VarCorr(model), "sc")^2  # Add residual variance
+
+# Standardized V_A
+mean_trait <- mean(AC_fit_23_G2$est_fecundity, na.rm = TRUE)
+V_A_standardized <- V_A / mean_trait^2
+V_A_standardized #0.1815279
+
+# Calculate heritability
+h2 <- V_A / V_P
+h2 #0.08625941
+
+# Coefficient of additive genetic variation
+CV_A <- (sqrt(V_A) / mean_trait) * 100
+CV_A #42.60609
+```

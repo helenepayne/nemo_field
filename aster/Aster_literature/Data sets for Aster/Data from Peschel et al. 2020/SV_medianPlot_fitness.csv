@@ -1,0 +1,5 @@
+Plot,Treatment,Generation,Fitness,SE
+1,Rain reduction,parental,654.02,41.96
+1,Full rain,progeny,866.08,0
+3,Full rain,parental,613.33,43.56
+3,Rain reduction,progeny,1039.49,0

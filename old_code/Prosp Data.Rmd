@@ -1,0 +1,156 @@
+---
+title: "Prosp Data"
+author: "Helen Payne"
+date: "2024-02-29"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r cars}
+AC_data <- read_csv(here::here("data_sheets", "compiled_sheets", "AC_mastersheet_Fitness-all_2023-11-06.csv"))
+```
+```{r}
+# Remove rows with NA in fl_duration
+AC_data_clean <- AC_data[!is.na(AC_data$fl_duration) & is.finite(AC_data$fl_duration), ]
+
+#creating a histogram of flowering duration and frequency amoung individuals
+ggplot(AC_data_clean, aes(x=fl_duration)) +
+  geom_histogram(binwidth=10, fill="blue", color="black") +
+  labs(title="Histogram of Flowering Duration", x="Flowering Duration (days)", y="Frequency") +
+  theme_minimal() +
+  theme(
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    axis.line = element_line(colour = "black") # This adds the axis line
+  )
+
+#Creating a scatterplot of WUE and estimated fecundity
+ggplot(data = AC_data_clean, aes(x = d13C, y = est_fecundity)) +
+  geom_point(color = "blue") +
+  labs(title = "",
+       x = "Water Use Efficency (Delta C-13)",
+       y = "Estimated Fecundity") +
+  theme_minimal() +
+  scale_y_continuous(limits = c(0, 300)) +
+  theme(panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(),
+        axis.line = element_line(colour = "black"), # Adds lines for both axes
+        axis.line.x = element_line(color = "black", size = 1), # Specifically for x-axis
+        axis.line.y = element_line(color = "black", size = 1)) # Specifically for y-axis
+
+```
+
+```{r}
+#Creating a scatterplot of WUE and estimated fecundity
+ggplot(data = AC_data_clean, aes(x = FFD, y = est_fecundity)) +
+  geom_point(color = "blue") +
+  labs(title = "",
+       x = "First Flowering Date",
+       y = "Estimated Fecundity") +
+  theme_minimal() +
+  scale_y_continuous(limits = c(0, 300)) +
+  theme(panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(),
+        axis.line = element_line(colour = "black"), # Adds lines for both axes
+        axis.line.x = element_line(color = "black", size = 1), # Specifically for x-axis
+        axis.line.y = element_line(color = "black", size = 1)) # Specifically for y-axis
+```
+Is the data normal?
+```{r}
+hist(AC_data_clean$skel_dryweight_mg)
+log_stembiomass <- log(AC_data_clean$skel_dryweight_mg)
+hist(log_stembiomass)
+
+hist(AC_data_clean$est_fecundity)
+log_fecundity <- log(AC_data_clean$est_fecundity)
+hist(log_fecundity)
+
+hist(AC_data_clean$corolla_area_mm2)
+log_corolla_area <- log(AC_data_clean$corolla_area_mm2)
+hist(log_corolla_area)
+
+hist(AC_data_clean$SLA)
+log_SLA <- log(AC_data_clean$SLA)
+hist(log_SLA)
+```
+
+
+```{r}
+library(lme4)
+library(visreg)
+
+model <- lmer(log_fecundity ~  + log_stembiomass + d13C + corolla_area_mm2 + log_SLA + (1|Transect) + (1|Donor) + (1|Donor:Recipient), data = AC_data_clean)]
+
+
+```
+```{r cars}
+
+###calling preliminary dataset on corolla area in 2022 and 2023
+
+AC_corolla <- read_csv(here::here("data_sheets", "compiled_sheets", "AC_corolla.csv"))
+```
+
+```{r}
+options(repr.plot.width = 6, repr.plot.height = 6)
+
+# Create a boxplot
+boxplot(corolla_dia ~ Year, data = data_filtered, 
+        main = "",
+        xlab = "Year", ylab = "Corolla Area (mm^2)",
+        col = c("lightblue", "lightgreen"),
+        mean = TRUE)  # Show mean in the boxplot
+
+p <- ggplot(data_filtered, aes(x = Year, y = corolla_dia, fill = factor(Year))) +
+  geom_boxplot() +
+  labs(title = "", x = "Year", y = "Corolla Area (mm^2)") +
+  theme_minimal()
+
+# Save the plot as a PDF file
+ggsave("boxplot_corolla_area.pdf", plot = p, width = 6, height = 6)
+
+```
+
+```{r}
+# Filter the AC data for the year 2023
+AC_corolla_2023 <- AC_corolla[AC_corolla$Year == 2023, ]
+
+# Create the boxplot
+g <- boxplot(corolla_dia ~ Gen, data = AC_corolla_2023, 
+             main = "Boxplot of Gen in 2023",
+             xlab = "Mean Corolla Diameter", ylab = "Gen")
+
+
+p <- ggplot(data_filtered, aes(x = Gen, y = corolla_dia, fill = factor(Gen))) +
+  geom_boxplot() +
+  labs(title = "", x = "Generation", y = "Corolla Area (mm^2)") +
+  theme_minimal()
+
+# Save the plot as a PDF file
+ggsave("gen_plot.pdf", plot = p, width = 6, height = 6)
+```
+
+```{r cars}
+
+###calling preliminary dataset on corolla area in 2022 and 2023
+
+AC_corolla_G1 <- read_csv(here::here("data_sheets", "compiled_sheets", "AC_corolla_G1_only.csv"))
+```
+```{r}
+# Create the boxplot
+g <- boxplot(corolla_dia ~ Year, data = AC_corolla_G1, 
+             main = "Boxplot of Gen in 2023",
+             xlab = "Mean Corolla Diameter", ylab = "Year")
+
+
+p <- ggplot(AC_corolla_G1, aes(x = Year, y = corolla_dia, fill = factor(Year))) +
+  geom_boxplot() +
+  labs(title = "", x = "Year ", y = "Corolla Area (mm^2)") +
+  theme_minimal()
+
+# Save the plot as a PDF file
+ggsave("gen.pdf", plot = p, width = 6, height = 6)
+```

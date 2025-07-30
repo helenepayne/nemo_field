@@ -1,0 +1,1738 @@
+---
+title: "BB_selection"
+author: "Helen Payne"
+date: "2024-11-26"
+output: html_document
+---
+
+
+```{r}
+# Load the lme4 package
+library(lme4)
+library(dplyr)
+library(tidyverse)
+
+
+### Load and preprocess data
+## Data for fitness plants only
+# Read the CSV file and create 'sample_ID' column
+BB_fit <- read_csv(here::here("data_sheets", "compiled_sheets", "BB_22_23_fit.csv")) %>%
+  mutate(
+    # Construct sample_ID conditionally
+    sample_ID = case_when(
+      is.na(SegPos) ~ paste(Year, Recipient, Gen, str_pad(Location, width = 3, pad = "0"), Plant_ID, sep = "-"),
+      TRUE ~ paste(Year, Recipient, Gen, str_pad(Location, width = 3, pad = "0"), SegPos, Plant_ID, sep = "-")
+    ),
+    # Replace leading underscores in sample_ID with hyphens
+    sample_ID = str_replace(sample_ID, "^([^_]*)_", "\\1-")
+  )
+
+# Read in data from non-fitness plants- this is to get survival data from
+BB_22_23_full <- read_csv(here::here("data_sheets", "compiled_sheets", "BB_22_23_full.csv"))
+
+#create the variable "prop_surv_to_flower"
+BB_22_23_full <- BB_22_23_full %>%
+  group_by(Year, Gen, Location, Sequence, Donor, Recipient, SegPos) %>%
+  mutate(prop_surv_to_flower = mean(surv_to_flower, na.rm = TRUE)) %>%
+  ungroup()  # Remove grouping
+
+#select for certain columns
+BB_prop_sample <- BB_22_23_full %>%
+  dplyr::select(c(Year, Gen, Location, Sequence, Donor, Recipient, SegPos, prop_surv_to_flower))  %>%
+    distinct()
+
+#add "prop_surv_to_flower" based on the columns listed
+BB_fit <- BB_fit %>%
+  left_join(BB_prop_sample %>% dplyr::select(Year, Gen, Location, Sequence, Donor, Recipient, SegPos, prop_surv_to_flower),
+            by = c("Year", "Gen", "Location", "Sequence", "Donor", "Recipient", "SegPos"))
+
+# Create the new column for "est_fitness" and rename "prop_surv_to_flower" to "survival"
+BB_fit <- BB_fit %>%
+  mutate(est_fitness = prop_surv_to_flower * est_fecundity) %>%
+  mutate(est_fitness = replace_na(est_fitness, 0)) %>%
+  rename(survival = prop_surv_to_flower)
+
+#isolate BB 2022
+BB_fit_22 <- BB_fit %>%
+  filter(Year == "2022")
+
+#isolate BB 2023 G1
+BB_fit_23_G1 <- BB_fit %>%
+  filter(Year == "2023", Gen == "G1")
+
+#isolate BB 2023 G2
+BB_fit_23_G2 <- BB_fit %>%
+  filter(Year == "2023", Gen == "G2")
+
+#isolate all G1 together
+BB_fit_G1 <- BB_fit %>%
+  filter(Gen == "G1")
+
+#isolate by year
+BB_fit_23 <- BB_fit %>%
+  filter(Year == "2023")
+
+```
+
+```{r}
+BB_fit_22 <- read_csv(here::here("data_sheets", "compiled_sheets", "BB_fit_22.csv"))
+BB_fit_23_G1 <- read_csv(here::here("data_sheets", "compiled_sheets", "BB_fit_23_G1.csv"))
+BB_fit_23_G2 <- read_csv(here::here("data_sheets", "compiled_sheets", "BB_fit_23_G2.csv"))
+
+```
+
+
+
+```{r}
+# Remove rows with NA values in specified columns
+BB_fit_22_clean <- BB_fit_22 %>%
+  filter(
+    !is.na(SLA_SEG),
+    !is.na(msm_all),
+    !is.na(fl_duration),
+    !is.na(d13C_SEG),
+    !is.na(corolla_diam_mm_SEG),
+    !is.na(est_fitness),
+    !is.na(g0_msm)
+  )
+
+
+# Standardize the continuous predictors
+##transforming each trait to have a mean of 0 and a standard deviation of 1. This transformation is useful for models that include traits measured on different scales, as it brings them onto a comparable scale and can improve model convergence and interpretability of coefficients.
+ BB_fit_22_clean <- BB_fit_22_clean %>%
+   mutate(
+     SLA_SEG = scale(SLA_SEG),
+     msm_all = scale(msm_all),
+     fl_duration = scale(fl_duration),
+     d13C_SEG = scale(d13C_SEG),
+     corolla_diam_mm_SEG = scale(corolla_diam_mm_SEG),
+     g0_msm = scale(g0_msm)
+   )
+
+##FOR RELATIVE FITNESS:
+# Calculate mean fitness
+#mean_fitness <- mean(BB_fit_22_clean$est_fitness, na.rm = TRUE)
+
+# Calculate relative fitness based on mean
+#BB_fit_22_clean <- BB_fit_22_clean %>%
+    #mutate(relative_fitness = est_fitness / mean_fitness)
+
+#BB_fit_22_clean$relative_fitness <- round(BB_fit_22_clean$relative_fitness)
+
+
+```
+
+Checking the correlation between Corolla area and diameter
+```{r}
+
+cor(BB_fit_22$corolla_area_mm2, BB_fit_22$corolla_diam_mm, use = "complete.obs")
+sum(complete.cases(BB_fit_22$corolla_area_mm2, BB_fit_22$corolla_diam_mm))
+
+```
+
+
+```{r}
+library(ggplot2)
+
+#BB_fit_22_clean$SLA_LOG <- log(BB_fit_22_clean$SLA_SEG + 10)
+#BB_fit_22_clean$est_fitness_LOG <- log(BB_fit_22_clean$est_fitness)
+
+#BB_fit_22_clean$est_fitness_LOG <- round(BB_fit_22_clean$est_fitness_LOG)
+#BB_fit_22_clean$est_fitness <- round(BB_fit_22_clean$est_fitness)
+
+
+#traits <- c("SLA_SEG", "msm_all", "fl_duration", "d13C_SEG", "corolla_diam_mm_SEG", "skel_dryweight_mg_SEG", "relative_fitness", "est_fitness")
+#log_traits <- c("SLA_LOG", "msm_all", "fl_duration", "d13C_SEG", "corolla_diam_mm_SEG", "skel_dryweight_mg_LOG", "est_fitness_LOG")
+
+# ##
+# # Checking histograms of traits
+# for (trait in traits) {
+#     plot <- ggplot(BB_fit_22_clean, aes_string(x = trait)) +
+#         geom_histogram(bins = 30) +
+#         ggtitle(paste("Histogram of", trait)) +
+#         theme_minimal()
+#     print(plot)
+# }
+# # Checking histograms of logged traits
+# for (trait in log_traits) {
+#     plot <- ggplot(BB_fit_22_clean, aes_string(x = trait)) +
+#         geom_histogram(bins = 30) +
+#         ggtitle(paste("Histogram of", trait)) +
+#         theme_minimal()
+#     print(plot)
+# }
+# 
+# ##
+# #Checking for Skewness and Kurtosis
+# library(e1071)
+# for (trait in traits) {
+#     cat(trait, "Skewness:", skewness(BB_fit_22_clean[[trait]], na.rm = TRUE), "\n")
+#     cat(trait, "Kurtosis:", kurtosis(BB_fit_22_clean[[trait]], na.rm = TRUE), "\n")
+# }
+# #Checking for Skewness and Kurtosis in logged traits
+# for (trait in log_traits) {
+#     cat(trait, "Skewness:", skewness(BB_fit_22_clean[[trait]], na.rm = TRUE), "\n")
+#     cat(trait, "Kurtosis:", kurtosis(BB_fit_22_clean[[trait]], na.rm = TRUE), "\n")
+# }
+# ##
+# 
+# #Checking for heteroscedasticity
+# # Loop through each trait and display the scatter plot
+# for (trait in traits) {
+#     plot <- ggplot(BB_fit_22_clean, aes_string(x = trait, y = "est_fitness")) + 
+#         geom_point() + 
+#         ggtitle(paste("Scatter Plot of", trait, "vs est_fitness")) + 
+#         theme_minimal()
+#     
+#     print(plot)  # Display the plot
+# }
+# #
+# for (trait in log_traits) {
+#     plot <- ggplot(BB_fit_22_clean, aes_string(x = trait, y = "est_fitness")) + 
+#         geom_point() + 
+#         ggtitle(paste("Scatter Plot of", trait, "vs est_fitness")) + 
+#         theme_minimal()
+#     
+#     print(plot)  # Display the plot
+# }
+# ##
+# 
+# #Checking QQ Plots
+# for (trait in traits) {
+#     qqnorm(BB_fit_22_clean[[trait]], main = paste("Q-Q Plot of", trait))
+#     qqline(BB_fit_22_clean[[trait]], col = "blue")
+# }
+# 
+# for (trait in log_traits) {
+#     qqnorm(BB_fit_22_clean[[trait]], main = paste("Q-Q Plot of", trait))
+#     qqline(BB_fit_22_clean[[trait]], col = "blue")
+# }
+# 
+```
+
+
+
+```{r}
+library(lmerTest)
+library(MuMIn)
+library(influence.ME)
+
+
+BB_fit_22_clean$Location_Binned <- cut(BB_fit_22_clean$Location, breaks = 5)
+
+model_1rf <- lmer(log(est_fitness) ~ SLA_SEG + msm_all + fl_duration + 
+                  d13C_SEG + corolla_diam_mm_SEG + g0_msm + (1|Donor:Recipient) + 
+                  (1|Location_Binned), 
+                  data = BB_fit_22_clean)
+
+#model with nested maternal effects
+model_2rf <- lmer(log(est_fitness) ~ SLA_SEG + msm_all + fl_duration + 
+                  d13C_SEG + corolla_diam_mm_SEG + g0_msm + (1|Donor:Recipient), 
+                data = BB_fit_22_clean)
+
+#model with just Location_Binned
+model_3rf <- lmer(log(est_fitness) ~ SLA_SEG + msm_all + fl_duration + 
+                  d13C_SEG + corolla_diam_mm_SEG + g0_msm + (1|Location_Binned), 
+                data = BB_fit_22_clean)
+
+#model_4rf_test <- lmer(log(est_fitness) ~ msm_all + fl_duration + d13C_SEG + (1|Donor:Recipient), 
+#                data = BB_fit_22_clean)
+
+
+#determine which model is the best - the one without Location_Binned
+AIC(model_1rf, model_2rf, model_3rf)
+
+#run the final model with all the fixed effects
+model_2full <-  lmer(log(est_fitness) ~ SLA_SEG + msm_all + fl_duration + 
+                  d13C_SEG + corolla_diam_mm_SEG + g0_msm + (1|Donor:Recipient), 
+                data = BB_fit_22_clean, REML =F, na.action = na.fail)
+
+#dredge the model to determine which fixed effects are the best
+dredge(model_2full)
+
+#dredge(model_4rf_test)
+
+
+#determine the best model
+model_best <-lmer(log(est_fitness) ~ msm_all + 
+                  d13C_SEG + (1|Donor:Recipient), 
+                data = BB_fit_22_clean)
+
+
+#model_4rf_test <- lmer(log(est_fitness) ~ msm_all + fl_duration + (1|Donor:Recipient), 
+#                data = BB_fit_22_clean)
+
+#summary(model_4rf_test)
+
+summary(model_best)
+
+#check if the model is any good 
+car::qqp(resid(model_best))
+
+residuals_best <- residuals(model_best, type = "pearson")
+car::qqp(ranef(model_best)$`Donor:Recipient`$`(Intercept)`)
+
+
+# Plot residuals to check for outliers
+ggplot(data = BB_fit_22_clean, aes(x = fitted(model_best), y = residuals_best)) +
+  geom_point(alpha = 0.5) +
+  geom_hline(yintercept = 0, color = "red", linetype = "dashed") +
+  labs(title = "Residuals vs Fitted Plot",
+       x = "Fitted Values",
+       y = "Pearson Residuals") +
+  theme_minimal()
+
+```
+
+
+```{r}
+#maternal genotypic trait influence on fitness for MSM
+ggplot(BB_fit_22_clean, aes(x=msm_all, y=est_fitness, col=Recipient)) + geom_point() + theme(legend.position ="") + geom_smooth(method="lm", se=F)
+
+#paternal genotypic trait influence on fitness for MSM
+ggplot(BB_fit_22_clean, aes(x=msm_all, y=est_fitness, col=Recipient)) + geom_point() + theme(legend.position ="") + geom_smooth(method="lm", se=F) +facet_wrap(~Donor)
+
+#maternal genotypic trait influence on fitness for fl duration
+ggplot(BB_fit_22_clean, aes(x=fl_duration, y=est_fitness, col=Recipient)) + geom_point() + theme(legend.position ="") + geom_smooth(method="lm", se=F)
+
+#paternal genotypic trait influence on fitness for fl duration
+ggplot(BB_fit_22_clean, aes(x=fl_duration, y=est_fitness, col=Recipient)) + geom_point() + theme(legend.position ="") + geom_smooth(method="lm", se=F) +facet_wrap(~Donor)
+
+#maternal genotypic trait influence on fitness for d13C
+ggplot(BB_fit_22_clean, aes(x=d13C, y=est_fitness, col=Recipient)) + geom_point() + theme(legend.position ="") + geom_smooth(method="lm", se=F)
+
+#paternal genotypic trait influence on fitness for d13C
+ggplot(BB_fit_22_clean, aes(x=d13C, y=est_fitness, col=Recipient)) + geom_point() + theme(legend.position ="") + geom_smooth(method="lm", se=F) +facet_wrap(~Donor)
+```
+
+
+```{r}
+
+##doing the same thing for BB 23 G1
+# Remove rows with NA values in specified columns
+BB_fit_23_G1_clean <- BB_fit_23_G1 %>%
+  filter(
+    !is.na(SLA_SEG),
+    !is.na(msm_all),
+    !is.na(fl_duration),
+    !is.na(d13C_SEG),
+    !is.na(corolla_diam_mm_SEG),
+    !is.na(est_fitness),
+    !is.na(g0_msm)
+  )
+
+
+# Standardize the continuous predictors
+##transforming each trait to have a mean of 0 and a standard deviation of 1. This transformation is useful for models that include traits measured on different scales, as it brings them onto a comparable scale and can improve model convergence and interpretability of coefficients.
+BB_fit_23_G1_clean <- BB_fit_23_G1_clean %>%
+  mutate(
+    SLA_SEG = scale(SLA_SEG),
+    msm_all = scale(msm_all),
+    fl_duration = scale(fl_duration),
+    d13C_SEG = scale(d13C_SEG),
+    corolla_diam_mm_SEG = scale(corolla_diam_mm_SEG),
+    g0_msm = scale(g0_msm)
+  )
+
+BB_fit_23_G1_clean$Location_Binned <- cut(BB_fit_23_G1_clean$Location, breaks = 5)
+
+```
+
+
+```{r}
+
+#model with nested maternal effects and Location_Binned
+model_1rf <- lmer(log(est_fitness) ~ SLA_SEG + msm_all + fl_duration + 
+                  d13C_SEG + corolla_diam_mm_SEG + g0_msm + (1|Donor:Recipient) + (1|Location_Binned), 
+                data = BB_fit_23_G1_clean)
+
+#model with nested maternal effects
+model_2rf <- lmer(log(est_fitness) ~ SLA_SEG + msm_all + fl_duration + 
+                  d13C_SEG + corolla_diam_mm_SEG + g0_msm + (1|Donor:Recipient), 
+                data = BB_fit_23_G1_clean)
+
+#model with just Location_Binned
+model_3rf <- lmer(log(est_fitness) ~ SLA_SEG + msm_all + fl_duration + 
+                  d13C_SEG + corolla_diam_mm_SEG + g0_msm + (1|Location_Binned), 
+                data = BB_fit_23_G1_clean)
+
+
+#determine which model is the best - the one without Location_Binned
+AIC(model_1rf, model_2rf, model_3rf)
+
+#run the final model with all the fixed effects
+library(MuMIn)
+
+options(na.action = "na.fail")
+
+model_1full <- lmer(
+  log(est_fitness) ~ SLA_SEG + msm_all + fl_duration + 
+    d13C_SEG + corolla_diam_mm_SEG + (1|Location_Binned), 
+  data = BB_fit_23_G1_clean, 
+  REML = FALSE
+)
+
+
+
+#dredge the model to determine which fixed effects are the best
+dredge(model_1full)
+
+
+#determine the best model
+model_best <- lmer(log(est_fitness) ~ fl_duration + (1|Location_Binned), 
+  data = BB_fit_23_G1_clean, 
+  REML = TRUE
+)
+
+summary(model_best)
+
+#check if the model is any good 
+car::qqp(resid(model_best))
+car::qqp(ranef(model_best)$`Location_Binned`$`(Intercept)`)
+
+
+residuals_best <- residuals(model_best, type = "pearson")
+
+# Plot residuals to check for outliers
+ggplot(data = BB_fit_23_G1_clean, aes(x = fitted(model_best), y = residuals_best)) +
+  geom_point(alpha = 0.5) +
+  geom_hline(yintercept = 0, color = "red", linetype = "dashed") +
+  labs(title = "Residuals vs Fitted Plot",
+       x = "Fitted Values",
+       y = "Pearson Residuals") +
+  theme_minimal()
+
+```
+
+```{r}
+##doing the same thing for BB 23 G2
+# Remove rows with NA values in specified columns
+BB_fit_23_G2_clean <- BB_fit_23_G2 %>%
+  filter(
+    !is.na(SLA_SEG),
+    !is.na(msm_all),
+    !is.na(fl_duration),
+    !is.na(d13C_SEG),
+    !is.na(corolla_diam_mm_SEG),
+    !is.na(est_fitness),
+    !is.na(g0_msm)
+  )
+
+
+# Standardize the continuous predictors
+##transforming each trait to have a mean of 0 and a standard deviation of 1. This transformation is useful for models that include traits measured on different scales, as it brings them onto a comparable scale and can improve model convergence and interpretability of coefficients.
+ BB_fit_23_G2_clean <- BB_fit_23_G2_clean %>%
+   mutate(
+     SLA_SEG = scale(SLA_SEG),
+     msm_all = scale(msm_all),
+     fl_duration = scale(fl_duration),
+     d13C_SEG = scale(d13C_SEG),
+     corolla_diam_mm_SEG = scale(corolla_diam_mm_SEG),
+     g0_msm = scale(g0_msm)
+   )
+
+BB_fit_23_G2_clean$Location_Binned <- cut(BB_fit_23_G2_clean$Location, breaks = 5)
+
+```
+
+
+```{r}
+
+#model with nested maternal effects and Location_Binned
+model_1rf <- lmer(log(est_fitness) ~ SLA_SEG + msm_all + fl_duration + 
+                  d13C_SEG + corolla_diam_mm_SEG + g0_msm + (1|Donor:Recipient) + (1|Location_Binned), 
+                data = BB_fit_23_G2_clean)
+
+#model with nested maternal effects
+model_2rf <- lmer(log(est_fitness) ~ SLA_SEG + msm_all + fl_duration + 
+                  d13C_SEG + corolla_diam_mm_SEG + g0_msm + (1|Donor:Recipient), 
+                data = BB_fit_23_G2_clean)
+
+#model with just Location_Binned
+model_3rf <- lmer(log(est_fitness) ~ SLA_SEG + msm_all + fl_duration + 
+                  d13C_SEG + corolla_diam_mm_SEG + g0_msm + (1|Location_Binned), 
+                data = BB_fit_23_G2_clean)
+
+
+#determine which model is the best - the one without Location_Binned
+AIC(model_1rf, model_2rf, model_3rf)
+
+#run the final model with all the fixed effects
+model_1full <- lmer(log(est_fitness) ~ SLA_SEG + msm_all + fl_duration + 
+                  d13C_SEG + corolla_diam_mm_SEG + g0_msm + (1|Location_Binned), 
+                data = BB_fit_23_G2_clean, REML = F, na.action = na.fail)
+
+#dredge the model to determine which fixed effects are the best
+dredge(model_1full)
+
+#determine the best model
+model_best <-lmer(log(est_fitness) ~ corolla_diam_mm_SEG + fl_duration + (1|Location_Binned), 
+                data = BB_fit_23_G2_clean, REML = T)
+
+summary(model_best)
+
+#check if the model is any good 
+car::qqp(resid(model_best))
+car::qqp(ranef(model_best)$`Location_Binned`$`(Intercept)`)
+
+
+residuals_best <- residuals(model_best, type = "pearson")
+
+# Plot residuals to check for outliers
+ggplot(data = BB_fit_23_G2_clean, aes(x = fitted(model_best), y = residuals_best)) +
+  geom_point(alpha = 0.5) +
+  geom_hline(yintercept = 0, color = "red", linetype = "dashed") +
+  labs(title = "Residuals vs Fitted Plot",
+       x = "Fitted Values",
+       y = "Pearson Residuals") +
+  theme_minimal()
+
+```
+
+
+
+```{r}
+##doing the same thing for BB G1
+# Remove rows with NA values in specified columns
+BB_fit_G1_clean <- BB_fit_G1 %>%
+  filter(
+    !is.na(SLA_SEG),
+    !is.na(msm_all),
+    !is.na(fl_duration),
+    !is.na(d13C_SEG),
+    !is.na(corolla_diam_mm_SEG),
+    !is.na(est_fitness)
+  )
+
+
+# Standardize the continuous predictors
+##transforming each trait to have a mean of 0 and a standard deviation of 1. This transformation is useful for models that include traits measured on different scales, as it brings them onto a comparable scale and can improve model convergence and interpretability of coefficients.
+BB_fit_G1_clean <- BB_fit_G1_clean %>%
+  mutate(
+    SLA_SEG = scale(SLA_SEG),
+    msm_all = scale(msm_all),
+    fl_duration = scale(fl_duration),
+    d13C_SEG = scale(d13C_SEG),
+    corolla_diam_mm_SEG = scale(corolla_diam_mm_SEG),
+  )
+
+BB_fit_G1_clean$Location_Binned <- cut(BB_fit_G1_clean$Location, breaks = 5)
+
+```
+
+
+```{r}
+
+#model 
+model_1rf <- lmer(log(est_fitness) ~ SLA_SEG + msm_all + fl_duration + 
+                  d13C_SEG + corolla_diam_mm_SEG + (1|Donor:Recipient) + (1|Location_Binned) + (1|Year), 
+                data = BB_fit_G1_clean)
+
+#model 
+model_2rf <- lmer(log(est_fitness) ~ SLA_SEG + msm_all + fl_duration + 
+                  d13C_SEG + corolla_diam_mm_SEG + (1|Donor:Recipient) + (1|Year), 
+                data = BB_fit_G1_clean)
+
+#model 
+model_3rf <- lmer(log(est_fitness) ~ SLA_SEG + msm_all + fl_duration + 
+                  d13C_SEG + corolla_diam_mm_SEG + (1|Donor:Recipient) + (1|Location_Binned), 
+                data = BB_fit_G1_clean)
+
+#model 
+model_4rf <- lmer(log(est_fitness) ~ SLA_SEG + msm_all + fl_duration + 
+                  d13C_SEG + corolla_diam_mm_SEG + (1|Year) + (1|Location_Binned), 
+                data = BB_fit_G1_clean)
+
+#model 
+model_5rf <- lmer(log(est_fitness) ~ SLA_SEG + msm_all + fl_duration + 
+                  d13C_SEG + corolla_diam_mm_SEG + (1|Year), 
+                data = BB_fit_G1_clean)
+
+#model 
+model_6rf <- lmer(log(est_fitness) ~ SLA_SEG + msm_all + fl_duration + 
+                  d13C_SEG + corolla_diam_mm_SEG + (1|Location_Binned), 
+                data = BB_fit_G1_clean)
+
+#model 
+model_7rf <- lmer(log(est_fitness) ~ SLA_SEG + msm_all + fl_duration + 
+                  d13C_SEG + corolla_diam_mm_SEG + (1|Donor:Recipient), 
+                data = BB_fit_G1_clean)
+
+#determine which model is the best - the one without Location_Binned
+AIC(model_1rf, model_2rf, model_3rf, model_4rf, model_5rf, model_6rf, model_7rf)
+
+#run the final model with all the fixed effects
+model_1full <- lmer(log(est_fitness) ~ SLA_SEG + msm_all + fl_duration + 
+                  d13C_SEG + corolla_diam_mm_SEG + (1|Year) + (1|Location_Binned), 
+                data = BB_fit_G1_clean, REML = F)
+
+#dredge the model to determine which fixed effects are the best
+dredge(model_1full)
+
+#determine the best model
+model_best <- lmer(log(est_fitness) ~ SLA_SEG + msm_all + fl_duration + (1|Year) + (1|Location_Binned), 
+                data = BB_fit_G1_clean, REML = T)
+
+summary(model_best)
+
+#check if the model is any good 
+car::qqp(resid(model_best))
+car::qqp(ranef(model_best)$`Location_Binned`$`(Intercept)`)
+car::qqp(ranef(model_best)$`Year`$`(Intercept)`)
+
+
+
+residuals_best <- residuals(model_best, type = "pearson")
+
+# Plot residuals to check for outliers
+ggplot(data = BB_fit_G1_clean, aes(x = fitted(model_best), y = residuals_best)) +
+  geom_point(alpha = 0.5) +
+  geom_hline(yintercept = 0, color = "red", linetype = "dashed") +
+  labs(title = "Residuals vs Fitted Plot",
+       x = "Fitted Values",
+       y = "Pearson Residuals") +
+  theme_minimal()
+
+```
+
+
+```{r}
+##doing the same thing for BB G1
+# Remove rows with NA values in specified columns
+BB_fit_23_clean <- BB_fit_23 %>%
+  filter(
+    !is.na(SLA_SEG),
+    !is.na(msm_all),
+    !is.na(fl_duration),
+    !is.na(d13C_SEG),
+    !is.na(corolla_diam_mm_SEG),
+    !is.na(est_fitness)
+  )
+
+
+# Standardize the continuous predictors
+##transforming each trait to have a mean of 0 and a standard deviation of 1. This transformation is useful for models that include traits measured on different scales, as it brings them onto a comparable scale and can improve model convergence and interpretability of coefficients.
+BB_fit_23_clean <- BB_fit_23_clean %>%
+  mutate(
+    SLA_SEG = scale(SLA_SEG),
+    msm_all = scale(msm_all),
+    fl_duration = scale(fl_duration),
+    d13C_SEG = scale(d13C_SEG),
+    corolla_diam_mm_SEG = scale(corolla_diam_mm_SEG),
+  )
+
+BB_fit_23_clean$Location_Binned <- cut(BB_fit_23_clean$Location, breaks = 5)
+
+```
+
+```{r}
+
+
+model_1rf <- lmer(log(est_fitness) ~ SLA_SEG + msm_all + fl_duration + 
+                  d13C_SEG + corolla_diam_mm_SEG + (1|Donor:Recipient) + (1|Location_Binned) + (1|Gen), 
+                data = BB_fit_23_clean)
+
+model_2rf <- lmer(log(est_fitness) ~ SLA_SEG + msm_all + fl_duration + 
+                  d13C_SEG + corolla_diam_mm_SEG + (1|Donor:Recipient) + (1|Gen), 
+                data = BB_fit_23_clean)
+
+
+model_3rf <- lmer(log(est_fitness) ~ SLA_SEG + msm_all + fl_duration + 
+                  d13C_SEG + corolla_diam_mm_SEG + (1|Donor:Recipient) + (1|Location_Binned), 
+                data = BB_fit_23_clean)
+
+model_4rf <- lmer(log(est_fitness) ~ SLA_SEG + msm_all + fl_duration + 
+                  d13C_SEG + corolla_diam_mm_SEG + (1|Gen) + (1|Location_Binned), 
+                data = BB_fit_23_clean)
+
+model_5rf <- lmer(log(est_fitness) ~ SLA_SEG + msm_all + fl_duration + 
+                  d13C_SEG + corolla_diam_mm_SEG + (1|Donor:Recipient), 
+                data = BB_fit_23_clean)
+
+model_6rf <- lmer(log(est_fitness) ~ SLA_SEG + msm_all + fl_duration + 
+                  d13C_SEG + corolla_diam_mm_SEG + (1|Donor:Recipient) + (1|Gen), 
+                data = BB_fit_23_clean)
+
+model_7rf <- lmer(log(est_fitness) ~ SLA_SEG + msm_all + fl_duration + 
+                  d13C_SEG + corolla_diam_mm_SEG + (1|Location_Binned), 
+                data = BB_fit_23_clean)
+
+model_8rf <- lmer(log(est_fitness) ~ SLA_SEG + msm_all + fl_duration + 
+                  d13C_SEG + corolla_diam_mm_SEG + (1|Gen), 
+                data = BB_fit_23_clean)
+
+
+#determine which model is the best - the one without Location_Binned
+AIC(model_1rf, model_2rf, model_3rf, model_4rf, model_5rf, model_6rf, model_7rf, model_8rf)
+
+#run the final model with all the fixed effects
+model_1full <-  lmer(log(est_fitness) ~ SLA_SEG + msm_all + fl_duration + 
+                  d13C_SEG + corolla_diam_mm_SEG + (1|Location_Binned), 
+                data = BB_fit_23_clean, REML = F)
+
+#dredge the model to determine which fixed effects are the best
+dredge(model_1full)
+
+#determine the best model
+model_best <- lmer(log(est_fitness) ~ msm_all + fl_duration + (1|Location_Binned), 
+                data = BB_fit_23_clean, REML = T)
+
+summary(model_best)
+
+#check if the model is any good 
+car::qqp(resid(model_best))
+car::qqp(ranef(model_best)$`Location_Binned`$`(Intercept)`)
+
+
+residuals_best <- residuals(model_best, type = "pearson")
+
+# Plot residuals to check for outliers
+ggplot(data = BB_fit_23_clean, aes(x = fitted(model_best), y = residuals_best)) +
+  geom_point(alpha = 0.5) +
+  geom_hline(yintercept = 0, color = "red", linetype = "dashed") +
+  labs(title = "Residuals vs Fitted Plot",
+       x = "Fitted Values",
+       y = "Pearson Residuals") +
+  theme_minimal()
+
+```
+
+
+```{r}
+##doing the same thing for BB 23 G1
+# Remove rows with NA values in specified columns
+BB_fit_clean <- BB_fit %>%
+  filter(
+    !is.na(SLA_SEG),
+    !is.na(msm_all),
+    !is.na(fl_duration),
+    !is.na(d13C_SEG),
+    !is.na(corolla_diam_mm_SEG),
+    !is.na(est_fitness)
+  )
+
+
+# Standardize the continuous predictors
+##transforming each trait to have a mean of 0 and a standard deviation of 1. This transformation is useful for models that include traits measured on different scales, as it brings them onto a comparable scale and can improve model convergence and interpretability of coefficients.
+BB_fit_clean <- BB_fit_clean %>%
+  mutate(
+    SLA_SEG = scale(SLA_SEG),
+    msm_all = scale(msm_all),
+    fl_duration = scale(fl_duration),
+    d13C_SEG = scale(d13C_SEG),
+    corolla_diam_mm_SEG = scale(corolla_diam_mm_SEG),
+  )
+
+BB_fit_clean$Location_Binned <- cut(BB_fit_clean$Location, breaks = 5)
+
+```
+
+
+```{r}
+
+
+model_1rf <- lmer(log(est_fitness) ~ SLA_SEG + msm_all + fl_duration + 
+                  d13C_SEG + corolla_diam_mm_SEG + (1|Donor:Recipient) + (1|Location_Binned) + (1|Year)  + (1|Gen), 
+                data = BB_fit_clean)
+
+model_2rf <- lmer(log(est_fitness) ~ SLA_SEG + msm_all + fl_duration + 
+                  d13C_SEG + corolla_diam_mm_SEG + (1|Donor:Recipient) + (1|Year) + (1|Gen), 
+                data = BB_fit_clean)
+
+
+model_3rf <- lmer(log(est_fitness) ~ SLA_SEG + msm_all + fl_duration + 
+                  d13C_SEG + corolla_diam_mm_SEG + (1|Donor:Recipient) + (1|Location_Binned), 
+                data = BB_fit_clean)
+
+model_4rf <- lmer(log(est_fitness) ~ SLA_SEG + msm_all + fl_duration + 
+                  d13C_SEG + corolla_diam_mm_SEG + (1|Year) + (1|Location_Binned), 
+                data = BB_fit_clean)
+
+model_5rf <- lmer(log(est_fitness) ~ SLA_SEG + msm_all + fl_duration + 
+                  d13C_SEG + corolla_diam_mm_SEG + (1|Donor:Recipient) + (1|Gen), 
+                data = BB_fit_clean)
+
+model_6rf <- lmer(log(est_fitness) ~ SLA_SEG + msm_all + fl_duration + 
+                  d13C_SEG + corolla_diam_mm_SEG + (1|Donor:Recipient) + (1|Year), 
+                data = BB_fit_clean)
+
+model_7rf <- lmer(log(est_fitness) ~ SLA_SEG + msm_all + fl_duration + 
+                  d13C_SEG + corolla_diam_mm_SEG + (1|Donor:Recipient), 
+                data = BB_fit_clean)
+
+model_8rf <- lmer(log(est_fitness) ~ SLA_SEG + msm_all + fl_duration + 
+                  d13C_SEG + corolla_diam_mm_SEG + (1|Year), 
+                data = BB_fit_clean)
+
+model_9rf <- lmer(log(est_fitness) ~ SLA_SEG + msm_all + fl_duration + 
+                  d13C_SEG + corolla_diam_mm_SEG + (1|Gen), 
+                data = BB_fit_clean)
+
+model_10rf <- lmer(log(est_fitness) ~ SLA_SEG + msm_all + fl_duration + 
+                  d13C_SEG + corolla_diam_mm_SEG + (1|Location_Binned), 
+                data = BB_fit_clean)
+
+#determine which model is the best - the one without Location_Binned
+AIC(model_1rf, model_2rf, model_3rf, model_4rf, model_5rf, model_6rf, model_7rf, model_8rf, model_9rf, model_10rf)
+
+#run the final model with all the fixed effects
+model_1full <-  lmer(log(est_fitness) ~ SLA_SEG + msm_all + fl_duration + 
+                  d13C_SEG + corolla_diam_mm_SEG + (1|Location_Binned), 
+                data = BB_fit_clean, REML = F)
+
+#dredge the model to determine which fixed effects are the best
+dredge(model_1full)
+
+#determine the best model
+model_best <-lmer(log(est_fitness) ~ msm_all + fl_duration + 
+                   corolla_diam_mm_SEG + (1|Location_Binned), 
+                data = BB_fit_clean, REML = T)
+
+summary(model_best)
+
+#check if the model is any good 
+car::qqp(resid(model_best))
+car::qqp(ranef(model_best)$`Location_Binned`$`(Intercept)`)
+
+residuals_best <- residuals(model_best, type = "pearson")
+
+# Plot residuals to check for outliers
+ggplot(data = BB_fit_clean, aes(x = fitted(model_best), y = residuals_best)) +
+  geom_point(alpha = 0.5) +
+  geom_hline(yintercept = 0, color = "red", linetype = "dashed") +
+  labs(title = "Residuals vs Fitted Plot",
+       x = "Fitted Values",
+       y = "Pearson Residuals") +
+  theme_minimal()
+
+```
+
+###MATERNAL TRAIT MEANS###
+```{r}
+library(dplyr)
+
+# Specify the traits
+traits <- c("SLA_SEG", "msm_all", "fl_duration", "d13C_SEG", "corolla_diam_mm_SEG", "est_fitness")
+
+# Calculate the mean values for each Recipient
+BB_22_mean <- BB_fit_22 %>%
+  select(Recipient, all_of(traits)) %>%  # Select only Recipient and the specified traits
+  group_by(Recipient) %>%               # Group by Recipient
+  summarise(across(everything(), mean, na.rm = TRUE))  # Calculate mean, ignoring NA values
+
+
+BB_22_mean_scale <- BB_22_mean %>%
+  mutate(
+    SLA_SEG = scale(SLA_SEG),
+    msm_all = scale(msm_all),
+    fl_duration = scale(fl_duration),
+    d13C_SEG = scale(d13C_SEG),
+    corolla_diam_mm_SEG = scale(corolla_diam_mm_SEG)
+  )
+
+BB_22_mean_scale <- BB_22_mean_scale %>%
+  filter(
+    !is.na(SLA_SEG),
+    !is.na(msm_all),
+    !is.na(fl_duration),
+    !is.na(d13C_SEG),
+    !is.na(corolla_diam_mm_SEG),
+    !is.na(est_fitness)
+  )
+
+```
+
+
+
+```{r}
+library(lmerTest)
+library(MuMIn)
+library(influence.ME)
+
+
+model_1 <- lm(log(est_fitness) ~ SLA_SEG + msm_all + fl_duration + 
+                  d13C_SEG + corolla_diam_mm_SEG, 
+                data = BB_22_mean_scale)
+
+#run the final model with all the fixed effects
+
+
+#dredge the model to determine which fixed effects are the best
+dredge(model_1)
+
+#determine the best model
+model_best <- lm(log(est_fitness) ~ msm_all + fl_duration, 
+                data = BB_22_mean_scale)
+
+summary(model_best)
+
+#check if the model is any good 
+car::qqp(resid(model_best))
+
+residuals_best <- residuals(model_best, type = "pearson")
+
+
+# Plot residuals to check for outliers
+ggplot(data = BB_22_mean_scale, aes(x = fitted(model_best), y = residuals_best)) +
+  geom_point(alpha = 0.5) +
+  geom_hline(yintercept = 0, color = "red", linetype = "dashed") +
+  labs(title = "Residuals vs Fitted Plot",
+       x = "Fitted Values",
+       y = "Pearson Residuals") +
+  theme_minimal()
+
+
+```
+
+```{r}
+
+# Specify the traits
+traits <- c("SLA_SEG", "msm_all", "fl_duration", "d13C_SEG", "corolla_diam_mm_SEG", "est_fitness")
+
+# Calculate the mean values for each Recipient
+BB_G1_23_mean <- BB_fit_23_G1 %>%
+  select(Recipient, all_of(traits)) %>%  # Select only Recipient and the specified traits
+  group_by(Recipient) %>%               # Group by Recipient
+  summarise(across(everything(), mean, na.rm = TRUE))  # Calculate mean, ignoring NA values
+
+
+BB_G1_23_mean_scale <- BB_G1_23_mean %>%
+  mutate(
+    SLA_SEG = scale(SLA_SEG),
+    msm_all = scale(msm_all),
+    fl_duration = scale(fl_duration),
+    d13C_SEG = scale(d13C_SEG),
+    corolla_diam_mm_SEG = scale(corolla_diam_mm_SEG)
+  )
+
+BB_G1_23_mean_scale <- BB_G1_23_mean_scale %>%
+  filter(
+    !is.na(SLA_SEG),
+    !is.na(msm_all),
+    !is.na(fl_duration),
+    !is.na(d13C_SEG),
+    !is.na(corolla_diam_mm_SEG),
+    !is.na(est_fitness)
+  )
+
+```
+
+
+```{r}
+
+model_1 <- lm(log(est_fitness) ~ SLA_SEG + msm_all + fl_duration + 
+                  d13C_SEG + corolla_diam_mm_SEG, 
+                data = BB_G1_23_mean_scale)
+
+
+#run the final model with all the fixed effects
+
+
+#dredge the model to determine which fixed effects are the best
+dredge(model_1)
+
+#determine the best model
+model_best <- lm(log(est_fitness) ~ fl_duration, 
+                data = BB_G1_23_mean_scale)
+
+summary(model_best)
+
+#check if the model is any good 
+car::qqp(resid(model_best))
+
+residuals_best <- residuals(model_best, type = "pearson")
+
+
+# Plot residuals to check for outliers
+ggplot(data = BB_G1_23_mean_scale, aes(x = fitted(model_best), y = residuals_best)) +
+  geom_point(alpha = 0.5) +
+  geom_hline(yintercept = 0, color = "red", linetype = "dashed") +
+  labs(title = "Residuals vs Fitted Plot",
+       x = "Fitted Values",
+       y = "Pearson Residuals") +
+  theme_minimal()
+
+```
+
+```{r}
+
+# Specify the traits
+traits <- c("SLA_SEG", "msm_all", "fl_duration", "d13C_SEG", "corolla_diam_mm_SEG", "est_fitness")
+
+# Calculate the mean values for each Recipient
+BB_G2_23_mean <- BB_fit_23_G2 %>%
+  select(Recipient, all_of(traits)) %>%  # Select only Recipient and the specified traits
+  group_by(Recipient) %>%               # Group by Recipient
+  summarise(across(everything(), mean, na.rm = TRUE))  # Calculate mean, ignoring NA values
+
+BB_G2_23_mean_scale <- BB_G2_23_mean %>%
+  mutate(
+    SLA_SEG = scale(SLA_SEG),
+    msm_all = scale(msm_all),
+    fl_duration = scale(fl_duration),
+    d13C_SEG = scale(d13C_SEG),
+    corolla_diam_mm_SEG = scale(corolla_diam_mm_SEG)
+  )
+
+BB_G2_23_mean_scale <- BB_G2_23_mean_scale %>%
+  filter(
+    !is.na(SLA_SEG),
+    !is.na(msm_all),
+    !is.na(fl_duration),
+    !is.na(d13C_SEG),
+    !is.na(corolla_diam_mm_SEG),
+    !is.na(est_fitness)
+  )
+
+```
+
+
+```{r}
+
+model_1 <-lm(log(est_fitness) ~ SLA_SEG + msm_all + fl_duration + 
+                  d13C_SEG + corolla_diam_mm_SEG, 
+                data = BB_G2_23_mean_scale)
+
+
+#run the final model with all the fixed effects
+
+
+#dredge the model to determine which fixed effects are the best
+dredge(model_1)
+
+# #determine the best model
+# model_best <- lm(log(est_fitness) ~ SLA_SEG + msm_all, 
+#                 data = BB_G2_23_mean_scale)
+# 
+# summary(model_best)
+# 
+# #check if the model is any good 
+# car::qqp(resid(model_best))
+# 
+# residuals_best <- residuals(model_best, type = "pearson")
+# 
+# 
+# # Plot residuals to check for outliers
+# ggplot(data = BB_G2_23_mean_scale, aes(x = fitted(model_best), y = residuals_best)) +
+#   geom_point(alpha = 0.5) +
+#   geom_hline(yintercept = 0, color = "red", linetype = "dashed") +
+#   labs(title = "Residuals vs Fitted Plot",
+#        x = "Fitted Values",
+#        y = "Pearson Residuals") +
+#   theme_minimal()
+
+```
+
+```{r}
+
+# Specify the traits
+traits <- c("SLA_SEG", "msm_all", "fl_duration", "d13C_SEG", "corolla_diam_mm_SEG", "est_fitness")
+
+# Calculate the mean values for each Recipient
+BB_G1_mean <- BB_fit_G1 %>%
+  select(Recipient, all_of(traits)) %>%  # Select only Recipient and the specified traits
+  group_by(Recipient) %>%               # Group by Recipient
+  summarise(across(everything(), mean, na.rm = TRUE))  # Calculate mean, ignoring NA values
+
+
+BB_G1_mean_scale <- BB_G1_mean %>%
+  mutate(
+    SLA_SEG = scale(SLA_SEG),
+    msm_all = scale(msm_all),
+    fl_duration = scale(fl_duration),
+    d13C_SEG = scale(d13C_SEG),
+    corolla_diam_mm_SEG = scale(corolla_diam_mm_SEG)
+  )
+
+BB_G1_mean_scale <- BB_G1_mean_scale %>%
+  filter(
+    !is.na(SLA_SEG),
+    !is.na(msm_all),
+    !is.na(fl_duration),
+    !is.na(d13C_SEG),
+    !is.na(corolla_diam_mm_SEG),
+    !is.na(est_fitness)
+  )
+
+```
+
+
+```{r}
+
+model_1 <- lm(log(est_fitness) ~ SLA_SEG + msm_all + fl_duration + 
+                  d13C_SEG + corolla_diam_mm_SEG, 
+                data = BB_G1_mean_scale)
+
+#run the final model with all the fixed effects
+
+#dredge the model to determine which fixed effects are the best
+dredge(model_1)
+
+#determine the best model
+model_best <- lm(log(est_fitness) ~ fl_duration, 
+                data = BB_G1_mean_scale)
+
+summary(model_best)
+
+#check if the model is any good 
+car::qqp(resid(model_best))
+
+residuals_best <- residuals(model_best, type = "pearson")
+
+
+# Plot residuals to check for outliers
+ggplot(data =  BB_G1_mean_scale, aes(x = fitted(model_best), y = residuals_best)) +
+  geom_point(alpha = 0.5) +
+  geom_hline(yintercept = 0, color = "red", linetype = "dashed") +
+  labs(title = "Residuals vs Fitted Plot",
+       x = "Fitted Values",
+       y = "Pearson Residuals") +
+  theme_minimal()
+
+```
+
+
+```{r}
+
+# Specify the traits
+traits <- c("SLA_SEG", "msm_all", "fl_duration", "d13C_SEG", "corolla_diam_mm_SEG", "est_fitness")
+
+names(BB_fit_23)
+
+# Calculate the mean values for each Recipient
+BB_2023_mean <- BB_fit_23 %>%
+  select(Recipient, all_of(traits)) %>%  # Select only Recipient and the specified traits
+  group_by(Recipient) %>%               # Group by Recipient
+  summarise(across(everything(), mean, na.rm = TRUE))  # Calculate mean, ignoring NA values
+
+
+BB_2023_mean_scale <- BB_2023_mean %>%
+  mutate(
+    SLA_SEG = scale(SLA_SEG),
+    msm_all = scale(msm_all),
+    fl_duration = scale(fl_duration),
+    d13C_SEG = scale(d13C_SEG),
+    corolla_diam_mm_SEG = scale(corolla_diam_mm_SEG)
+  )
+
+BB_2023_mean_scale <- BB_2023_mean_scale %>%
+  filter(
+    !is.na(SLA_SEG),
+    !is.na(msm_all),
+    !is.na(fl_duration),
+    !is.na(d13C_SEG),
+    !is.na(corolla_diam_mm_SEG),
+    !is.na(est_fitness)
+  )
+
+```
+
+
+```{r}
+
+#model with nested maternal effects and transect
+model_1 <- lm(log(est_fitness) ~ SLA_SEG + msm_all + fl_duration + 
+                  d13C_SEG + corolla_diam_mm_SEG, 
+                data = BB_2023_mean_scale)
+
+#dredge the model to determine which fixed effects are the best
+dredge(model_1)
+
+#determine the best model
+model_best <- lm(log(est_fitness) ~ fl_duration + msm_all, 
+                data = BB_2023_mean_scale)
+
+summary(model_best)
+
+#check if the model is any good 
+car::qqp(resid(model_best))
+
+residuals_best <- residuals(model_best, type = "pearson")
+
+
+# Plot residuals to check for outliers
+ggplot(data =  BB_2023_mean_scale, aes(x = fitted(model_best), y = residuals_best)) +
+  geom_point(alpha = 0.5) +
+  geom_hline(yintercept = 0, color = "red", linetype = "dashed") +
+  labs(title = "Residuals vs Fitted Plot",
+       x = "Fitted Values",
+       y = "Pearson Residuals") +
+  theme_minimal()
+
+```
+
+
+```{r}
+
+# Specify the traits
+traits <- c("SLA_SEG", "msm_all", "fl_duration", "d13C_SEG", "corolla_diam_mm_SEG", "est_fitness")
+
+
+# Calculate the mean values for each Recipient
+BB_mean <- BB_fit %>%
+  select(Recipient, all_of(traits)) %>%  # Select only Recipient and the specified traits
+  group_by(Recipient) %>%               # Group by Recipient
+  summarise(across(everything(), mean, na.rm = TRUE))  # Calculate mean, ignoring NA values
+
+
+BB_mean_scale <- BB_mean %>%
+  mutate(
+    SLA_SEG = scale(SLA_SEG),
+    msm_all = scale(msm_all),
+    fl_duration = scale(fl_duration),
+    d13C_SEG = scale(d13C_SEG),
+    corolla_diam_mm_SEG = scale(corolla_diam_mm_SEG)
+  )
+
+BB_mean_scale <- BB_mean_scale %>%
+  filter(
+    !is.na(SLA_SEG),
+    !is.na(msm_all),
+    !is.na(fl_duration),
+    !is.na(d13C_SEG),
+    !is.na(corolla_diam_mm_SEG),
+    !is.na(est_fitness)
+  )
+
+```
+
+
+```{r}
+
+#model with nested maternal effects and transect
+model_1 <- lm(log(est_fitness) ~ SLA_SEG + msm_all + fl_duration + 
+                  d13C_SEG + corolla_diam_mm_SEG, 
+                data = BB_mean_scale)
+
+#dredge the model to determine which fixed effects are the best
+dredge(model_1)
+
+#determine the best model
+model_best <- lm(log(est_fitness) ~ msm_all + fl_duration + 
+                  d13C_SEG, 
+                data = BB_mean_scale)
+
+summary(model_best)
+
+#check if the model is any good 
+car::qqp(resid(model_best))
+
+residuals_best <- residuals(model_best, type = "pearson")
+
+
+# Plot residuals to check for outliers
+ggplot(data =  BB_mean_scale, aes(x = fitted(model_best), y = residuals_best)) +
+  geom_point(alpha = 0.5) +
+  geom_hline(yintercept = 0, color = "red", linetype = "dashed") +
+  labs(title = "Residuals vs Fitted Plot",
+       x = "Fitted Values",
+       y = "Pearson Residuals") +
+  theme_minimal()
+
+```
+
+#Donor means
+```{r}
+library(dplyr)
+
+# Specify the traits
+traits <- c("SLA_SEG", "msm_all", "fl_duration", "d13C_SEG", "corolla_diam_mm_SEG", "est_fitness")
+
+# Calculate the mean values for each Recipient
+BB_22_mean <- BB_fit_22 %>%
+  select(Donor, all_of(traits)) %>%  # Select only Recipient and the specified traits
+  group_by(Donor) %>%               # Group by Recipient
+  summarise(across(everything(), mean, na.rm = TRUE))  # Calculate mean, ignoring NA values
+
+BB_22_mean <- read_csv(here::here("data_sheets", "compiled_sheets", "BB_mean_donor_traits_22.csv"))
+
+
+BB_22_mean_scale <- BB_22_mean %>%
+  mutate(
+    SLA_SEG = scale(SLA_SEG),
+    msm_all = scale(msm_all),
+    fl_duration = scale(fl_duration),
+    d13C_SEG = scale(d13C_SEG),
+    corolla_diam_mm_SEG = scale(corolla_diam_mm_SEG),
+    g0_msm = scale(g0_msm)
+  )
+
+BB_22_mean_scale <- BB_22_mean_scale %>%
+  filter(
+    !is.na(SLA_SEG),
+    !is.na(msm_all),
+    !is.na(fl_duration),
+    !is.na(d13C_SEG),
+    !is.na(corolla_diam_mm_SEG),
+    !is.na(est_fitness),
+    !is.na(g0_msm)
+  )
+
+```
+
+
+
+```{r}
+library(lmerTest)
+library(MuMIn)
+library(influence.ME)
+
+options(na.action = "na.fail")
+
+
+model_1 <- lm(log(est_fitness) ~ SLA_SEG + msm_all + fl_duration + 
+                  d13C_SEG + corolla_diam_mm_SEG + g0_msm, 
+                data = BB_22_mean_scale)
+
+
+#run the final model with all the fixed effects
+
+
+#dredge the model to determine which fixed effects are the best
+dredge(model_1)
+
+# #determine the best model
+model_best <- lm(log(est_fitness) ~  fl_duration + msm_all, 
+                 data = BB_22_mean_scale)
+ 
+summary(model_best)
+ 
+# #check if the model is any good 
+ car::qqp(resid(model_best))
+# 
+ residuals_best <- residuals(model_best, type = "pearson")
+# 
+# 
+# # Plot residuals to check for outliers
+ ggplot(data = BB_22_mean_scale, aes(x = fitted(model_best), y = residuals_best)) +
+   geom_point(alpha = 0.5) +
+   geom_hline(yintercept = 0, color = "red", linetype = "dashed") +
+   labs(title = "Residuals vs Fitted Plot",
+       x = "Fitted Values",
+        y = "Pearson Residuals") +
+   theme_minimal()
+
+```
+
+```{r}
+library(dplyr)
+
+# Specify the traits
+traits <- c("SLA_SEG", "msm_all", "fl_duration", "d13C_SEG", "corolla_diam_mm_SEG", "est_fitness")
+
+# Calculate the mean values for each Recipient
+BB_23_G1_mean <- BB_fit_23_G1 %>%
+  select(Donor, all_of(traits)) %>%  # Select only Recipient and the specified traits
+  group_by(Donor) %>%               # Group by Recipient
+  summarise(across(everything(), mean, na.rm = TRUE))  # Calculate mean, ignoring NA values
+
+BB_23_G1_mean <- read_csv(here::here("data_sheets", "compiled_sheets", "BB_mean_donor_traits_23_G1.csv"))
+
+BB_23_G1_mean_scale <- BB_23_G1_mean %>%
+  mutate(
+    SLA_SEG = scale(SLA_SEG),
+    msm_all = scale(msm_all),
+    fl_duration = scale(fl_duration),
+    d13C_SEG = scale(d13C_SEG),
+    corolla_diam_mm_SEG = scale(corolla_diam_mm_SEG),
+    g0_msm = scale(g0_msm)
+  )
+
+BB_23_G1_mean_scale <- BB_23_G1_mean_scale %>%
+  filter(
+    !is.na(SLA_SEG),
+    !is.na(msm_all),
+    !is.na(fl_duration),
+    !is.na(d13C_SEG),
+    !is.na(corolla_diam_mm_SEG),
+    !is.na(est_fitness),
+    !is.na(g0_msm)
+  )
+
+```
+
+
+
+```{r}
+library(lmerTest)
+library(MuMIn)
+library(influence.ME)
+
+options(na.action = "na.fail")
+
+
+model_1 <- lm(log(est_fitness) ~ SLA_SEG + msm_all + fl_duration + 
+                  d13C_SEG + corolla_diam_mm_SEG + g0_msm, 
+                data = BB_23_G1_mean_scale)
+
+
+#run the final model with all the fixed effects
+
+
+#dredge the model to determine which fixed effects are the best
+dredge(model_1)
+
+#determine the best model
+model_best <- lm(log(est_fitness) ~ SLA_SEG + msm_all + fl_duration, 
+                data = BB_23_G1_mean_scale)
+
+summary(model_best)
+
+#check if the model is any good 
+car::qqp(resid(model_best))
+
+residuals_best <- residuals(model_best, type = "pearson")
+
+
+# Plot residuals to check for outliers
+ggplot(data = BB_23_G1_mean_scale, aes(x = fitted(model_best), y = residuals_best)) +
+  geom_point(alpha = 0.5) +
+  geom_hline(yintercept = 0, color = "red", linetype = "dashed") +
+  labs(title = "Residuals vs Fitted Plot",
+       x = "Fitted Values",
+       y = "Pearson Residuals") +
+  theme_minimal()
+
+```
+
+```{r}
+library(dplyr)
+
+# Specify the traits
+traits <- c("SLA_SEG", "msm_all", "fl_duration", "d13C_SEG", "corolla_diam_mm_SEG", "est_fitness")
+
+# Calculate the mean values for each Recipient
+BB_23_G2_mean <- BB_fit_23_G2 %>%
+  select(Donor, all_of(traits)) %>%  # Select only Recipient and the specified traits
+  group_by(Donor) %>%               # Group by Recipient
+  summarise(across(everything(), mean, na.rm = TRUE))  # Calculate mean, ignoring NA values
+
+BB_23_G2_mean <- read_csv(here::here("data_sheets", "compiled_sheets", "BB_mean_donor_traits_23_G2.csv"))
+
+
+
+BB_23_G2_mean_scale <- BB_23_G2_mean %>%
+  mutate(
+    SLA_SEG = scale(SLA_SEG),
+    msm_all = scale(msm_all),
+    fl_duration = scale(fl_duration),
+    d13C_SEG = scale(d13C_SEG),
+    corolla_diam_mm_SEG = scale(corolla_diam_mm_SEG),
+    g0_msm = scale(g0_msm)
+  )
+
+BB_23_G2_mean_scale <- BB_23_G2_mean_scale %>%
+  filter(
+    !is.na(SLA_SEG),
+    !is.na(msm_all),
+    !is.na(fl_duration),
+    !is.na(d13C_SEG),
+    !is.na(corolla_diam_mm_SEG),
+    !is.na(est_fitness),
+    !is.na(g0_msm)
+  )
+
+```
+
+
+
+```{r}
+library(lmerTest)
+library(MuMIn)
+library(influence.ME)
+
+options(na.action = "na.fail")
+
+
+model_1 <- lm(log(est_fitness) ~ SLA_SEG + msm_all + fl_duration + 
+                  d13C_SEG + corolla_diam_mm_SEG + g0_msm, 
+                data = BB_23_G2_mean_scale)
+
+
+#run the final model with all the fixed effects
+
+
+#dredge the model to determine which fixed effects are the best
+dredge(model_1)
+
+#determine the best model
+model_best <- lm(log(est_fitness) ~ msm_all, 
+                data = BB_23_G2_mean_scale)
+
+
+summary(model_best)
+
+#check if the model is any good 
+car::qqp(resid(model_best))
+
+residuals_best <- residuals(model_best, type = "pearson")
+
+
+# Plot residuals to check for outliers
+ggplot(data = BB_23_G2_mean_scale, aes(x = fitted(model_best), y = residuals_best)) +
+  geom_point(alpha = 0.5) +
+  geom_hline(yintercept = 0, color = "red", linetype = "dashed") +
+  labs(title = "Residuals vs Fitted Plot",
+       x = "Fitted Values",
+       y = "Pearson Residuals") +
+  theme_minimal()
+
+```
+
+
+
+```{r}
+library(dplyr)
+
+# Specify the traits
+traits <- c("SLA_SEG", "msm_all", "fl_duration", "d13C_SEG", "corolla_diam_mm_SEG", "est_fitness")
+
+# Calculate the mean values for each Recipient
+BB_G1_mean <- BB_fit_G1 %>%
+  select(Donor, all_of(traits)) %>%  # Select only Recipient and the specified traits
+  group_by(Donor) %>%               # Group by Recipient
+  summarise(across(everything(), mean, na.rm = TRUE))  # Calculate mean, ignoring NA values
+
+
+BB_G1_mean_scale <- BB_G1_mean %>%
+  mutate(
+    SLA_SEG = scale(SLA_SEG),
+    msm_all = scale(msm_all),
+    fl_duration = scale(fl_duration),
+    d13C_SEG = scale(d13C_SEG),
+    corolla_diam_mm_SEG = scale(corolla_diam_mm_SEG)
+  )
+
+BB_G1_mean_scale <- BB_G1_mean_scale %>%
+  filter(
+    !is.na(SLA_SEG),
+    !is.na(msm_all),
+    !is.na(fl_duration),
+    !is.na(d13C_SEG),
+    !is.na(corolla_diam_mm_SEG),
+    !is.na(est_fitness)
+  )
+
+```
+
+
+
+```{r}
+library(lmerTest)
+library(MuMIn)
+library(influence.ME)
+
+options(na.action = "na.fail")
+
+
+model_1 <- lm(log(est_fitness) ~ SLA_SEG + msm_all + fl_duration + 
+                  d13C_SEG + corolla_diam_mm_SEG, 
+                data = BB_G1_mean_scale)
+
+
+#run the final model with all the fixed effects
+
+
+#dredge the model to determine which fixed effects are the best
+dredge(model_1)
+
+# #determine the best model
+model_best <- lm(log(est_fitness) ~
+                 SLA_SEG + msm_all + fl_duration, 
+            data = BB_G1_mean_scale)
+
+summary(model_best)
+# 
+# #check if the model is any good 
+ car::qqp(resid(model_best))
+# 
+ residuals_best <- residuals(model_best, type = "pearson")
+# 
+# 
+# # Plot residuals to check for outliers
+ggplot(data = BB_G1_mean_scale, aes(x = fitted(model_best), y = residuals_best)) +
+   geom_point(alpha = 0.5) +
+   geom_hline(yintercept = 0, color = "red", linetype = "dashed") +
+   labs(title = "Residuals vs Fitted Plot",
+        x = "Fitted Values",
+        y = "Pearson Residuals") +
+  theme_minimal()
+
+```
+
+```{r}
+library(dplyr)
+
+# Specify the traits
+traits <- c("SLA_SEG", "msm_all", "fl_duration", "d13C_SEG", "corolla_diam_mm_SEG", "est_fitness")
+
+# Calculate the mean values for each Recipient
+BB_23_mean <- BB_fit_23 %>%
+  select(Donor, all_of(traits)) %>%  # Select only Recipient and the specified traits
+  group_by(Donor) %>%               # Group by Recipient
+  summarise(across(everything(), mean, na.rm = TRUE))  # Calculate mean, ignoring NA values
+
+
+BB_23_mean_scale <- BB_23_mean %>%
+  mutate(
+    SLA_SEG = scale(SLA_SEG),
+    msm_all = scale(msm_all),
+    fl_duration = scale(fl_duration),
+    d13C_SEG = scale(d13C_SEG),
+    corolla_diam_mm_SEG = scale(corolla_diam_mm_SEG)
+  )
+
+BB_23_mean_scale <- BB_23_mean_scale %>%
+  filter(
+    !is.na(SLA_SEG),
+    !is.na(msm_all),
+    !is.na(fl_duration),
+    !is.na(d13C_SEG),
+    !is.na(corolla_diam_mm_SEG),
+    !is.na(est_fitness)
+  )
+
+```
+
+
+
+```{r}
+library(lmerTest)
+library(MuMIn)
+library(influence.ME)
+
+options(na.action = "na.fail")
+
+
+model_1 <- lm(log(est_fitness) ~ SLA_SEG + msm_all + fl_duration + 
+                  d13C_SEG + corolla_diam_mm_SEG, 
+                data = BB_23_mean_scale)
+
+
+#run the final model with all the fixed effects
+
+
+#dredge the model to determine which fixed effects are the best
+dredge(model_1)
+
+# #determine the best model
+ model_best <- lm(log(est_fitness) ~ SLA_SEG + msm_all + fl_duration, 
+               data = BB_23_mean_scale)
+
+ summary(model_best)
+
+# #check if the model is any good 
+car::qqp(resid(model_best))
+
+ residuals_best <- residuals(model_best, type = "pearson")
+
+# # Plot residuals to check for outliers
+ ggplot(data = BB_23_mean_scale, aes(x = fitted(model_best), y = residuals_best)) +
+   geom_point(alpha = 0.5) +
+   geom_hline(yintercept = 0, color = "red", linetype = "dashed") +
+   labs(title = "Residuals vs Fitted Plot",
+       x = "Fitted Values",
+       y = "Pearson Residuals") +
+   theme_minimal()
+
+```
+
+```{r}
+library(dplyr)
+
+# Specify the traits
+traits <- c("SLA_SEG", "msm_all", "fl_duration", "d13C_SEG", "corolla_diam_mm_SEG", "est_fitness")
+
+# Calculate the mean values for each Recipient
+BB_mean <- BB_fit %>%
+  select(Donor, all_of(traits)) %>%  # Select only Recipient and the specified traits
+  group_by(Donor) %>%               # Group by Recipient
+  summarise(across(everything(), mean, na.rm = TRUE))  # Calculate mean, ignoring NA values
+
+
+BB_mean_scale <- BB_mean %>%
+  mutate(
+    SLA_SEG = scale(SLA_SEG),
+    msm_all = scale(msm_all),
+    fl_duration = scale(fl_duration),
+    d13C_SEG = scale(d13C_SEG),
+    corolla_diam_mm_SEG = scale(corolla_diam_mm_SEG)
+  )
+
+BB_mean_scale <- BB_mean_scale %>%
+  filter(
+    !is.na(SLA_SEG),
+    !is.na(msm_all),
+    !is.na(fl_duration),
+    !is.na(d13C_SEG),
+    !is.na(corolla_diam_mm_SEG),
+    !is.na(est_fitness)
+  )
+
+```
+
+
+
+```{r}
+library(lmerTest)
+library(MuMIn)
+library(influence.ME)
+
+options(na.action = "na.fail")
+
+
+model_1 <- lm(log(est_fitness) ~ SLA_SEG + msm_all + fl_duration + 
+                  d13C_SEG + corolla_diam_mm_SEG, 
+                data = BB_mean_scale)
+
+
+#run the final model with all the fixed effects
+
+
+#dredge the model to determine which fixed effects are the best
+dredge(model_1)
+
+# #determine the best model
+ model_best <- lm(log(est_fitness) ~ msm_all +
+                  fl_duration, 
+               data = BB_mean_scale)
+
+ summary(model_best)
+
+# #check if the model is any good 
+car::qqp(resid(model_best))
+
+ residuals_best <- residuals(model_best, type = "pearson")
+
+# # Plot residuals to check for outliers
+ ggplot(data = BB_23_mean_scale, aes(x = fitted(model_best), y = residuals_best)) +
+   geom_point(alpha = 0.5) +
+   geom_hline(yintercept = 0, color = "red", linetype = "dashed") +
+   labs(title = "Residuals vs Fitted Plot",
+       x = "Fitted Values",
+       y = "Pearson Residuals") +
+   theme_minimal()
+
+```
+
+```{r}
+BB_fit_clean_test <- BB_fit %>%
+  filter(
+    !is.na(est_fitness),
+    !is.na(Year),
+    !is.na(Donor))
+    
+ model_test <- lm(log(est_fitness) ~ Donor +
+                  Year + (Donor*Year), 
+               data = BB_fit)
+ 
+ model_test <- lm(log(est_fitness) ~ Donor * Year, data = BB_fit_clean_test)
+ 
+ BB_fit_clean_test <- BB_fit %>%
+  filter(!is.na(est_fitness), est_fitness > 0, !is.na(Year), !is.na(Donor))
+
+ model_test <- lm(log(est_fitness) ~ Donor * Year, data = BB_fit_clean_test)
+
+ summary(model_test)
+```
+

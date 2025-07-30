@@ -1,0 +1,2536 @@
+###AC
+```{r}
+# 
+# # Load the lme4 package
+# library(lme4)
+# library(dplyr)
+# library(tidyverse)
+# 
+# 
+# ### Load and preprocess data
+# ## Data for fitness plants only
+# # Read the CSV file and create 'sample_ID' column
+# AC_fit <- read_csv(here::here("data_sheets", "compiled_sheets", "AC_22_23_fit.csv")) %>%
+#   rename_at(vars(48), ~"surv_to_fruitpod") %>% #rename this column which was miss spelled
+#   mutate(
+#     # Construct sample_ID conditionally
+#     sample_ID = case_when(
+#       is.na(SegPos) ~ paste(Year, Recipient, Gen, str_pad(Transect, width = 3, pad = "0"), Plant_ID, sep = "-"),
+#       TRUE ~ paste(Year, Recipient, Gen, str_pad(Transect, width = 3, pad = "0"), SegPos, Plant_ID, sep = "-")
+#     ),
+#     # Replace leading underscores in sample_ID with hyphens
+#     sample_ID = str_replace(sample_ID, "^([^_]*)_", "\\1-")
+#   )
+# 
+# # Read in data from non-fitness plants- this is to get survival data from
+# AC_22_23_full <- read_csv(here::here("data_sheets", "compiled_sheets", "AC_22_23_full.csv"))
+# 
+# #create the variable "prop_surv_to_flower"
+# AC_22_23_full <- AC_22_23_full %>%
+#   group_by(Year, Gen, Transect, Sequence, Donor, Recipient, SegPos) %>%
+#   mutate(prop_surv_to_flower = mean(surv_to_flower, na.rm = TRUE)) %>%
+#   ungroup()  # Remove grouping
+# 
+# #select for certain columns
+# AC_prop_sample <- AC_22_23_full %>%
+#   dplyr::select(c(Year, Gen, Transect, Sequence, Donor, Recipient, SegPos, prop_surv_to_flower))  %>%
+#     distinct()
+# 
+# #add "prop_surv_to_flower" based on the columns listed
+# AC_fit <- AC_fit %>%
+#   left_join(AC_prop_sample %>% dplyr::select(Year, Gen, Transect, Sequence, Donor, Recipient, SegPos, prop_surv_to_flower),
+#             by = c("Year", "Gen", "Transect", "Sequence", "Donor", "Recipient", "SegPos"))
+# 
+# # Create the new column for "est_fitness" and rename "prop_surv_to_flower" to "survival"
+# AC_fit <- AC_fit %>%
+#   mutate(est_fitness = prop_surv_to_flower * est_fecundity) %>%
+#   mutate(est_fitness = replace_na(est_fitness, 0)) %>%
+#   rename(survival = prop_surv_to_flower)
+# 
+# #isolate AC 2022
+# AC_fit_22 <- AC_fit %>%
+#   filter(Year == "2022")
+# 
+# #isolate AC 2023 G1
+# AC_fit_23_G1 <- AC_fit %>%
+#   filter(Year == "2023", Gen == "G1")
+# 
+# #isolate AC 2023 G2
+# AC_fit_23_G2 <- AC_fit %>%
+#   filter(Year == "2023", Gen == "G2")
+# 
+# #isolate all G1 together
+# AC_fit_G1 <- AC_fit %>%
+#   filter(Gen == "G1")
+# 
+# #isolate by year
+# AC_fit_23 <- AC_fit %>%
+#   filter(Year == "2023")
+
+AC_fit_22 <- read_csv(here::here("data_sheets", "compiled_sheets", "AC_fit_22.csv"))
+AC_fit_23_G1 <- read_csv(here::here("data_sheets", "compiled_sheets", "AC_fit_23_G1.csv"))
+AC_fit_23_G2 <- read_csv(here::here("data_sheets", "compiled_sheets", "AC_fit_23_G2.csv"))
+
+
+```
+
+
+```{r}
+# Remove rows with NA values in specified columns
+AC_fit_22_clean <- AC_fit_22 %>%
+  filter(
+    !is.na(SLA_SEG),
+    !is.na(msm_all),
+    !is.na(fl_duration),
+    !is.na(d13C_SEG),
+    !is.na(corolla_diam_mm_SEG),
+    !is.na(est_fitness),
+    !is.na(g0_msm)
+  )
+
+AC_fit_23_G1_clean <- AC_fit_23_G1 %>%
+  filter(
+    !is.na(SLA_SEG),
+    !is.na(msm_all),
+    !is.na(fl_duration),
+    !is.na(d13C_SEG),
+    !is.na(corolla_diam_mm_SEG),
+    !is.na(est_fitness),
+    !is.na(g0_msm)
+  )
+
+AC_fit_23_G2_clean <- AC_fit_23_G2 %>%
+  filter(
+    !is.na(SLA_SEG),
+    !is.na(msm_all),
+    !is.na(fl_duration),
+    !is.na(d13C_SEG),
+    !is.na(corolla_diam_mm_SEG),
+    !is.na(est_fitness),
+    !is.na(g0_msm)
+  )
+
+```
+
+#NOTE: THE CV caluculated here is the coefficient of variation for Va!!!
+#G1 2022
+```{r}
+# Fit mixed model
+model <- lmer(log(est_fitness) ~ 1 + (1|Donor) + (1|Transect), data = AC_fit_22_clean)
+
+summary(model)
+
+# Extract variance components
+V_A_pat <- as.numeric(VarCorr(model)$Donor)
+V_T_pat <- as.numeric(VarCorr(model)$Transect)
+V_A <- 4 * V_A_pat  # Full additive genetic variance
+V_T <- V_T_pat      # Transect variance
+
+# Total phenotypic variance
+V_P <- V_A + V_T + attr(VarCorr(model), "sc")^2
+
+# Heritability and other metrics
+mean_trait <- mean(log(AC_fit_22_clean$est_fitness), na.rm = TRUE)
+h2 <- V_A / V_P
+V_A_standardized <- V_A / mean_trait^2
+CV_A <- (sqrt(V_A) / exp(mean_trait)) * 100
+
+# Results
+list(
+  Heritability = h2,
+  Standardized_VA = V_A_standardized,
+  CV_A = CV_A
+)
+```
+
+```{r}
+# Define traits to analyze
+traits <- c("SLA_SEG", "msm_all", "fl_duration", "d13C_SEG", "corolla_diam_mm_SEG", "g0_msm")
+
+# Initialize a list to store results for each trait
+results_list <- list()
+
+# Loop through each trait
+for (trait in traits) {
+  # Fit the mixed model without Transect
+  model <- lmer(
+    formula = paste0("(", trait, ") ~ 1 + (1|Donor)"),
+    data = AC_fit_22_clean
+  )
+  
+  # Check for singular fit
+  if (isSingular(model)) {
+    message(paste("Model for", trait, "is singular. Proceed with caution."))
+  }
+  
+  # Extract variance components
+  V_A_pat <- as.numeric(VarCorr(model)$Donor)  # Donor variance
+  V_A <- 4 * V_A_pat  # Additive genetic variance
+  V_R <- attr(VarCorr(model), "sc")^2  # Residual variance
+  
+  # Total phenotypic variance
+  V_P <- V_A + V_R
+  
+  # Calculate heritability and other metrics
+  mean_trait <- mean((AC_fit_22_clean[[trait]]), na.rm = TRUE)
+  h2 <- V_A / V_P
+  V_A_standardized <- V_A / mean_trait^2
+  CV_A <- (sqrt(V_A) / mean_trait) * 100
+  
+  # Store results in the list
+  results_list[[trait]] <- list(
+    Trait = trait,
+    Heritability = h2,
+    Standardized_VA = V_A_standardized,
+    CV_A = CV_A
+  )
+}
+
+# Combine results into a data frame for better presentation
+results_df <- do.call(rbind, lapply(results_list, as.data.frame))
+
+# View results
+print(results_df)
+
+
+# Combine results into a data frame for better presentation
+results_df <- do.call(rbind, lapply(results_list, as.data.frame))
+
+# View results
+print(results_df)
+
+```
+
+#G1 2023
+```{r}
+# Fit mixed model
+model <- lmer(log(est_fitness) ~ 1 + (1|Donor) + (1|Transect), data = AC_fit_23_G1_clean)
+
+summary(model)
+
+# Extract variance components
+V_A_pat <- as.numeric(VarCorr(model)$Donor)
+V_T_pat <- as.numeric(VarCorr(model)$Transect)
+V_A <- 4 * V_A_pat  # Full additive genetic variance
+V_T <- V_T_pat      # Transect variance
+
+# Total phenotypic variance
+V_P <- V_A + V_T + attr(VarCorr(model), "sc")^2
+
+# Heritability and other metrics
+mean_trait <- mean(log(AC_fit_23_G1_clean$est_fitness), na.rm = TRUE)
+h2 <- V_A / V_P
+V_A_standardized <- V_A / mean_trait^2
+CV_A <- (sqrt(V_A) / exp(mean_trait)) * 100
+
+# Results
+list(
+  Heritability = h2,
+  Standardized_VA = V_A_standardized,
+  CV_A = CV_A
+)
+```
+
+```{r}
+# Define traits to analyze
+traits <- c("SLA_SEG", "msm_all", "fl_duration", "d13C_SEG", "corolla_diam_mm_SEG")
+
+# Initialize a list to store results for each trait
+results_list <- list()
+
+# Loop through each trait
+for (trait in traits) {
+  # Fit the mixed model without Transect
+  model <- lmer(
+    formula = paste0("(", trait, ") ~ 1 + (1|Donor)"),
+    data = AC_fit_23_G1_clean
+  )
+  
+  # Check for singular fit
+  if (isSingular(model)) {
+    message(paste("Model for", trait, "is singular. Proceed with caution."))
+  }
+  
+  # Extract variance components
+  V_A_pat <- as.numeric(VarCorr(model)$Donor)  # Donor variance
+  V_A <- 4 * V_A_pat  # Additive genetic variance
+  V_R <- attr(VarCorr(model), "sc")^2  # Residual variance
+  
+  # Total phenotypic variance
+  V_P <- V_A + V_R
+  
+  # Calculate heritability and other metrics
+  mean_trait <- mean((AC_fit_23_G1_clean[[trait]]), na.rm = TRUE)
+  h2 <- V_A / V_P
+  V_A_standardized <- V_A / mean_trait^2
+  CV_A <- (sqrt(V_A) / mean_trait) * 100
+  
+  # Store results in the list
+  results_list[[trait]] <- list(
+    Trait = trait,
+    Heritability = h2,
+    Standardized_VA = V_A_standardized,
+    CV_A = CV_A
+  )
+}
+
+# Combine results into a data frame for better presentation
+results_df <- do.call(rbind, lapply(results_list, as.data.frame))
+
+# View results
+print(results_df)
+
+
+# Combine results into data frame
+results_df <- do.call(rbind, lapply(results_list, as.data.frame))
+
+# View results
+print(results_df)
+
+```
+
+#G2 2023
+```{r}
+# Fit mixed model
+model <- lmer(log(est_fitness) ~ 1 + (1|Donor), data = AC_fit_23_G2_clean)
+
+
+  # Extract variance components
+  V_A_pat <- as.numeric(VarCorr(model)$Donor)  # Donor variance
+  V_A <- 4 * V_A_pat  # Additive genetic variance
+  V_R <- attr(VarCorr(model), "sc")^2  # Residual variance
+  
+  # Total phenotypic variance
+  V_P <- V_A + V_R
+
+# Heritability and other metrics
+mean_trait <- mean(log(AC_fit_23_G2_clean$est_fitness), na.rm = TRUE)
+h2 <- V_A / V_P
+V_A_standardized <- V_A / mean_trait^2
+CV_A <- (sqrt(V_A) / exp(mean_trait)) * 100
+
+# Results
+list(
+  Heritability = h2,
+  Standardized_VA = V_A_standardized,
+  CV_A = CV_A
+)
+```
+
+```{r}
+# Define traits to analyze
+traits <- c("SLA_SEG", "msm_all", "fl_duration", "d13C_SEG", "corolla_diam_mm_SEG")
+
+# Initialize a list to store results for each trait
+results_list <- list()
+
+# Loop through each trait
+for (trait in traits) {
+  # Fit the mixed model without Transect
+  model <- lmer(
+    formula = paste0("(", trait, ") ~ 1 + (1|Donor)"),
+    data = AC_fit_23_G2_clean
+  )
+  
+  # Check for singular fit
+  if (isSingular(model)) {
+    message(paste("Model for", trait, "is singular. Proceed with caution."))
+  }
+  
+  # Extract variance components
+  V_A_pat <- as.numeric(VarCorr(model)$Donor)  # Donor variance
+  V_A <- 4 * V_A_pat  # Additive genetic variance
+  V_R <- attr(VarCorr(model), "sc")^2  # Residual variance
+  
+  # Total phenotypic variance
+  V_P <- V_A + V_R
+  
+  # Calculate heritability and other metrics
+  mean_trait <- mean((AC_fit_23_G2_clean[[trait]]), na.rm = TRUE)
+  h2 <- V_A / V_P
+  V_A_standardized <- V_A / mean_trait^2
+  CV_A <- (sqrt(V_A) / mean_trait) * 100
+  
+  # Store results in the list
+  results_list[[trait]] <- list(
+    Trait = trait,
+    Heritability = h2,
+    Standardized_VA = V_A_standardized,
+    CV_A = CV_A
+  )
+}
+
+# Combine results into a data frame for better presentation
+results_df <- do.call(rbind, lapply(results_list, as.data.frame))
+
+# View results
+print(results_df)
+
+
+# Combine results into data frame
+results_df <- do.call(rbind, lapply(results_list, as.data.frame))
+
+# View results
+print(results_df)
+
+```
+
+###BB
+```{r}
+# Load the lme4 package
+library(lme4)
+library(dplyr)
+library(tidyverse)
+
+
+# ### Load and preprocess data
+# ## Data for fitness plants only
+# # Read the CSV file and create 'sample_ID' column
+# BB_fit <- read_csv(here::here("data_sheets", "compiled_sheets", "BB_22_23_fit.csv")) %>%
+#   mutate(
+#     # Construct sample_ID conditionally
+#     sample_ID = case_when(
+#       is.na(SegPos) ~ paste(Year, Recipient, Gen, str_pad(Location, width = 3, pad = "0"), Plant_ID, sep = "-"),
+#       TRUE ~ paste(Year, Recipient, Gen, str_pad(Location, width = 3, pad = "0"), SegPos, Plant_ID, sep = "-")
+#     ),
+#     # Replace leading underscores in sample_ID with hyphens
+#     sample_ID = str_replace(sample_ID, "^([^_]*)_", "\\1-")
+#   )
+# 
+# # Read in data from non-fitness plants- this is to get survival data from
+# BB_22_23_full <- read_csv(here::here("data_sheets", "compiled_sheets", "BB_22_23_full.csv"))
+# 
+# #create the variable "prop_surv_to_flower"
+# BB_22_23_full <- BB_22_23_full %>%
+#   group_by(Year, Gen, Location, Sequence, Donor, Recipient, SegPos) %>%
+#   mutate(prop_surv_to_flower = mean(surv_to_flower, na.rm = TRUE)) %>%
+#   ungroup()  # Remove grouping
+# 
+# #select for certain columns
+# BB_prop_sample <- BB_22_23_full %>%
+#   dplyr::select(c(Year, Gen, Location, Sequence, Donor, Recipient, SegPos, prop_surv_to_flower))  %>%
+#     distinct()
+# 
+# #add "prop_surv_to_flower" based on the columns listed
+# BB_fit <- BB_fit %>%
+#   left_join(BB_prop_sample %>% dplyr::select(Year, Gen, Location, Sequence, Donor, Recipient, SegPos, prop_surv_to_flower),
+#             by = c("Year", "Gen", "Location", "Sequence", "Donor", "Recipient", "SegPos"))
+# 
+# # Create the new column for "est_fitness" and rename "prop_surv_to_flower" to "survival"
+# BB_fit <- BB_fit %>%
+#   mutate(est_fitness = prop_surv_to_flower * est_fecundity) %>%
+#   mutate(est_fitness = replace_na(est_fitness, 0)) %>%
+#   rename(survival = prop_surv_to_flower)
+# 
+# BB_fit$Location_Binned <- cut(BB_fit$Location, breaks = 5)
+# 
+# 
+# #isolate BB 2022
+# BB_fit_22 <- BB_fit %>%
+#   filter(Year == "2022")
+# 
+# #isolate BB 2023 G1
+# BB_fit_23_G1 <- BB_fit %>%
+#   filter(Year == "2023", Gen == "G1")
+# 
+# #isolate BB 2023 G2
+# BB_fit_23_G2 <- BB_fit %>%
+#   filter(Year == "2023", Gen == "G2")
+# 
+# #isolate all G1 together
+# BB_fit_G1 <- BB_fit %>%
+#   filter(Gen == "G1")
+# 
+# #isolate by year
+# BB_fit_23 <- BB_fit %>%
+#   filter(Year == "2023")
+
+
+BB_fit_22 <- read_csv(here::here("data_sheets", "compiled_sheets", "BB_fit_22.csv"))
+BB_fit_23_G1 <- read_csv(here::here("data_sheets", "compiled_sheets", "BB_fit_23_G1.csv"))
+BB_fit_23_G2 <- read_csv(here::here("data_sheets", "compiled_sheets", "BB_fit_23_G2.csv"))
+```
+
+
+```{r}
+# Remove rows with NA values in specified columns
+BB_fit_22_clean <- BB_fit_22 %>%
+  filter(
+    !is.na(SLA_SEG),
+    !is.na(msm_all),
+    !is.na(fl_duration),
+    !is.na(d13C_SEG),
+    !is.na(corolla_diam_mm_SEG),
+    !is.na(est_fitness),
+    !is.na(g0_msm)
+  )
+
+BB_fit_23_G1_clean <- BB_fit_23_G1 %>%
+  filter(
+    !is.na(SLA_SEG),
+    !is.na(msm_all),
+    !is.na(fl_duration),
+    !is.na(d13C_SEG),
+    !is.na(corolla_diam_mm_SEG),
+    !is.na(est_fitness),
+    !is.na(g0_msm)
+  )
+
+BB_fit_23_G2_clean <- BB_fit_23_G2 %>%
+  filter(
+    !is.na(SLA_SEG),
+    !is.na(msm_all),
+    !is.na(fl_duration),
+    !is.na(d13C_SEG),
+    !is.na(corolla_diam_mm_SEG),
+    !is.na(est_fitness),
+    !is.na(g0_msm)
+  )
+
+```
+
+#FOR LOG TRANSFORMED TRAITS
+#G1 2022
+```{r}
+# Fit mixed model
+model <- lmer(log(est_fitness) ~ 1 + (1|Donor), data = BB_fit_22_clean)
+
+  # Extract variance components
+  V_A_pat <- as.numeric(VarCorr(model)$Donor)  # Donor variance
+  V_A <- 4 * V_A_pat  # Additive genetic variance
+  V_R <- attr(VarCorr(model), "sc")^2  # Residual variance
+  
+  # Total phenotypic variance
+  V_P <- V_A + V_R
+
+# Heritability and other metrics
+mean_trait <- mean(log(BB_fit_22_clean$est_fitness), na.rm = TRUE)
+h2 <- V_A / V_P
+V_A_standardized <- V_A / mean_trait^2
+CV_A <- (sqrt(V_A) / exp(mean_trait)) * 100
+
+# Results
+list(
+  Heritability = h2,
+  Standardized_VA = V_A_standardized,
+  CV_A = CV_A
+)
+```
+```{r}
+# Define traits to analyze
+traits <- c("SLA_SEG", "msm_all", "fl_duration", "d13C_SEG", "corolla_diam_mm_SEG", "g0_msm")
+
+# Initialize a list to store results for each trait
+results_list <- list()
+
+# Loop through each trait
+for (trait in traits) {
+  # Fit the mixed model for the current trait
+  model <- lmer(
+    formula = paste0("(", trait, ") ~ 1 + (1|Donor)"), 
+    data = BB_fit_22_clean
+  )
+  
+    # Check for singular fit
+  if (isSingular(model)) {
+    message(paste("Model for", trait, "is singular. Proceed with caution."))
+  }
+  
+  # Extract variance components
+  V_A_pat <- as.numeric(VarCorr(model)$Donor)  # Donor variance
+  V_A <- 4 * V_A_pat  # Additive genetic variance
+  V_R <- attr(VarCorr(model), "sc")^2  # Residual variance
+  
+  # Total phenotypic variance
+  V_P <- V_A + V_R
+  
+  # Calculate heritability and other metrics
+  mean_trait <- mean((BB_fit_22_clean[[trait]]), na.rm = TRUE)
+  h2 <- V_A / V_P
+  V_A_standardized <- V_A / mean_trait^2
+  CV_A <- (sqrt(V_A) / mean_trait) * 100
+  
+  # Store results in the list
+  results_list[[trait]] <- list(
+    Trait = trait,
+    Heritability = h2,
+    Standardized_VA = V_A_standardized,
+    CV_A = CV_A
+  )
+}
+
+# Combine results into a data frame for better presentation
+results_df <- do.call(rbind, lapply(results_list, as.data.frame))
+
+# View results
+print(results_df)
+
+```
+
+#G1 2023
+```{r}
+# Fit mixed model
+model <- lmer(log(est_fitness) ~ 1 + (1|Donor) + (1|Location_Binned), data = BB_fit_23_G1_clean)
+
+# Extract variance components
+V_A_pat <- as.numeric(VarCorr(model)$Donor)
+V_T_pat <- as.numeric(VarCorr(model)$Location_Binned)
+V_A <- 4 * V_A_pat  # Full additive genetic variance
+V_T <- V_T_pat      # Location_Binned variance
+
+# Total phenotypic variance
+V_P <- V_A + V_T + attr(VarCorr(model), "sc")^2
+
+# Heritability and other metrics
+mean_trait <- mean(log(BB_fit_23_G1_clean$est_fitness), na.rm = TRUE)
+h2 <- V_A / V_P
+V_A_standardized <- V_A / mean_trait^2
+CV_A <- (sqrt(V_A) / exp(mean_trait)) * 100
+
+# Results
+list(
+  Heritability = h2,
+  Standardized_VA = V_A_standardized,
+  CV_A = CV_A
+)
+```
+
+
+#G1 2023
+```{r} 
+# Define traits to analyze
+traits <- c("SLA_SEG", "msm_all", "fl_duration", "d13C_SEG", "corolla_diam_mm_SEG")
+
+# Initialize a list to store results for each trait
+results_list <- list()
+
+# Loop through each trait
+for (trait in traits) {
+  # Fit the mixed model for the current trait
+  model <- lmer(
+    formula = paste0("(", trait, ") ~ 1 + (1|Donor)"), 
+    data = BB_fit_23_G1_clean
+  )
+  
+     # Check for singular fit
+  if (isSingular(model)) {
+    message(paste("Model for", trait, "is singular. Proceed with caution."))
+  }
+  
+  # Extract variance components
+  V_A_pat <- as.numeric(VarCorr(model)$Donor)  # Donor variance
+  V_A <- 4 * V_A_pat  # Additive genetic variance
+  V_R <- attr(VarCorr(model), "sc")^2  # Residual variance
+  
+  # Total phenotypic variance
+  V_P <- V_A + V_R
+  
+  # Calculate heritability and other metrics
+  mean_trait <- mean((BB_fit_23_G1_clean[[trait]]), na.rm = TRUE)
+  h2 <- V_A / V_P
+  V_A_standardized <- V_A / mean_trait^2
+  CV_A <- (sqrt(V_A) / mean_trait) * 100
+  
+  # Store results in the list
+  results_list[[trait]] <- list(
+    Trait = trait,
+    Heritability = h2,
+    Standardized_VA = V_A_standardized,
+    CV_A = CV_A
+  )
+}
+
+# Combine results into a data frame for better presentation
+results_df <- do.call(rbind, lapply(results_list, as.data.frame))
+
+# View results
+print(results_df)
+
+```
+
+#G2 2023
+```{r}
+# Fit mixed model
+model <- lmer(log(est_fitness) ~ 1 + (1|Donor) + (1|Location_Binned), data = BB_fit_23_G2_clean)
+
+# Extract variance components
+V_A_pat <- as.numeric(VarCorr(model)$Donor)
+V_T_pat <- as.numeric(VarCorr(model)$Location_Binned)
+V_A <- 4 * V_A_pat  # Full additive genetic variance
+V_T <- V_T_pat      # Location_Binned variance
+
+# Total phenotypic variance
+V_P <- V_A + V_T + attr(VarCorr(model), "sc")^2
+
+# Heritability and other metrics
+mean_trait <- mean(log(BB_fit_23_G2_clean$est_fitness), na.rm = TRUE)
+h2 <- V_A / V_P
+V_A_standardized <- V_A / mean_trait^2
+CV_A <- (sqrt(V_A) / exp(mean_trait)) * 100
+
+# Results
+list(
+  Heritability = h2,
+  Standardized_VA = V_A_standardized,
+  CV_A = CV_A
+)
+```
+
+#G2 2023
+```{r}
+# Define traits to analyze
+traits <- c("SLA_SEG", "msm_all", "fl_duration", "d13C_SEG", "corolla_diam_mm_SEG")
+
+# Initialize a list to store results for each trait
+results_list <- list()
+
+# Loop through each trait
+for (trait in traits) {
+  # Fit the mixed model for the current trait
+  model <- lmer(
+    formula = paste0("(", trait, ") ~ 1 + (1|Donor) + (1|Location_Binned)"), 
+    data = BB_fit_23_G2_clean
+  )
+
+  
+       # Check for singular fit
+  if (isSingular(model)) {
+    message(paste("Model for", trait, "is singular. Proceed with caution."))
+  }
+  
+  # Extract variance components
+  V_A_pat <- as.numeric(VarCorr(model)$Donor)  # Donor variance
+  V_A <- 4 * V_A_pat  # Additive genetic variance
+  V_R <- attr(VarCorr(model), "sc")^2  # Residual variance
+  
+  # Total phenotypic variance
+  V_P <- V_A + V_R
+  
+  # Calculate heritability and other metrics
+  mean_trait <- mean((BB_fit_23_G2_clean[[trait]]), na.rm = TRUE)
+  h2 <- V_A / V_P
+  V_A_standardized <- V_A / mean_trait^2
+  CV_A <- (sqrt(V_A) / mean_trait) * 100
+  
+  # Store results in the list
+  results_list[[trait]] <- list(
+    Trait = trait,
+    Heritability = h2,
+    Standardized_VA = V_A_standardized,
+    CV_A = CV_A
+  )
+}
+
+# Combine results into a data frame for better presentation
+results_df <- do.call(rbind, lapply(results_list, as.data.frame))
+
+# View results
+print(results_df)
+
+```
+
+
+###HR
+```{r}
+# Load the lme4 package
+library(lme4)
+library(dplyr)
+library(tidyverse)
+
+# 
+# ### Load and preprocess data
+# ## Data for fitness plants only
+# # Read the CSV file and create 'sample_ID' column
+# HR_fit <- read_csv(here::here("data_sheets", "compiled_sheets", "HR_22_23_fit.csv")) %>%
+#   mutate(
+#     # Construct sample_ID conditionally
+#     sample_ID = case_when(
+#       is.na(SegPos) ~ paste(Year, Recipient, Gen, str_pad(Transect, width = 3, pad = "0"), Plant_ID, sep = "-"),
+#       TRUE ~ paste(Year, Recipient, Gen, str_pad(Transect, width = 3, pad = "0"), SegPos, Plant_ID, sep = "-")
+#     ),
+#     # Replace leading underscores in sample_ID with hyphens
+#     sample_ID = str_replace(sample_ID, "^([^_]*)_", "\\1-")
+#   )
+# 
+# # Read in data from non-fitness plants- this is to get survival data from
+# HR_22_23_full <- read_csv(here::here("data_sheets", "compiled_sheets", "HR_22_23_full.csv"))
+# 
+# #create the variable "prop_surv_to_flower"
+# HR_22_23_full <- HR_22_23_full %>%
+#   group_by(Year, Gen, Transect, Sequence, Donor, Recipient, SegPos) %>%
+#   mutate(prop_surv_to_flower = mean(surv_to_flower, na.rm = TRUE)) %>%
+#   ungroup()  # Remove grouping
+# 
+# #select for certain columns
+# HR_prop_sample <- HR_22_23_full %>%
+#   dplyr::select(c(Year, Gen, Transect, Sequence, Donor, Recipient, SegPos, prop_surv_to_flower))  %>%
+#     distinct()
+# 
+# #add "prop_surv_to_flower" based on the columns listed
+# HR_fit <- HR_fit %>%
+#   left_join(HR_prop_sample %>% dplyr::select(Year, Gen, Transect, Sequence, Donor, Recipient, SegPos, prop_surv_to_flower),
+#             by = c("Year", "Gen", "Transect", "Sequence", "Donor", "Recipient", "SegPos"))
+# 
+# # Create the new column for "est_fitness" and rename "prop_surv_to_flower" to "survival"
+# HR_fit <- HR_fit %>%
+#   mutate(est_fitness = prop_surv_to_flower * est_fecundity) %>%
+#   mutate(est_fitness = replace_na(est_fitness, 0)) %>%
+#   rename(survival = prop_surv_to_flower)
+# 
+# 
+# #isolate HR 2022
+# HR_fit_22 <- HR_fit %>%
+#   filter(Year == "2022")
+# 
+# #isolate HR 2023 G1
+# HR_fit_23_G1 <- HR_fit %>%
+#   filter(Year == "2023", Gen == "G1")
+# 
+# #isolate BB 2023 G2
+# HR_fit_23_G2 <- HR_fit %>%
+#   filter(Year == "2023", Gen == "G2")
+# 
+# #isolate all G1 together
+# HR_fit_G1 <- HR_fit %>%
+#   filter(Gen == "G1")
+# 
+# #isolate by year
+# HR_fit_23 <- HR_fit %>%
+#   filter(Year == "2023")
+
+
+HR_fit_22 <- read_csv(here::here("data_sheets", "compiled_sheets", "HR_fit_22.csv"))
+HR_fit_23_G1 <- read_csv(here::here("data_sheets", "compiled_sheets", "HR_fit_23_G1.csv"))
+HR_fit_23_G2 <- read_csv(here::here("data_sheets", "compiled_sheets", "HR_fit_23_G2.csv"))
+
+```
+
+
+```{r}
+# Remove rows with NA values in specified columns
+HR_fit_22_clean <- HR_fit_22 %>%
+  filter(
+    !is.na(SLA_SEG),
+    !is.na(msm_all),
+    !is.na(fl_duration),
+    !is.na(d13C_SEG),
+    !is.na(corolla_diam_mm_SEG),
+    !is.na(est_fitness),
+    !is.na(g0_msm)
+  )
+
+HR_fit_23_G1_clean <- HR_fit_23_G1 %>%
+  filter(
+    !is.na(SLA_SEG),
+    !is.na(msm_all),
+    !is.na(fl_duration),
+    !is.na(d13C_SEG),
+    !is.na(corolla_diam_mm_SEG),
+    !is.na(est_fitness),
+    !is.na(g0_msm)
+  )
+
+HR_fit_23_G2_clean <- HR_fit_23_G2 %>%
+  filter(
+    !is.na(SLA_SEG),
+    !is.na(msm_all),
+    !is.na(fl_duration),
+    !is.na(d13C_SEG),
+    !is.na(corolla_diam_mm_SEG),
+    !is.na(est_fitness),
+    !is.na(g0_msm)
+  )
+
+```
+
+#FOR LOG TRANSFORMED TRAITS
+#G1 2022
+```{r}
+HR_fit_22 <- read_csv(here::here("data_sheets", "compiled_sheets", "HR_fit_22.csv"))
+
+# Fit mixed model
+model <- lmer(log(est_fitness) ~ 1 + (1|Donor), data = HR_fit_22_clean)
+
+  # Extract variance components
+  V_A_pat <- as.numeric(VarCorr(model)$Donor)  # Donor variance
+  V_A <- 4 * V_A_pat  # Additive genetic variance
+  V_R <- attr(VarCorr(model), "sc")^2  # Residual variance
+  
+  # Total phenotypic variance
+  V_P <- V_A + V_R
+
+# Heritability and other metrics
+mean_trait <- mean(log(HR_fit_22_clean$est_fitness), na.rm = TRUE)
+h2 <- V_A / V_P
+V_A_standardized <- V_A / mean_trait^2
+CV_A <- (sqrt(V_A) / exp(mean_trait)) * 100
+
+# Results
+list(
+  Heritability = h2,
+  Standardized_VA = V_A_standardized,
+  CV_A = CV_A
+)
+```
+
+```{r}
+# Define traits to analyze
+traits <- c("SLA_SEG", "msm_all", "fl_duration", "d13C_SEG", "corolla_diam_mm_SEG", "g0_msm")
+
+# Initialize a list to store results for each trait
+results_list <- list()
+
+# Loop through each trait
+for (trait in traits) {
+  # Fit the mixed model for the current trait
+  model <- lmer(
+    formula = paste0("(", trait, ") ~ 1 + (1|Donor)"), 
+    data = HR_fit_22_clean
+  )
+  
+    # Check for singular fit
+  if (isSingular(model)) {
+    message(paste("Model for", trait, "is singular. Proceed with caution."))
+  }
+  
+  # Extract variance components
+  V_A_pat <- as.numeric(VarCorr(model)$Donor)  # Donor variance
+  V_A <- 4 * V_A_pat  # Additive genetic variance
+  V_R <- attr(VarCorr(model), "sc")^2  # Residual variance
+  
+  # Total phenotypic variance
+  V_P <- V_A + V_R
+  
+  # Calculate heritability and other metrics
+  mean_trait <- mean((HR_fit_22_clean[[trait]]), na.rm = TRUE)
+  h2 <- V_A / V_P
+  V_A_standardized <- V_A / mean_trait^2
+  CV_A <- (sqrt(V_A) / mean_trait) * 100
+  
+  # Store results in the list
+  results_list[[trait]] <- list(
+    Trait = trait,
+    Heritability = h2,
+    Standardized_VA = V_A_standardized,
+    CV_A = CV_A
+  )
+}
+
+# Combine results into a data frame for better presentation
+results_df <- do.call(rbind, lapply(results_list, as.data.frame))
+
+# View results
+print(results_df)
+
+```
+
+#G1 2023
+```{r}
+# Fit mixed model
+model <- lmer(log(est_fitness) ~ 1 + (1|Donor), data = HR_fit_23_G1_clean)
+
+  # Extract variance components
+  V_A_pat <- as.numeric(VarCorr(model)$Donor)  # Donor variance
+  V_A <- 4 * V_A_pat  # Additive genetic variance
+  V_R <- attr(VarCorr(model), "sc")^2  # Residual variance
+  
+  # Total phenotypic variance
+  V_P <- V_A + V_R
+
+# Heritability and other metrics
+mean_trait <- mean(log(HR_fit_23_G1_clean$est_fitness), na.rm = TRUE)
+h2 <- V_A / V_P
+V_A_standardized <- V_A / mean_trait^2
+CV_A <- (sqrt(V_A) / exp(mean_trait)) * 100
+
+# Results
+list(
+  Heritability = h2,
+  Standardized_VA = V_A_standardized,
+  CV_A = CV_A
+)
+```
+
+
+#G1 2023
+```{r} 
+# Define traits to analyze
+traits <- c("SLA_SEG", "msm_all", "fl_duration", "d13C_SEG", "corolla_diam_mm_SEG")
+
+# Initialize a list to store results for each trait
+results_list <- list()
+
+# Loop through each trait
+for (trait in traits) {
+  # Fit the mixed model for the current trait
+  model <- lmer(
+    formula = paste0("(", trait, ") ~ 1 + (1|Donor)"), 
+    data = HR_fit_23_G1_clean
+  )
+  
+     # Check for singular fit
+  if (isSingular(model)) {
+    message(paste("Model for", trait, "is singular. Proceed with caution."))
+  }
+  
+  # Extract variance components
+  V_A_pat <- as.numeric(VarCorr(model)$Donor)  # Donor variance
+  V_A <- 4 * V_A_pat  # Additive genetic variance
+  V_R <- attr(VarCorr(model), "sc")^2  # Residual variance
+  
+  # Total phenotypic variance
+  V_P <- V_A + V_R
+  
+  # Calculate heritability and other metrics
+  mean_trait <- mean((HR_fit_23_G1_clean[[trait]]), na.rm = TRUE)
+  h2 <- V_A / V_P
+  V_A_standardized <- V_A / mean_trait^2
+  CV_A <- (sqrt(V_A) / mean_trait) * 100
+  
+  # Store results in the list
+  results_list[[trait]] <- list(
+    Trait = trait,
+    Heritability = h2,
+    Standardized_VA = V_A_standardized,
+    CV_A = CV_A
+  )
+}
+
+# Combine results into a data frame for better presentation
+results_df <- do.call(rbind, lapply(results_list, as.data.frame))
+
+# View results
+print(results_df)
+
+```
+
+#G2 2023
+```{r}
+# Fit mixed model
+model <- lmer(log(est_fitness) ~ 1 + (1|Donor) + (1|Transect), data = HR_fit_23_G2_clean)
+
+# Extract variance components
+V_A_pat <- as.numeric(VarCorr(model)$Donor)
+V_T_pat <- as.numeric(VarCorr(model)$Transect)
+V_A <- 4 * V_A_pat  # Full additive genetic variance
+V_T <- V_T_pat      # Location_Binned variance
+
+# Total phenotypic variance
+V_P <- V_A + V_T + attr(VarCorr(model), "sc")^2
+
+# Heritability and other metrics
+mean_trait <- mean(log(HR_fit_23_G2_clean$est_fitness), na.rm = TRUE)
+h2 <- V_A / V_P
+V_A_standardized <- V_A / mean_trait^2
+CV_A <- (sqrt(V_A) / exp(mean_trait)) * 100
+
+# Results
+list(
+  Heritability = h2,
+  Standardized_VA = V_A_standardized,
+  CV_A = CV_A
+)
+```
+
+#G2 2023
+```{r}
+# Define traits to analyze
+traits <- c("SLA_SEG", "msm_all", "fl_duration", "d13C_SEG", "corolla_diam_mm_SEG")
+
+# Initialize a list to store results for each trait
+results_list <- list()
+
+# Loop through each trait
+for (trait in traits) {
+  # Fit the mixed model for the current trait
+  model <- lmer(
+    formula = paste0("(", trait, ") ~ 1 + (1|Donor)"), 
+    data = HR_fit_23_G2_clean
+  )
+
+  
+       # Check for singular fit
+  if (isSingular(model)) {
+    message(paste("Model for", trait, "is singular. Proceed with caution."))
+  }
+  
+  # Extract variance components
+  V_A_pat <- as.numeric(VarCorr(model)$Donor)  # Donor variance
+  V_A <- 4 * V_A_pat  # Additive genetic variance
+  V_R <- attr(VarCorr(model), "sc")^2  # Residual variance
+  
+  # Total phenotypic variance
+  V_P <- V_A + V_R
+  
+  # Calculate heritability and other metrics
+  mean_trait <- mean((HR_fit_23_G2_clean[[trait]]), na.rm = TRUE)
+  h2 <- V_A / V_P
+  V_A_standardized <- V_A / mean_trait^2
+  CV_A <- (sqrt(V_A) / mean_trait) * 100
+  
+  # Store results in the list
+  results_list[[trait]] <- list(
+    Trait = trait,
+    Heritability = h2,
+    Standardized_VA = V_A_standardized,
+    CV_A = CV_A
+  )
+}
+
+# Combine results into a data frame for better presentation
+results_df <- do.call(rbind, lapply(results_list, as.data.frame))
+
+# View results
+print(results_df)
+
+```
+
+
+###BO
+```{r}
+# Load the lme4 package
+library(lme4)
+library(dplyr)
+library(tidyverse)
+
+# 
+# ### Load and preprocess data
+# ## Data for fitness plants only
+# # Read the CSV file and create 'sample_ID' column
+# BO_fit <- read_csv(here::here("data_sheets", "compiled_sheets", "BO_22_23_fit.csv")) %>%
+#   mutate(
+#     # Construct sample_ID conditionally
+#     sample_ID = case_when(
+#       is.na(SegPos) ~ paste(Year, Recipient, Gen, str_pad(Transect, width = 3, pad = "0"), Plant_ID, sep = "-"),
+#       TRUE ~ paste(Year, Recipient, Gen, str_pad(Transect, width = 3, pad = "0"), SegPos, Plant_ID, sep = "-")
+#     ),
+#     # Replace leading underscores in sample_ID with hyphens
+#     sample_ID = str_replace(sample_ID, "^([^_]*)_", "\\1-")
+#   )
+# 
+# # Read in data from non-fitness plants- this is to get survival data from
+# BO_22_23_full <- read_csv(here::here("data_sheets", "compiled_sheets", "BO_22_23_full.csv"))
+# 
+# #create the variable "prop_surv_to_flower"
+# BO_22_23_full <- BO_22_23_full %>%
+#   group_by(Year, Gen, Transect, Sequence, Donor, Recipient, SegPos) %>%
+#   mutate(prop_surv_to_flower = mean(surv_to_flower, na.rm = TRUE)) %>%
+#   ungroup()  # Remove grouping
+# 
+# #select for certain columns
+# BO_prop_sample <- BO_22_23_full %>%
+#   dplyr::select(c(Year, Gen, Transect, Sequence, Donor, Recipient, SegPos, prop_surv_to_flower))  %>%
+#     distinct()
+# 
+# #add "prop_surv_to_flower" based on the columns listed
+# BO_fit <- BO_fit %>%
+#   left_join(BO_prop_sample %>% dplyr::select(Year, Gen, Transect, Sequence, Donor, Recipient, SegPos, prop_surv_to_flower),
+#             by = c("Year", "Gen", "Transect", "Sequence", "Donor", "Recipient", "SegPos"))
+# 
+# # Create the new column for "est_fitness" and rename "prop_surv_to_flower" to "survival"
+# BO_fit <- BO_fit %>%
+#   mutate(est_fitness = prop_surv_to_flower * est_fecundity) %>%
+#   mutate(est_fitness = replace_na(est_fitness, 0)) %>%
+#   rename(survival = prop_surv_to_flower)
+# 
+# 
+# #isolate HR 2022
+# BO_fit_22 <- BO_fit %>%
+#   filter(Year == "2022")
+# 
+# #isolate HR 2023 G1
+# BO_fit_23_G1 <- BO_fit %>%
+#   filter(Year == "2023", Gen == "G1")
+# 
+# #isolate BB 2023 G2
+# BO_fit_23_G2 <- BO_fit %>%
+#   filter(Year == "2023", Gen == "G2")
+# 
+# #isolate all G1 together
+# BO_fit_G1 <- BO_fit %>%
+#   filter(Gen == "G1")
+# 
+# #isolate by year
+# BO_fit_23 <- BO_fit %>%
+#   filter(Year == "2023")
+
+
+BO_fit_22 <- read_csv(here::here("data_sheets", "compiled_sheets", "BO_fit_22.csv"))
+BO_fit_23_G1 <- read_csv(here::here("data_sheets", "compiled_sheets", "BO_fit_23_G1.csv"))
+BO_fit_23_G2 <- read_csv(here::here("data_sheets", "compiled_sheets", "BO_fit_23_G2.csv"))
+
+```
+
+
+```{r}
+# Remove rows with NA values in specified columns
+BO_fit_22_clean <- BO_fit_22 %>%
+  filter(
+    !is.na(SLA_SEG),
+    !is.na(msm_all),
+    !is.na(fl_duration),
+    !is.na(d13C_SEG),
+    !is.na(corolla_diam_mm_SEG),
+    !is.na(est_fitness),
+    !is.na(g0_msm)
+  )
+
+BO_fit_23_G1_clean <- BO_fit_23_G1 %>%
+  filter(
+    !is.na(SLA_SEG),
+    !is.na(msm_all),
+    !is.na(fl_duration),
+    !is.na(d13C_SEG),
+    !is.na(corolla_diam_mm_SEG),
+    !is.na(est_fitness),
+    !is.na(g0_msm)
+  )
+
+BO_fit_23_G2_clean <- BO_fit_23_G2 %>%
+  filter(
+    !is.na(SLA_SEG),
+    !is.na(msm_all),
+    !is.na(fl_duration),
+    !is.na(d13C_SEG),
+    !is.na(corolla_diam_mm_SEG),
+    !is.na(est_fitness),
+    !is.na(g0_msm)
+  )
+
+```
+
+#FOR LOG TRANSFORMED TRAITS
+#G1 2022
+```{r}
+# Fit mixed model
+model <- lmer(log(est_fitness) ~ 1 + (1|Donor) + (1|Transect), data = BO_fit_22_clean)
+
+# Extract variance components
+V_A_pat <- as.numeric(VarCorr(model)$Donor)
+V_T_pat <- as.numeric(VarCorr(model)$Location_Binned)
+V_A <- 4 * V_A_pat  # Full additive genetic variance
+V_T <- V_T_pat      # Location_Binned variance
+
+# Total phenotypic variance
+V_P <- V_A + V_T + attr(VarCorr(model), "sc")^2
+
+# Heritability and other metrics
+mean_trait <- mean(log(BO_fit_22_clean$est_fitness), na.rm = TRUE)
+h2 <- V_A / V_P
+V_A_standardized <- V_A / mean_trait^2
+CV_A <- (sqrt(V_A) / exp(mean_trait)) * 100
+
+# Results
+list(
+  Heritability = h2,
+  Standardized_VA = V_A_standardized,
+  CV_A = CV_A
+)
+```
+
+```{r}
+# Define traits to analyze
+traits <- c("SLA_SEG", "msm_all", "fl_duration", "d13C_SEG", "corolla_diam_mm_SEG", "g0_msm")
+
+# Initialize a list to store results for each trait
+results_list <- list()
+
+# Loop through each trait
+for (trait in traits) {
+  # Fit the mixed model for the current trait
+  model <- lmer(
+    formula = paste0("(", trait, ") ~ 1 + (1|Donor)"), 
+    data = BO_fit_22_clean
+  )
+  
+    # Check for singular fit
+  if (isSingular(model)) {
+    message(paste("Model for", trait, "is singular. Proceed with caution."))
+  }
+  
+  # Extract variance components
+  V_A_pat <- as.numeric(VarCorr(model)$Donor)  # Donor variance
+  V_A <- 4 * V_A_pat  # Additive genetic variance
+  V_R <- attr(VarCorr(model), "sc")^2  # Residual variance
+  
+  # Total phenotypic variance
+  V_P <- V_A + V_R
+  
+  # Calculate heritability and other metrics
+  mean_trait <- mean((BO_fit_22_clean[[trait]]), na.rm = TRUE)
+  h2 <- V_A / V_P
+  V_A_standardized <- V_A / mean_trait^2
+  CV_A <- (sqrt(V_A) / mean_trait) * 100
+  
+  # Store results in the list
+  results_list[[trait]] <- list(
+    Trait = trait,
+    Heritability = h2,
+    Standardized_VA = V_A_standardized,
+    CV_A = CV_A
+  )
+}
+
+# Combine results into a data frame for better presentation
+results_df <- do.call(rbind, lapply(results_list, as.data.frame))
+
+# View results
+print(results_df)
+
+```
+
+#G1 2023
+```{r}
+# Fit mixed model
+model <- lmer(log(est_fitness) ~ 1 + (1|Donor), data = BO_fit_23_G1_clean)
+
+  # Extract variance components
+  V_A_pat <- as.numeric(VarCorr(model)$Donor)  # Donor variance
+  V_A <- 4 * V_A_pat  # Additive genetic variance
+  V_R <- attr(VarCorr(model), "sc")^2  # Residual variance
+  
+  # Total phenotypic variance
+  V_P <- V_A + V_R
+
+# Heritability and other metrics
+mean_trait <- mean(log(BO_fit_23_G1_clean$est_fitness), na.rm = TRUE)
+h2 <- V_A / V_P
+V_A_standardized <- V_A / mean_trait^2
+CV_A <- (sqrt(V_A) / exp(mean_trait)) * 100
+
+# Results
+list(
+  Heritability = h2,
+  Standardized_VA = V_A_standardized,
+  CV_A = CV_A
+)
+```
+
+
+#G1 2023
+```{r} 
+# Define traits to analyze
+traits <- c("SLA_SEG", "msm_all", "fl_duration", "d13C_SEG", "corolla_diam_mm_SEG")
+
+# Initialize a list to store results for each trait
+results_list <- list()
+
+# Loop through each trait
+for (trait in traits) {
+  # Fit the mixed model for the current trait
+  model <- lmer(
+    formula = paste0("(", trait, ") ~ 1 + (1|Donor)"), 
+    data = BO_fit_23_G1_clean
+  )
+  
+     # Check for singular fit
+  if (isSingular(model)) {
+    message(paste("Model for", trait, "is singular. Proceed with caution."))
+  }
+  
+  # Extract variance components
+  V_A_pat <- as.numeric(VarCorr(model)$Donor)  # Donor variance
+  V_A <- 4 * V_A_pat  # Additive genetic variance
+  V_R <- attr(VarCorr(model), "sc")^2  # Residual variance
+  
+  # Total phenotypic variance
+  V_P <- V_A + V_R
+  
+  # Calculate heritability and other metrics
+  mean_trait <- mean((BO_fit_23_G1_clean[[trait]]), na.rm = TRUE)
+  h2 <- V_A / V_P
+  V_A_standardized <- V_A / mean_trait^2
+  CV_A <- (sqrt(V_A) / mean_trait) * 100
+  
+  # Store results in the list
+  results_list[[trait]] <- list(
+    Trait = trait,
+    Heritability = h2,
+    Standardized_VA = V_A_standardized,
+    CV_A = CV_A
+  )
+}
+
+# Combine results into a data frame for better presentation
+results_df <- do.call(rbind, lapply(results_list, as.data.frame))
+
+# View results
+print(results_df)
+
+```
+
+#G2 2023
+```{r}
+# Fit mixed model
+model <- lmer(log(est_fitness) ~ 1 + (1|Donor), data = BO_fit_23_G2_clean)
+
+  # Extract variance components
+  V_A_pat <- as.numeric(VarCorr(model)$Donor)  # Donor variance
+  V_A <- 4 * V_A_pat  # Additive genetic variance
+  V_R <- attr(VarCorr(model), "sc")^2  # Residual variance
+  
+  # Total phenotypic variance
+  V_P <- V_A + V_R
+
+# Heritability and other metrics
+mean_trait <- mean(log(BO_fit_23_G2_clean$est_fitness), na.rm = TRUE)
+h2 <- V_A / V_P
+V_A_standardized <- V_A / mean_trait^2
+CV_A <- (sqrt(V_A) / exp(mean_trait)) * 100
+
+# Results
+list(
+  Heritability = h2,
+  Standardized_VA = V_A_standardized,
+  CV_A = CV_A
+)
+```
+
+#G2 2023
+```{r}
+# Define traits to analyze
+traits <- c("SLA_SEG", "msm_all", "fl_duration", "d13C_SEG", "corolla_diam_mm_SEG")
+
+# Initialize a list to store results for each trait
+results_list <- list()
+
+# Loop through each trait
+for (trait in traits) {
+  # Fit the mixed model for the current trait
+  model <- lmer(
+    formula = paste0("(", trait, ") ~ 1 + (1|Donor)"), 
+    data = BO_fit_23_G2_clean
+  )
+
+  
+       # Check for singular fit
+  if (isSingular(model)) {
+    message(paste("Model for", trait, "is singular. Proceed with caution."))
+  }
+  
+  # Extract variance components
+  V_A_pat <- as.numeric(VarCorr(model)$Donor)  # Donor variance
+  V_A <- 4 * V_A_pat  # Additive genetic variance
+  V_R <- attr(VarCorr(model), "sc")^2  # Residual variance
+  
+  # Total phenotypic variance
+  V_P <- V_A + V_R
+  
+  # Calculate heritability and other metrics
+  mean_trait <- mean((BO_fit_23_G2_clean[[trait]]), na.rm = TRUE)
+  h2 <- V_A / V_P
+  V_A_standardized <- V_A / mean_trait^2
+  CV_A <- (sqrt(V_A) / mean_trait) * 100
+  
+  # Store results in the list
+  results_list[[trait]] <- list(
+    Trait = trait,
+    Heritability = h2,
+    Standardized_VA = V_A_standardized,
+    CV_A = CV_A
+  )
+}
+
+# Combine results into a data frame for better presentation
+results_df <- do.call(rbind, lapply(results_list, as.data.frame))
+
+# View results
+print(results_df)
+
+```
+####################################################################################################################################################################################################################################################################### Calculating CV for phenotypic traits ##################################################################################################################### ############################################################################################
+```{r}
+library(dplyr)
+
+
+# Calculate mean, SD, and CV for all traits
+cv_summary <- AC_fit_22_clean %>%
+  summarise(
+    SLA_SEG_mean = mean(SLA_SEG, na.rm = TRUE),
+    SLA_SEG_sd = sd(SLA_SEG, na.rm = TRUE),
+    SLA_SEG_cv = SLA_SEG_sd / SLA_SEG_mean,
+    
+    msm_all_mean = mean(msm_all, na.rm = TRUE),
+    msm_all_sd = sd(msm_all, na.rm = TRUE),
+    msm_all_cv = msm_all_sd / msm_all_mean,
+    
+    fl_duration_mean = mean(fl_duration, na.rm = TRUE),
+    fl_duration_sd = sd(fl_duration, na.rm = TRUE),
+    fl_duration_cv = fl_duration_sd / fl_duration_mean,
+    
+    d13C_SEG_mean = mean(d13C_SEG, na.rm = TRUE),
+    d13C_SEG_sd = sd(d13C_SEG, na.rm = TRUE),
+    d13C_SEG_cv = d13C_SEG_sd / d13C_SEG_mean,
+    
+    corolla_diam_mm_SEG_mean = mean(corolla_diam_mm_SEG, na.rm = TRUE),
+    corolla_diam_mm_SEG_sd = sd(corolla_diam_mm_SEG, na.rm = TRUE),
+    corolla_diam_mm_SEG_cv = corolla_diam_mm_SEG_sd / corolla_diam_mm_SEG_mean,
+    
+    
+            est_fitness_mean = mean(est_fitness, na.rm = TRUE),
+    est_fitness_sd = sd(est_fitness, na.rm = TRUE),
+    est_fitness_cv = est_fitness_sd / est_fitness_mean
+  )
+
+
+# View the results
+print(cv_summary)
+
+
+```
+```{r}
+AC_fit_22 <- read_csv(here::here("data_sheets", "compiled_sheets", "AC_fit_22.csv"))
+
+
+AC_fit_22_clean <- AC_fit_22 %>%
+  filter(
+    !is.na(SLA_SEG),
+    !is.na(msm_all),
+    !is.na(fl_duration),
+    !is.na(d13C_SEG),
+    !is.na(corolla_diam_mm_SEG),
+    !is.na(est_fitness),
+    !is.na(g0_msm)
+  )
+
+cv_summary <- AC_fit_22_clean %>%
+  summarise(
+    SLA_SEG_mean = mean(SLA_SEG, na.rm = TRUE),
+    SLA_SEG_sd = sd(SLA_SEG, na.rm = TRUE),
+    SLA_SEG_cv = SLA_SEG_sd / SLA_SEG_mean,
+    
+    msm_all_mean = mean(msm_all, na.rm = TRUE),
+    msm_all_sd = sd(msm_all, na.rm = TRUE),
+    msm_all_cv = msm_all_sd / msm_all_mean,
+    
+    fl_duration_mean = mean(fl_duration, na.rm = TRUE),
+    fl_duration_sd = sd(fl_duration, na.rm = TRUE),
+    fl_duration_cv = fl_duration_sd / fl_duration_mean,
+    
+    d13C_SEG_mean = mean(d13C_SEG, na.rm = TRUE),
+    d13C_SEG_sd = sd(d13C_SEG, na.rm = TRUE),
+    d13C_SEG_cv = d13C_SEG_sd / d13C_SEG_mean,
+    
+    corolla_diam_mm_SEG_mean = mean(corolla_diam_mm_SEG, na.rm = TRUE),
+    corolla_diam_mm_SEG_sd = sd(corolla_diam_mm_SEG, na.rm = TRUE),
+    corolla_diam_mm_SEG_cv = corolla_diam_mm_SEG_sd / corolla_diam_mm_SEG_mean,
+    
+    
+            est_fitness_mean = mean(est_fitness, na.rm = TRUE),
+    est_fitness_sd = sd(est_fitness, na.rm = TRUE),
+    est_fitness_cv = est_fitness_sd / est_fitness_mean,
+    
+            g0_msm_mean = mean(g0_msm, na.rm = TRUE),
+    g0_msm_sd = sd(g0_msm, na.rm = TRUE),
+    g0_msm_cv = g0_msm_sd / g0_msm_mean
+  )
+```
+
+
+```{r}
+library(dplyr)
+
+
+# Calculate mean, SD, and CV for all traits
+cv_summary <- AC_fit_23_G1_clean %>%
+  summarise(
+    SLA_SEG_mean = mean(SLA_SEG, na.rm = TRUE),
+    SLA_SEG_sd = sd(SLA_SEG, na.rm = TRUE),
+    SLA_SEG_cv = SLA_SEG_sd / SLA_SEG_mean,
+    
+    msm_all_mean = mean(msm_all, na.rm = TRUE),
+    msm_all_sd = sd(msm_all, na.rm = TRUE),
+    msm_all_cv = msm_all_sd / msm_all_mean,
+    
+    fl_duration_mean = mean(fl_duration, na.rm = TRUE),
+    fl_duration_sd = sd(fl_duration, na.rm = TRUE),
+    fl_duration_cv = fl_duration_sd / fl_duration_mean,
+    
+    d13C_SEG_mean = mean(d13C_SEG, na.rm = TRUE),
+    d13C_SEG_sd = sd(d13C_SEG, na.rm = TRUE),
+    d13C_SEG_cv = d13C_SEG_sd / d13C_SEG_mean,
+    
+    corolla_diam_mm_SEG_mean = mean(corolla_diam_mm_SEG, na.rm = TRUE),
+    corolla_diam_mm_SEG_sd = sd(corolla_diam_mm_SEG, na.rm = TRUE),
+    corolla_diam_mm_SEG_cv = corolla_diam_mm_SEG_sd / corolla_diam_mm_SEG_mean,
+    
+                est_fitness_mean = mean(est_fitness, na.rm = TRUE),
+    est_fitness_sd = sd(est_fitness, na.rm = TRUE),
+    est_fitness_cv = est_fitness_sd / est_fitness_mean
+    
+    
+  )
+
+# View the results
+print(cv_summary)
+
+
+```
+
+```{r}
+library(dplyr)
+
+
+
+# Calculate mean, SD, and CV for all traits
+cv_summary <- AC_fit_23_G2 %>%
+  summarise(
+    SLA_SEG_mean = mean(SLA_SEG, na.rm = TRUE),
+    SLA_SEG_sd = sd(SLA_SEG, na.rm = TRUE),
+    SLA_SEG_cv = SLA_SEG_sd / SLA_SEG_mean,
+    
+    msm_all_mean = mean(msm_all, na.rm = TRUE),
+    msm_all_sd = sd(msm_all, na.rm = TRUE),
+    msm_all_cv = msm_all_sd / msm_all_mean,
+    
+    fl_duration_mean = mean(fl_duration, na.rm = TRUE),
+    fl_duration_sd = sd(fl_duration, na.rm = TRUE),
+    fl_duration_cv = fl_duration_sd / fl_duration_mean,
+    
+    d13C_SEG_mean = mean(d13C_SEG, na.rm = TRUE),
+    d13C_SEG_sd = sd(d13C_SEG, na.rm = TRUE),
+    d13C_SEG_cv = d13C_SEG_sd / d13C_SEG_mean,
+    
+    corolla_diam_mm_SEG_mean = mean(corolla_diam_mm_SEG, na.rm = TRUE),
+    corolla_diam_mm_SEG_sd = sd(corolla_diam_mm_SEG, na.rm = TRUE),
+    corolla_diam_mm_SEG_cv = corolla_diam_mm_SEG_sd / corolla_diam_mm_SEG_mean,
+    
+                est_fitness_mean = mean(est_fitness, na.rm = TRUE),
+    est_fitness_sd = sd(est_fitness, na.rm = TRUE),
+    est_fitness_cv = est_fitness_sd / est_fitness_mean
+    
+  )
+
+# View the results
+print(cv_summary)
+
+
+```
+
+
+```{r}
+library(dplyr)
+
+BB_fit_22 <- read_csv(here::here("data_sheets", "compiled_sheets", "BB_fit_22.csv"))
+
+
+BB_fit_22_clean <- BB_fit_22 %>%
+  filter(
+    !is.na(SLA_SEG),
+    !is.na(msm_all),
+    !is.na(fl_duration),
+    !is.na(d13C_SEG),
+    !is.na(corolla_diam_mm_SEG),
+    !is.na(est_fitness),
+    !is.na(g0_msm)
+  )
+
+
+# Calculate mean, SD, and CV for all traits
+cv_summary <- BB_fit_22 %>%
+  summarise(
+    SLA_SEG_mean = mean(SLA_SEG, na.rm = TRUE),
+    SLA_SEG_sd = sd(SLA_SEG, na.rm = TRUE),
+    SLA_SEG_cv = SLA_SEG_sd / SLA_SEG_mean,
+    
+    msm_all_mean = mean(msm_all, na.rm = TRUE),
+    msm_all_sd = sd(msm_all, na.rm = TRUE),
+    msm_all_cv = msm_all_sd / msm_all_mean,
+    
+    fl_duration_mean = mean(fl_duration, na.rm = TRUE),
+    fl_duration_sd = sd(fl_duration, na.rm = TRUE),
+    fl_duration_cv = fl_duration_sd / fl_duration_mean,
+    
+    d13C_SEG_mean = mean(d13C_SEG, na.rm = TRUE),
+    d13C_SEG_sd = sd(d13C_SEG, na.rm = TRUE),
+    d13C_SEG_cv = d13C_SEG_sd / d13C_SEG_mean,
+    
+    corolla_diam_mm_SEG_mean = mean(corolla_diam_mm_SEG, na.rm = TRUE),
+    corolla_diam_mm_SEG_sd = sd(corolla_diam_mm_SEG, na.rm = TRUE),
+    corolla_diam_mm_SEG_cv = corolla_diam_mm_SEG_sd / corolla_diam_mm_SEG_mean,
+    
+                est_fitness_mean = mean(est_fitness, na.rm = TRUE),
+    est_fitness_sd = sd(est_fitness, na.rm = TRUE),
+    est_fitness_cv = est_fitness_sd / est_fitness_mean,
+                
+    g0_msm_mean = mean(g0_msm, na.rm = TRUE),
+    g0_msm_sd = sd(g0_msm, na.rm = TRUE),
+    g0_msm_cv = g0_msm_sd / g0_msm_mean
+  )
+
+# View the results
+print(cv_summary)
+
+
+```
+
+```{r}
+library(dplyr)
+
+
+
+# Calculate mean, SD, and CV for all traits
+cv_summary <- BB_fit_23_G1 %>%
+  summarise(
+    SLA_SEG_mean = mean(SLA_SEG, na.rm = TRUE),
+    SLA_SEG_sd = sd(SLA_SEG, na.rm = TRUE),
+    SLA_SEG_cv = SLA_SEG_sd / SLA_SEG_mean,
+    
+    msm_all_mean = mean(msm_all, na.rm = TRUE),
+    msm_all_sd = sd(msm_all, na.rm = TRUE),
+    msm_all_cv = msm_all_sd / msm_all_mean,
+    
+    fl_duration_mean = mean(fl_duration, na.rm = TRUE),
+    fl_duration_sd = sd(fl_duration, na.rm = TRUE),
+    fl_duration_cv = fl_duration_sd / fl_duration_mean,
+    
+    d13C_SEG_mean = mean(d13C_SEG, na.rm = TRUE),
+    d13C_SEG_sd = sd(d13C_SEG, na.rm = TRUE),
+    d13C_SEG_cv = d13C_SEG_sd / d13C_SEG_mean,
+    
+    corolla_diam_mm_SEG_mean = mean(corolla_diam_mm_SEG, na.rm = TRUE),
+    corolla_diam_mm_SEG_sd = sd(corolla_diam_mm_SEG, na.rm = TRUE),
+    corolla_diam_mm_SEG_cv = corolla_diam_mm_SEG_sd / corolla_diam_mm_SEG_mean,
+    
+            est_fitness_mean = mean(est_fitness, na.rm = TRUE),
+    est_fitness_sd = sd(est_fitness, na.rm = TRUE),
+    est_fitness_cv = est_fitness_sd / est_fitness_mean
+  )
+
+# View the results
+print(cv_summary)
+
+
+```
+
+```{r}
+library(dplyr)
+
+
+
+# Calculate mean, SD, and CV for all traits
+cv_summary <- BB_fit_23_G2 %>%
+  summarise(
+    SLA_SEG_mean = mean(SLA_SEG, na.rm = TRUE),
+    SLA_SEG_sd = sd(SLA_SEG, na.rm = TRUE),
+    SLA_SEG_cv = SLA_SEG_sd / SLA_SEG_mean,
+    
+    msm_all_mean = mean(msm_all, na.rm = TRUE),
+    msm_all_sd = sd(msm_all, na.rm = TRUE),
+    msm_all_cv = msm_all_sd / msm_all_mean,
+    
+    fl_duration_mean = mean(fl_duration, na.rm = TRUE),
+    fl_duration_sd = sd(fl_duration, na.rm = TRUE),
+    fl_duration_cv = fl_duration_sd / fl_duration_mean,
+    
+    d13C_SEG_mean = mean(d13C_SEG, na.rm = TRUE),
+    d13C_SEG_sd = sd(d13C_SEG, na.rm = TRUE),
+    d13C_SEG_cv = d13C_SEG_sd / d13C_SEG_mean,
+    
+    corolla_diam_mm_SEG_mean = mean(corolla_diam_mm_SEG, na.rm = TRUE),
+    corolla_diam_mm_SEG_sd = sd(corolla_diam_mm_SEG, na.rm = TRUE),
+    corolla_diam_mm_SEG_cv = corolla_diam_mm_SEG_sd / corolla_diam_mm_SEG_mean,
+    
+            est_fitness_mean = mean(est_fitness, na.rm = TRUE),
+    est_fitness_sd = sd(est_fitness, na.rm = TRUE),
+    est_fitness_cv = est_fitness_sd / est_fitness_mean
+  )
+
+# View the results
+print(cv_summary)
+
+
+```
+
+```{r}
+library(dplyr)
+
+
+
+# Calculate mean, SD, and CV for all traits
+cv_summary <- BB_fit_G1 %>%
+  summarise(
+    SLA_SEG_mean = mean(SLA_SEG, na.rm = TRUE),
+    SLA_SEG_sd = sd(SLA_SEG, na.rm = TRUE),
+    SLA_SEG_cv = SLA_SEG_sd / SLA_SEG_mean,
+    
+    msm_all_mean = mean(msm_all, na.rm = TRUE),
+    msm_all_sd = sd(msm_all, na.rm = TRUE),
+    msm_all_cv = msm_all_sd / msm_all_mean,
+    
+    fl_duration_mean = mean(fl_duration, na.rm = TRUE),
+    fl_duration_sd = sd(fl_duration, na.rm = TRUE),
+    fl_duration_cv = fl_duration_sd / fl_duration_mean,
+    
+    d13C_SEG_mean = mean(d13C_SEG, na.rm = TRUE),
+    d13C_SEG_sd = sd(d13C_SEG, na.rm = TRUE),
+    d13C_SEG_cv = d13C_SEG_sd / d13C_SEG_mean,
+    
+    corolla_diam_mm_SEG_mean = mean(corolla_diam_mm_SEG, na.rm = TRUE),
+    corolla_diam_mm_SEG_sd = sd(corolla_diam_mm_SEG, na.rm = TRUE),
+    corolla_diam_mm_SEG_cv = corolla_diam_mm_SEG_sd / corolla_diam_mm_SEG_mean,
+    
+            est_fitness_mean = mean(est_fitness, na.rm = TRUE),
+    est_fitness_sd = sd(est_fitness, na.rm = TRUE),
+    est_fitness_cv = est_fitness_sd / est_fitness_mean
+  )
+
+# View the results
+print(cv_summary)
+
+
+```
+
+
+```{r}
+library(dplyr)
+
+
+
+# Calculate mean, SD, and CV for all traits
+cv_summary <- BB_fit_23 %>%
+  summarise(
+    SLA_SEG_mean = mean(SLA_SEG, na.rm = TRUE),
+    SLA_SEG_sd = sd(SLA_SEG, na.rm = TRUE),
+    SLA_SEG_cv = SLA_SEG_sd / SLA_SEG_mean,
+    
+    msm_all_mean = mean(msm_all, na.rm = TRUE),
+    msm_all_sd = sd(msm_all, na.rm = TRUE),
+    msm_all_cv = msm_all_sd / msm_all_mean,
+    
+    fl_duration_mean = mean(fl_duration, na.rm = TRUE),
+    fl_duration_sd = sd(fl_duration, na.rm = TRUE),
+    fl_duration_cv = fl_duration_sd / fl_duration_mean,
+    
+    d13C_SEG_mean = mean(d13C_SEG, na.rm = TRUE),
+    d13C_SEG_sd = sd(d13C_SEG, na.rm = TRUE),
+    d13C_SEG_cv = d13C_SEG_sd / d13C_SEG_mean,
+    
+    corolla_diam_mm_SEG_mean = mean(corolla_diam_mm_SEG, na.rm = TRUE),
+    corolla_diam_mm_SEG_sd = sd(corolla_diam_mm_SEG, na.rm = TRUE),
+    corolla_diam_mm_SEG_cv = corolla_diam_mm_SEG_sd / corolla_diam_mm_SEG_mean,
+    
+            est_fitness_mean = mean(est_fitness, na.rm = TRUE),
+    est_fitness_sd = sd(est_fitness, na.rm = TRUE),
+    est_fitness_cv = est_fitness_sd / est_fitness_mean
+  )
+
+# View the results
+print(cv_summary)
+
+
+```
+
+```{r}
+library(dplyr)
+
+
+
+# Calculate mean, SD, and CV for all traits
+cv_summary <- BB_fit %>%
+  summarise(
+    SLA_SEG_mean = mean(SLA_SEG, na.rm = TRUE),
+    SLA_SEG_sd = sd(SLA_SEG, na.rm = TRUE),
+    SLA_SEG_cv = SLA_SEG_sd / SLA_SEG_mean,
+    
+    msm_all_mean = mean(msm_all, na.rm = TRUE),
+    msm_all_sd = sd(msm_all, na.rm = TRUE),
+    msm_all_cv = msm_all_sd / msm_all_mean,
+    
+    fl_duration_mean = mean(fl_duration, na.rm = TRUE),
+    fl_duration_sd = sd(fl_duration, na.rm = TRUE),
+    fl_duration_cv = fl_duration_sd / fl_duration_mean,
+    
+    d13C_SEG_mean = mean(d13C_SEG, na.rm = TRUE),
+    d13C_SEG_sd = sd(d13C_SEG, na.rm = TRUE),
+    d13C_SEG_cv = d13C_SEG_sd / d13C_SEG_mean,
+    
+    corolla_diam_mm_SEG_mean = mean(corolla_diam_mm_SEG, na.rm = TRUE),
+    corolla_diam_mm_SEG_sd = sd(corolla_diam_mm_SEG, na.rm = TRUE),
+    corolla_diam_mm_SEG_cv = corolla_diam_mm_SEG_sd / corolla_diam_mm_SEG_mean,
+    
+            est_fitness_mean = mean(est_fitness, na.rm = TRUE),
+    est_fitness_sd = sd(est_fitness, na.rm = TRUE),
+    est_fitness_cv = est_fitness_sd / est_fitness_mean
+  )
+
+# View the results
+print(cv_summary)
+
+
+```
+
+```{r}
+library(dplyr)
+
+
+BO_fit_22 <- read_csv(here::here("data_sheets", "compiled_sheets", "BO_fit_22.csv"))
+
+
+BO_fit_22_clean <- BO_fit_22 %>%
+  filter(
+    !is.na(SLA_SEG),
+    !is.na(msm_all),
+    !is.na(fl_duration),
+    !is.na(d13C_SEG),
+    !is.na(corolla_diam_mm_SEG),
+    !is.na(est_fitness),
+    !is.na(g0_msm)
+  )
+
+
+# Calculate mean, SD, and CV for all traits
+cv_summary <- BO_fit_22 %>%
+  summarise(
+    SLA_SEG_mean = mean(SLA_SEG, na.rm = TRUE),
+    SLA_SEG_sd = sd(SLA_SEG, na.rm = TRUE),
+    SLA_SEG_cv = SLA_SEG_sd / SLA_SEG_mean,
+    
+    msm_all_mean = mean(msm_all, na.rm = TRUE),
+    msm_all_sd = sd(msm_all, na.rm = TRUE),
+    msm_all_cv = msm_all_sd / msm_all_mean,
+    
+    fl_duration_mean = mean(fl_duration, na.rm = TRUE),
+    fl_duration_sd = sd(fl_duration, na.rm = TRUE),
+    fl_duration_cv = fl_duration_sd / fl_duration_mean,
+    
+    d13C_SEG_mean = mean(d13C_SEG, na.rm = TRUE),
+    d13C_SEG_sd = sd(d13C_SEG, na.rm = TRUE),
+    d13C_SEG_cv = d13C_SEG_sd / d13C_SEG_mean,
+    
+    corolla_diam_mm_SEG_mean = mean(corolla_diam_mm_SEG, na.rm = TRUE),
+    corolla_diam_mm_SEG_sd = sd(corolla_diam_mm_SEG, na.rm = TRUE),
+    corolla_diam_mm_SEG_cv = corolla_diam_mm_SEG_sd / corolla_diam_mm_SEG_mean,
+    
+                est_fitness_mean = mean(est_fitness, na.rm = TRUE),
+    est_fitness_sd = sd(est_fitness, na.rm = TRUE),
+    est_fitness_cv = est_fitness_sd / est_fitness_mean,
+                
+    g0_msm_mean = mean(g0_msm, na.rm = TRUE),
+    g0_msm_sd = sd(g0_msm, na.rm = TRUE),
+    g0_msm_cv = g0_msm_sd / g0_msm_mean
+  )
+
+
+# View the results
+print(cv_summary)
+
+
+```
+
+```{r}
+library(dplyr)
+
+
+# Calculate mean, SD, and CV for all traits
+cv_summary <- BO_fit_23_G1 %>%
+  summarise(
+    SLA_SEG_mean = mean(SLA_SEG, na.rm = TRUE),
+    SLA_SEG_sd = sd(SLA_SEG, na.rm = TRUE),
+    SLA_SEG_cv = SLA_SEG_sd / SLA_SEG_mean,
+    
+    msm_all_mean = mean(msm_all, na.rm = TRUE),
+    msm_all_sd = sd(msm_all, na.rm = TRUE),
+    msm_all_cv = msm_all_sd / msm_all_mean,
+    
+    fl_duration_mean = mean(fl_duration, na.rm = TRUE),
+    fl_duration_sd = sd(fl_duration, na.rm = TRUE),
+    fl_duration_cv = fl_duration_sd / fl_duration_mean,
+    
+    d13C_SEG_mean = mean(d13C_SEG, na.rm = TRUE),
+    d13C_SEG_sd = sd(d13C_SEG, na.rm = TRUE),
+    d13C_SEG_cv = d13C_SEG_sd / d13C_SEG_mean,
+    
+    corolla_diam_mm_SEG_mean = mean(corolla_diam_mm_SEG, na.rm = TRUE),
+    corolla_diam_mm_SEG_sd = sd(corolla_diam_mm_SEG, na.rm = TRUE),
+    corolla_diam_mm_SEG_cv = corolla_diam_mm_SEG_sd / corolla_diam_mm_SEG_mean,
+    
+            est_fitness_mean = mean(est_fitness, na.rm = TRUE),
+    est_fitness_sd = sd(est_fitness, na.rm = TRUE),
+    est_fitness_cv = est_fitness_sd / est_fitness_mean
+  )
+
+# View the results
+print(cv_summary)
+
+
+```
+
+```{r}
+library(dplyr)
+
+
+# Calculate mean, SD, and CV for all traits
+cv_summary <- BO_fit_23_G2 %>%
+  summarise(
+    SLA_SEG_mean = mean(SLA_SEG, na.rm = TRUE),
+    SLA_SEG_sd = sd(SLA_SEG, na.rm = TRUE),
+    SLA_SEG_cv = SLA_SEG_sd / SLA_SEG_mean,
+    
+    msm_all_mean = mean(msm_all, na.rm = TRUE),
+    msm_all_sd = sd(msm_all, na.rm = TRUE),
+    msm_all_cv = msm_all_sd / msm_all_mean,
+    
+    fl_duration_mean = mean(fl_duration, na.rm = TRUE),
+    fl_duration_sd = sd(fl_duration, na.rm = TRUE),
+    fl_duration_cv = fl_duration_sd / fl_duration_mean,
+    
+    d13C_SEG_mean = mean(d13C_SEG, na.rm = TRUE),
+    d13C_SEG_sd = sd(d13C_SEG, na.rm = TRUE),
+    d13C_SEG_cv = d13C_SEG_sd / d13C_SEG_mean,
+    
+    corolla_diam_mm_SEG_mean = mean(corolla_diam_mm_SEG, na.rm = TRUE),
+    corolla_diam_mm_SEG_sd = sd(corolla_diam_mm_SEG, na.rm = TRUE),
+    corolla_diam_mm_SEG_cv = corolla_diam_mm_SEG_sd / corolla_diam_mm_SEG_mean,
+    
+            est_fitness_mean = mean(est_fitness, na.rm = TRUE),
+    est_fitness_sd = sd(est_fitness, na.rm = TRUE),
+    est_fitness_cv = est_fitness_sd / est_fitness_mean
+  )
+
+# View the results
+print(cv_summary)
+
+
+```
+
+```{r}
+library(dplyr)
+
+
+
+# Calculate mean, SD, and CV for all traits
+cv_summary <- BO_fit_G1 %>%
+  summarise(
+    SLA_SEG_mean = mean(SLA_SEG, na.rm = TRUE),
+    SLA_SEG_sd = sd(SLA_SEG, na.rm = TRUE),
+    SLA_SEG_cv = SLA_SEG_sd / SLA_SEG_mean,
+    
+    msm_all_mean = mean(msm_all, na.rm = TRUE),
+    msm_all_sd = sd(msm_all, na.rm = TRUE),
+    msm_all_cv = msm_all_sd / msm_all_mean,
+    
+    fl_duration_mean = mean(fl_duration, na.rm = TRUE),
+    fl_duration_sd = sd(fl_duration, na.rm = TRUE),
+    fl_duration_cv = fl_duration_sd / fl_duration_mean,
+    
+    d13C_SEG_mean = mean(d13C_SEG, na.rm = TRUE),
+    d13C_SEG_sd = sd(d13C_SEG, na.rm = TRUE),
+    d13C_SEG_cv = d13C_SEG_sd / d13C_SEG_mean,
+    
+    corolla_diam_mm_SEG_mean = mean(corolla_diam_mm_SEG, na.rm = TRUE),
+    corolla_diam_mm_SEG_sd = sd(corolla_diam_mm_SEG, na.rm = TRUE),
+    corolla_diam_mm_SEG_cv = corolla_diam_mm_SEG_sd / corolla_diam_mm_SEG_mean,
+    
+            est_fitness_mean = mean(est_fitness, na.rm = TRUE),
+    est_fitness_sd = sd(est_fitness, na.rm = TRUE),
+    est_fitness_cv = est_fitness_sd / est_fitness_mean
+    )
+
+# View the results
+print(cv_summary)
+
+
+```
+
+
+```{r}
+library(dplyr)
+
+
+
+# Calculate mean, SD, and CV for all traits
+cv_summary <- BO_fit_23 %>%
+  summarise(
+    SLA_SEG_mean = mean(SLA_SEG, na.rm = TRUE),
+    SLA_SEG_sd = sd(SLA_SEG, na.rm = TRUE),
+    SLA_SEG_cv = SLA_SEG_sd / SLA_SEG_mean,
+    
+    msm_all_mean = mean(msm_all, na.rm = TRUE),
+    msm_all_sd = sd(msm_all, na.rm = TRUE),
+    msm_all_cv = msm_all_sd / msm_all_mean,
+    
+    fl_duration_mean = mean(fl_duration, na.rm = TRUE),
+    fl_duration_sd = sd(fl_duration, na.rm = TRUE),
+    fl_duration_cv = fl_duration_sd / fl_duration_mean,
+    
+    d13C_SEG_mean = mean(d13C_SEG, na.rm = TRUE),
+    d13C_SEG_sd = sd(d13C_SEG, na.rm = TRUE),
+    d13C_SEG_cv = d13C_SEG_sd / d13C_SEG_mean,
+    
+    corolla_diam_mm_SEG_mean = mean(corolla_diam_mm_SEG, na.rm = TRUE),
+    corolla_diam_mm_SEG_sd = sd(corolla_diam_mm_SEG, na.rm = TRUE),
+    corolla_diam_mm_SEG_cv = corolla_diam_mm_SEG_sd / corolla_diam_mm_SEG_mean,
+    
+            est_fitness_mean = mean(est_fitness, na.rm = TRUE),
+    est_fitness_sd = sd(est_fitness, na.rm = TRUE),
+    est_fitness_cv = est_fitness_sd / est_fitness_mean
+  )
+
+# View the results
+print(cv_summary)
+
+
+```
+
+```{r}
+library(dplyr)
+
+
+
+# Calculate mean, SD, and CV for all traits
+cv_summary <- BO_fit %>%
+  summarise(
+    SLA_SEG_mean = mean(SLA_SEG, na.rm = TRUE),
+    SLA_SEG_sd = sd(SLA_SEG, na.rm = TRUE),
+    SLA_SEG_cv = SLA_SEG_sd / SLA_SEG_mean,
+    
+    msm_all_mean = mean(msm_all, na.rm = TRUE),
+    msm_all_sd = sd(msm_all, na.rm = TRUE),
+    msm_all_cv = msm_all_sd / msm_all_mean,
+    
+    fl_duration_mean = mean(fl_duration, na.rm = TRUE),
+    fl_duration_sd = sd(fl_duration, na.rm = TRUE),
+    fl_duration_cv = fl_duration_sd / fl_duration_mean,
+    
+    d13C_SEG_mean = mean(d13C_SEG, na.rm = TRUE),
+    d13C_SEG_sd = sd(d13C_SEG, na.rm = TRUE),
+    d13C_SEG_cv = d13C_SEG_sd / d13C_SEG_mean,
+    
+    corolla_diam_mm_SEG_mean = mean(corolla_diam_mm_SEG, na.rm = TRUE),
+    corolla_diam_mm_SEG_sd = sd(corolla_diam_mm_SEG, na.rm = TRUE),
+    corolla_diam_mm_SEG_cv = corolla_diam_mm_SEG_sd / corolla_diam_mm_SEG_mean,
+    
+            est_fitness_mean = mean(est_fitness, na.rm = TRUE),
+    est_fitness_sd = sd(est_fitness, na.rm = TRUE),
+    est_fitness_cv = est_fitness_sd / est_fitness_mean
+  )
+
+# View the results
+print(cv_summary)
+
+
+```
+
+```{r}
+library(dplyr)
+
+HR_fit_22 <- read_csv(here::here("data_sheets", "compiled_sheets", "HR_fit_22.csv"))
+
+
+HR_fit_22_clean <- HR_fit_22 %>%
+  filter(
+    !is.na(SLA_SEG),
+    !is.na(msm_all),
+    !is.na(fl_duration),
+    !is.na(d13C_SEG),
+    !is.na(corolla_diam_mm_SEG),
+    !is.na(est_fitness),
+    !is.na(g0_msm)
+  )
+
+
+# Calculate mean, SD, and CV for all traits
+cv_summary <- HR_fit_22 %>%
+  summarise(
+    SLA_SEG_mean = mean(SLA_SEG, na.rm = TRUE),
+    SLA_SEG_sd = sd(SLA_SEG, na.rm = TRUE),
+    SLA_SEG_cv = SLA_SEG_sd / SLA_SEG_mean,
+    
+    msm_all_mean = mean(msm_all, na.rm = TRUE),
+    msm_all_sd = sd(msm_all, na.rm = TRUE),
+    msm_all_cv = msm_all_sd / msm_all_mean,
+    
+    fl_duration_mean = mean(fl_duration, na.rm = TRUE),
+    fl_duration_sd = sd(fl_duration, na.rm = TRUE),
+    fl_duration_cv = fl_duration_sd / fl_duration_mean,
+    
+    d13C_SEG_mean = mean(d13C_SEG, na.rm = TRUE),
+    d13C_SEG_sd = sd(d13C_SEG, na.rm = TRUE),
+    d13C_SEG_cv = d13C_SEG_sd / d13C_SEG_mean,
+    
+    corolla_diam_mm_SEG_mean = mean(corolla_diam_mm_SEG, na.rm = TRUE),
+    corolla_diam_mm_SEG_sd = sd(corolla_diam_mm_SEG, na.rm = TRUE),
+    corolla_diam_mm_SEG_cv = corolla_diam_mm_SEG_sd / corolla_diam_mm_SEG_mean,
+    
+                est_fitness_mean = mean(est_fitness, na.rm = TRUE),
+    est_fitness_sd = sd(est_fitness, na.rm = TRUE),
+    est_fitness_cv = est_fitness_sd / est_fitness_mean,
+                
+    g0_msm_mean = mean(g0_msm, na.rm = TRUE),
+    g0_msm_sd = sd(g0_msm, na.rm = TRUE),
+    g0_msm_cv = g0_msm_sd / g0_msm_mean
+  )
+
+
+# View the results
+print(cv_summary)
+
+
+
+```
+
+```{r}
+library(dplyr)
+
+
+
+# Calculate mean, SD, and CV for all traits
+cv_summary <- HR_fit_23_G1 %>%
+  summarise(
+    SLA_SEG_mean = mean(SLA_SEG, na.rm = TRUE),
+    SLA_SEG_sd = sd(SLA_SEG, na.rm = TRUE),
+    SLA_SEG_cv = SLA_SEG_sd / SLA_SEG_mean,
+    
+    msm_all_mean = mean(msm_all, na.rm = TRUE),
+    msm_all_sd = sd(msm_all, na.rm = TRUE),
+    msm_all_cv = msm_all_sd / msm_all_mean,
+    
+    fl_duration_mean = mean(fl_duration, na.rm = TRUE),
+    fl_duration_sd = sd(fl_duration, na.rm = TRUE),
+    fl_duration_cv = fl_duration_sd / fl_duration_mean,
+    
+    d13C_SEG_mean = mean(d13C_SEG, na.rm = TRUE),
+    d13C_SEG_sd = sd(d13C_SEG, na.rm = TRUE),
+    d13C_SEG_cv = d13C_SEG_sd / d13C_SEG_mean,
+    
+    corolla_diam_mm_SEG_mean = mean(corolla_diam_mm_SEG, na.rm = TRUE),
+    corolla_diam_mm_SEG_sd = sd(corolla_diam_mm_SEG, na.rm = TRUE),
+    corolla_diam_mm_SEG_cv = corolla_diam_mm_SEG_sd / corolla_diam_mm_SEG_mean,
+    
+            est_fitness_mean = mean(est_fitness, na.rm = TRUE),
+    est_fitness_sd = sd(est_fitness, na.rm = TRUE),
+    est_fitness_cv = est_fitness_sd / est_fitness_mean
+  )
+
+# View the results
+print(cv_summary)
+
+
+```
+
+```{r}
+library(dplyr)
+
+
+
+# Calculate mean, SD, and CV for all traits
+cv_summary <- HR_fit_23_G2 %>%
+  summarise(
+    SLA_SEG_mean = mean(SLA_SEG, na.rm = TRUE),
+    SLA_SEG_sd = sd(SLA_SEG, na.rm = TRUE),
+    SLA_SEG_cv = SLA_SEG_sd / SLA_SEG_mean,
+    
+    msm_all_mean = mean(msm_all, na.rm = TRUE),
+    msm_all_sd = sd(msm_all, na.rm = TRUE),
+    msm_all_cv = msm_all_sd / msm_all_mean,
+    
+    fl_duration_mean = mean(fl_duration, na.rm = TRUE),
+    fl_duration_sd = sd(fl_duration, na.rm = TRUE),
+    fl_duration_cv = fl_duration_sd / fl_duration_mean,
+    
+    d13C_SEG_mean = mean(d13C_SEG, na.rm = TRUE),
+    d13C_SEG_sd = sd(d13C_SEG, na.rm = TRUE),
+    d13C_SEG_cv = d13C_SEG_sd / d13C_SEG_mean,
+    
+    corolla_diam_mm_SEG_mean = mean(corolla_diam_mm_SEG, na.rm = TRUE),
+    corolla_diam_mm_SEG_sd = sd(corolla_diam_mm_SEG, na.rm = TRUE),
+    corolla_diam_mm_SEG_cv = corolla_diam_mm_SEG_sd / corolla_diam_mm_SEG_mean,
+    
+            est_fitness_mean = mean(est_fitness, na.rm = TRUE),
+    est_fitness_sd = sd(est_fitness, na.rm = TRUE),
+    est_fitness_cv = est_fitness_sd / est_fitness_mean
+  )
+
+# View the results
+print(cv_summary)
+
+
+```
+
+```{r}
+library(dplyr)
+
+
+
+# Calculate mean, SD, and CV for all traits
+cv_summary <- HR_fit_G1 %>%
+  summarise(
+    SLA_SEG_mean = mean(SLA_SEG, na.rm = TRUE),
+    SLA_SEG_sd = sd(SLA_SEG, na.rm = TRUE),
+    SLA_SEG_cv = SLA_SEG_sd / SLA_SEG_mean,
+    
+    msm_all_mean = mean(msm_all, na.rm = TRUE),
+    msm_all_sd = sd(msm_all, na.rm = TRUE),
+    msm_all_cv = msm_all_sd / msm_all_mean,
+    
+    fl_duration_mean = mean(fl_duration, na.rm = TRUE),
+    fl_duration_sd = sd(fl_duration, na.rm = TRUE),
+    fl_duration_cv = fl_duration_sd / fl_duration_mean,
+    
+    d13C_SEG_mean = mean(d13C_SEG, na.rm = TRUE),
+    d13C_SEG_sd = sd(d13C_SEG, na.rm = TRUE),
+    d13C_SEG_cv = d13C_SEG_sd / d13C_SEG_mean,
+    
+    corolla_diam_mm_SEG_mean = mean(corolla_diam_mm_SEG, na.rm = TRUE),
+    corolla_diam_mm_SEG_sd = sd(corolla_diam_mm_SEG, na.rm = TRUE),
+    corolla_diam_mm_SEG_cv = corolla_diam_mm_SEG_sd / corolla_diam_mm_SEG_mean,
+    
+            est_fitness_mean = mean(est_fitness, na.rm = TRUE),
+    est_fitness_sd = sd(est_fitness, na.rm = TRUE),
+    est_fitness_cv = est_fitness_sd / est_fitness_mean
+  )
+
+# View the results
+print(cv_summary)
+
+
+```
+
+
+```{r}
+library(dplyr)
+
+
+# Calculate mean, SD, and CV for all traits
+cv_summary <- HR_fit_23 %>%
+  summarise(
+    SLA_SEG_mean = mean(SLA_SEG, na.rm = TRUE),
+    SLA_SEG_sd = sd(SLA_SEG, na.rm = TRUE),
+    SLA_SEG_cv = SLA_SEG_sd / SLA_SEG_mean,
+    
+    msm_all_mean = mean(msm_all, na.rm = TRUE),
+    msm_all_sd = sd(msm_all, na.rm = TRUE),
+    msm_all_cv = msm_all_sd / msm_all_mean,
+    
+    fl_duration_mean = mean(fl_duration, na.rm = TRUE),
+    fl_duration_sd = sd(fl_duration, na.rm = TRUE),
+    fl_duration_cv = fl_duration_sd / fl_duration_mean,
+    
+    d13C_SEG_mean = mean(d13C_SEG, na.rm = TRUE),
+    d13C_SEG_sd = sd(d13C_SEG, na.rm = TRUE),
+    d13C_SEG_cv = d13C_SEG_sd / d13C_SEG_mean,
+    
+    corolla_diam_mm_SEG_mean = mean(corolla_diam_mm_SEG, na.rm = TRUE),
+    corolla_diam_mm_SEG_sd = sd(corolla_diam_mm_SEG, na.rm = TRUE),
+    corolla_diam_mm_SEG_cv = corolla_diam_mm_SEG_sd / corolla_diam_mm_SEG_mean,
+    
+            est_fitness_mean = mean(est_fitness, na.rm = TRUE),
+    est_fitness_sd = sd(est_fitness, na.rm = TRUE),
+    est_fitness_cv = est_fitness_sd / est_fitness_mean
+  )
+
+# View the results
+print(cv_summary)
+
+
+```
+
+```{r}
+library(dplyr)
+
+
+# Calculate mean, SD, and CV for all traits
+cv_summary <- HR_fit %>%
+  summarise(
+    SLA_SEG_mean = mean(SLA_SEG, na.rm = TRUE),
+    SLA_SEG_sd = sd(SLA_SEG, na.rm = TRUE),
+    SLA_SEG_cv = SLA_SEG_sd / SLA_SEG_mean,
+    
+    msm_all_mean = mean(msm_all, na.rm = TRUE),
+    msm_all_sd = sd(msm_all, na.rm = TRUE),
+    msm_all_cv = msm_all_sd / msm_all_mean,
+    
+    fl_duration_mean = mean(fl_duration, na.rm = TRUE),
+    fl_duration_sd = sd(fl_duration, na.rm = TRUE),
+    fl_duration_cv = fl_duration_sd / fl_duration_mean,
+    
+    d13C_SEG_mean = mean(d13C_SEG, na.rm = TRUE),
+    d13C_SEG_sd = sd(d13C_SEG, na.rm = TRUE),
+    d13C_SEG_cv = d13C_SEG_sd / d13C_SEG_mean,
+    
+    corolla_diam_mm_SEG_mean = mean(corolla_diam_mm_SEG, na.rm = TRUE),
+    corolla_diam_mm_SEG_sd = sd(corolla_diam_mm_SEG, na.rm = TRUE),
+    corolla_diam_mm_SEG_cv = corolla_diam_mm_SEG_sd / corolla_diam_mm_SEG_mean,
+    
+            est_fitness_mean = mean(est_fitness, na.rm = TRUE),
+    est_fitness_sd = sd(est_fitness, na.rm = TRUE),
+    est_fitness_cv = est_fitness_sd / est_fitness_mean
+  )
+
+# View the results
+print(cv_summary)
+
+
+```
+
+#####################################GENOTYPIC TRAIT CV###################################################################################
+```{r}
+library(tidyverse)
+
+AC_mean_donor_traits_22 <- read_csv(here::here("data_sheets", "compiled_sheets", "AC_mean_donor_traits_22.csv"))
+BB_mean_donor_traits_22 <- read_csv(here::here("data_sheets", "compiled_sheets", "BB_mean_donor_traits_22.csv"))
+BO_mean_donor_traits_22 <- read_csv(here::here("data_sheets", "compiled_sheets", "BO_mean_donor_traits_22.csv"))
+HR_mean_donor_traits_22 <- read_csv(here::here("data_sheets", "compiled_sheets", "HR_mean_donor_traits_22.csv"))
+
+AC_mean_donor_traits_23_G1 <- read_csv(here::here("data_sheets", "compiled_sheets", "AC_mean_donor_traits_23_G1.csv"))
+BB_mean_donor_traits_23_G1 <- read_csv(here::here("data_sheets", "compiled_sheets", "BB_mean_donor_traits_23_G1.csv"))
+BO_mean_donor_traits_23_G1 <- read_csv(here::here("data_sheets", "compiled_sheets", "BO_mean_donor_traits_23_G1.csv"))
+HR_mean_donor_traits_23_G1 <- read_csv(here::here("data_sheets", "compiled_sheets", "HR_mean_donor_traits_23_G1.csv"))
+
+AC_mean_donor_traits_23_G2 <- read_csv(here::here("data_sheets", "compiled_sheets", "AC_mean_donor_traits_23_G2.csv"))
+BB_mean_donor_traits_23_G2 <- read_csv(here::here("data_sheets", "compiled_sheets", "BB_mean_donor_traits_23_G2.csv"))
+BO_mean_donor_traits_23_G2 <- read_csv(here::here("data_sheets", "compiled_sheets", "BO_mean_donor_traits_23_G2.csv"))
+HR_mean_donor_traits_23_G2 <- read_csv(here::here("data_sheets", "compiled_sheets", "HR_mean_donor_traits_23_G2.csv"))
+```
+```{r}
+# Calculate mean, SD, and CV for all traits
+cv_summary <- AC_mean_donor_traits_22 %>%
+  summarise(
+    g0_msm_mean = mean(g0_msm, na.rm = TRUE),
+    g0_msm_sd = sd(g0_msm, na.rm = TRUE),
+    g0_msm_cv = g0_msm_sd/g0_msm_mean,
+    
+    SLA_SEG_mean = mean(SLA_SEG, na.rm = TRUE),
+    SLA_SEG_sd = sd(SLA_SEG, na.rm = TRUE),
+    SLA_SEG_cv = SLA_SEG_sd / SLA_SEG_mean,
+    
+    msm_all_mean = mean(msm_all, na.rm = TRUE),
+    msm_all_sd = sd(msm_all, na.rm = TRUE),
+    msm_all_cv = msm_all_sd / msm_all_mean,
+    
+    fl_duration_mean = mean(fl_duration, na.rm = TRUE),
+    fl_duration_sd = sd(fl_duration, na.rm = TRUE),
+    fl_duration_cv = fl_duration_sd / fl_duration_mean,
+    
+    d13C_SEG_mean = mean(d13C_SEG, na.rm = TRUE),
+    d13C_SEG_sd = sd(d13C_SEG, na.rm = TRUE),
+    d13C_SEG_cv = d13C_SEG_sd / d13C_SEG_mean,
+    
+    corolla_diam_mm_SEG_mean = mean(corolla_diam_mm_SEG, na.rm = TRUE),
+    corolla_diam_mm_SEG_sd = sd(corolla_diam_mm_SEG, na.rm = TRUE),
+    corolla_diam_mm_SEG_cv = corolla_diam_mm_SEG_sd / corolla_diam_mm_SEG_mean,
+    
+            est_fitness_mean = mean(est_fitness, na.rm = TRUE),
+    est_fitness_sd = sd(est_fitness, na.rm = TRUE),
+    est_fitness_cv = est_fitness_sd / est_fitness_mean
+  )
+
+# View the results
+print(cv_summary)
+```
+
+
+```{r}
+# Calculate mean, SD, and CV for all traits
+cv_summary <- BB_mean_donor_traits_22 %>%
+  summarise(
+    g0_msm_mean = mean(g0_msm, na.rm = TRUE),
+    g0_msm_sd = sd(g0_msm, na.rm = TRUE),
+    g0_msm_cv = g0_msm_sd/g0_msm_mean,
+    
+    SLA_SEG_mean = mean(SLA_SEG, na.rm = TRUE),
+    SLA_SEG_sd = sd(SLA_SEG, na.rm = TRUE),
+    SLA_SEG_cv = SLA_SEG_sd / SLA_SEG_mean,
+    
+    msm_all_mean = mean(msm_all, na.rm = TRUE),
+    msm_all_sd = sd(msm_all, na.rm = TRUE),
+    msm_all_cv = msm_all_sd / msm_all_mean,
+    
+    fl_duration_mean = mean(fl_duration, na.rm = TRUE),
+    fl_duration_sd = sd(fl_duration, na.rm = TRUE),
+    fl_duration_cv = fl_duration_sd / fl_duration_mean,
+    
+    d13C_SEG_mean = mean(d13C_SEG, na.rm = TRUE),
+    d13C_SEG_sd = sd(d13C_SEG, na.rm = TRUE),
+    d13C_SEG_cv = d13C_SEG_sd / d13C_SEG_mean,
+    
+    corolla_diam_mm_SEG_mean = mean(corolla_diam_mm_SEG, na.rm = TRUE),
+    corolla_diam_mm_SEG_sd = sd(corolla_diam_mm_SEG, na.rm = TRUE),
+    corolla_diam_mm_SEG_cv = corolla_diam_mm_SEG_sd / corolla_diam_mm_SEG_mean,
+    
+            est_fitness_mean = mean(est_fitness, na.rm = TRUE),
+    est_fitness_sd = sd(est_fitness, na.rm = TRUE),
+    est_fitness_cv = est_fitness_sd / est_fitness_mean
+  )
+
+# View the results
+print(cv_summary)
+```
+
+
+
+```{r}
+# Calculate mean, SD, and CV for all traits
+cv_summary <- BO_mean_donor_traits_22 %>%
+  summarise(
+    g0_msm_mean = mean(g0_msm, na.rm = TRUE),
+    g0_msm_sd = sd(g0_msm, na.rm = TRUE),
+    g0_msm_cv = g0_msm_sd/g0_msm_mean,
+    
+    SLA_SEG_mean = mean(SLA_SEG, na.rm = TRUE),
+    SLA_SEG_sd = sd(SLA_SEG, na.rm = TRUE),
+    SLA_SEG_cv = SLA_SEG_sd / SLA_SEG_mean,
+    
+    msm_all_mean = mean(msm_all, na.rm = TRUE),
+    msm_all_sd = sd(msm_all, na.rm = TRUE),
+    msm_all_cv = msm_all_sd / msm_all_mean,
+    
+    fl_duration_mean = mean(fl_duration, na.rm = TRUE),
+    fl_duration_sd = sd(fl_duration, na.rm = TRUE),
+    fl_duration_cv = fl_duration_sd / fl_duration_mean,
+    
+    d13C_SEG_mean = mean(d13C_SEG, na.rm = TRUE),
+    d13C_SEG_sd = sd(d13C_SEG, na.rm = TRUE),
+    d13C_SEG_cv = d13C_SEG_sd / d13C_SEG_mean,
+    
+    corolla_diam_mm_SEG_mean = mean(corolla_diam_mm_SEG, na.rm = TRUE),
+    corolla_diam_mm_SEG_sd = sd(corolla_diam_mm_SEG, na.rm = TRUE),
+    corolla_diam_mm_SEG_cv = corolla_diam_mm_SEG_sd / corolla_diam_mm_SEG_mean,
+    
+            est_fitness_mean = mean(est_fitness, na.rm = TRUE),
+    est_fitness_sd = sd(est_fitness, na.rm = TRUE),
+    est_fitness_cv = est_fitness_sd / est_fitness_mean
+  )
+
+# View the results
+print(cv_summary)
+```
+
+```{r}
+# Calculate mean, SD, and CV for all traits
+cv_summary <- HR_mean_donor_traits_22 %>%
+  summarise(
+    g0_msm_mean = mean(g0_msm, na.rm = TRUE),
+    g0_msm_sd = sd(g0_msm, na.rm = TRUE),
+    g0_msm_cv = g0_msm_sd/g0_msm_mean,
+    
+    SLA_SEG_mean = mean(SLA_SEG, na.rm = TRUE),
+    SLA_SEG_sd = sd(SLA_SEG, na.rm = TRUE),
+    SLA_SEG_cv = SLA_SEG_sd / SLA_SEG_mean,
+    
+    msm_all_mean = mean(msm_all, na.rm = TRUE),
+    msm_all_sd = sd(msm_all, na.rm = TRUE),
+    msm_all_cv = msm_all_sd / msm_all_mean,
+    
+    fl_duration_mean = mean(fl_duration, na.rm = TRUE),
+    fl_duration_sd = sd(fl_duration, na.rm = TRUE),
+    fl_duration_cv = fl_duration_sd / fl_duration_mean,
+    
+    d13C_SEG_mean = mean(d13C_SEG, na.rm = TRUE),
+    d13C_SEG_sd = sd(d13C_SEG, na.rm = TRUE),
+    d13C_SEG_cv = d13C_SEG_sd / d13C_SEG_mean,
+    
+    corolla_diam_mm_SEG_mean = mean(corolla_diam_mm_SEG, na.rm = TRUE),
+    corolla_diam_mm_SEG_sd = sd(corolla_diam_mm_SEG, na.rm = TRUE),
+    corolla_diam_mm_SEG_cv = corolla_diam_mm_SEG_sd / corolla_diam_mm_SEG_mean,
+    
+            est_fitness_mean = mean(est_fitness, na.rm = TRUE),
+    est_fitness_sd = sd(est_fitness, na.rm = TRUE),
+    est_fitness_cv = est_fitness_sd / est_fitness_mean
+  )
+
+# View the results
+print(cv_summary)
+```
+

@@ -1,0 +1,577 @@
+---
+title: "Trait mean visualizations"
+author: "Helen Payne"
+date: "2025-02-25"
+output: html_document
+---
+
+```{r}
+AC_fit_22 <- read_csv(here::here("data_sheets", "compiled_sheets", "AC_fit_22.csv"))
+BB_fit_22 <- read_csv(here::here("data_sheets", "compiled_sheets", "BB_fit_22.csv"))
+BO_fit_22 <- read_csv(here::here("data_sheets", "compiled_sheets", "BO_fit_22.csv"))
+HR_fit_22 <- read_csv(here::here("data_sheets", "compiled_sheets", "HR_fit_22.csv"))
+
+AC_fit_23_G1 <- read_csv(here::here("data_sheets", "compiled_sheets", "AC_fit_23_G1.csv"))
+BB_fit_23_G1 <- read_csv(here::here("data_sheets", "compiled_sheets", "BB_fit_23_G1.csv"))
+BO_fit_23_G1 <- read_csv(here::here("data_sheets", "compiled_sheets", "BO_fit_23_G1.csv"))
+HR_fit_23_G1 <- read_csv(here::here("data_sheets", "compiled_sheets", "HR_fit_23_G1.csv"))
+
+AC_fit_23_G2 <- read_csv(here::here("data_sheets", "compiled_sheets", "AC_fit_23_G2.csv"))
+BB_fit_23_G2 <- read_csv(here::here("data_sheets", "compiled_sheets", "BB_fit_23_G2.csv"))
+BO_fit_23_G2 <- read_csv(here::here("data_sheets", "compiled_sheets", "BO_fit_23_G2.csv"))
+HR_fit_23_G2 <- read_csv(here::here("data_sheets", "compiled_sheets", "HR_fit_23_G2.csv"))
+```
+
+```{r}
+AC_mean_donor_traits_22 <- read_csv(here::here("data_sheets", "compiled_sheets", "AC_mean_donor_traits_22.csv"))
+BB_mean_donor_traits_22 <- read_csv(here::here("data_sheets", "compiled_sheets", "BB_mean_donor_traits_22.csv"))
+BO_mean_donor_traits_22 <- read_csv(here::here("data_sheets", "compiled_sheets", "BO_mean_donor_traits_22.csv"))
+HR_mean_donor_traits_22 <- read_csv(here::here("data_sheets", "compiled_sheets", "HR_mean_donor_traits_22.csv"))
+
+AC_mean_donor_traits_23_G1 <- read_csv(here::here("data_sheets", "compiled_sheets", "AC_mean_donor_traits_23_G1.csv"))
+BB_mean_donor_traits_23_G1 <- read_csv(here::here("data_sheets", "compiled_sheets", "BB_mean_donor_traits_23_G1.csv"))
+BO_mean_donor_traits_23_G1 <- read_csv(here::here("data_sheets", "compiled_sheets", "BO_mean_donor_traits_23_G1.csv"))
+HR_mean_donor_traits_23_G1 <- read_csv(here::here("data_sheets", "compiled_sheets", "HR_mean_donor_traits_23_G1.csv"))
+
+AC_mean_donor_traits_23_G2 <- read_csv(here::here("data_sheets", "compiled_sheets", "AC_mean_donor_traits_23_G2.csv"))
+BB_mean_donor_traits_23_G2 <- read_csv(here::here("data_sheets", "compiled_sheets", "BB_mean_donor_traits_23_G2.csv"))
+BO_mean_donor_traits_23_G2 <- read_csv(here::here("data_sheets", "compiled_sheets", "BO_mean_donor_traits_23_G2.csv"))
+HR_mean_donor_traits_23_G2 <- read_csv(here::here("data_sheets", "compiled_sheets", "HR_mean_donor_traits_23_G2.csv"))
+```
+
+```{r}
+AC_mean_donor_traits_22 <- AC_mean_donor_traits_22 %>%
+  mutate(relative_fitness_22 = est_fitness / mean(est_fitness, na.rm = TRUE))
+
+BB_mean_donor_traits_22 <- BB_mean_donor_traits_22 %>%
+  mutate(relative_fitness_22 = est_fitness / mean(est_fitness, na.rm = TRUE))
+
+BO_mean_donor_traits_22 <- BO_mean_donor_traits_22 %>%
+  mutate(relative_fitness_22 = est_fitness / mean(est_fitness, na.rm = TRUE))
+
+HR_mean_donor_traits_22 <- HR_mean_donor_traits_22 %>%
+  mutate(relative_fitness_22 = est_fitness / mean(est_fitness, na.rm = TRUE))
+
+AC_mean_donor_traits_23_G1 <- AC_mean_donor_traits_23_G1 %>%
+  mutate(relative_fitness_23_G1 = est_fitness / mean(est_fitness, na.rm = TRUE))
+
+BB_mean_donor_traits_23_G1 <- BB_mean_donor_traits_23_G1 %>%
+  mutate(relative_fitness_23_G1 = est_fitness / mean(est_fitness, na.rm = TRUE))
+
+BO_mean_donor_traits_23_G1 <- BO_mean_donor_traits_23_G1 %>%
+  mutate(relative_fitness_23_G1 = est_fitness / mean(est_fitness, na.rm = TRUE))
+
+HR_mean_donor_traits_23_G1 <- HR_mean_donor_traits_23_G1 %>%
+  mutate(relative_fitness_23_G1 = est_fitness / mean(est_fitness, na.rm = TRUE))
+
+AC_mean_donor_traits_23_G2 <- AC_mean_donor_traits_23_G2 %>%
+  mutate(relative_fitness_23_G2 = est_fitness / mean(est_fitness, na.rm = TRUE))
+
+BB_mean_donor_traits_23_G2 <- BB_mean_donor_traits_23_G2 %>%
+  mutate(relative_fitness_23_G2 = est_fitness / mean(est_fitness, na.rm = TRUE))
+
+BO_mean_donor_traits_23_G2 <- BO_mean_donor_traits_23_G2 %>%
+  mutate(relative_fitness_23_G2 = est_fitness / mean(est_fitness, na.rm = TRUE))
+
+HR_mean_donor_traits_23_G2 <- HR_mean_donor_traits_23_G2 %>%
+  mutate(relative_fitness_23_G2 = est_fitness / mean(est_fitness, na.rm = TRUE))
+```
+
+```{r}
+# Join the two data frames
+AC_mean_donor_traits_23_G2 <- AC_mean_donor_traits_23_G2 %>%
+  left_join(
+    AC_mean_donor_traits_22 %>% dplyr::select(Donor, relative_fitness_22),  # Select only relevant columns
+    by = "Donor"
+  )
+
+# Weight each trait in 23_G2 by relative_fitness from 22
+AC_23_G2_weighted_by_22 <- AC_mean_donor_traits_23_G2 %>%
+  mutate(
+    across(
+      .cols = c(closed_fruits, total_fruits, filled_seeds, mean_seeds_per_fruit, 
+                fl_duration, skel_dryweight_mg, msm_all, corolla_diam_mm_SEG, 
+                SLA_SEG, d13C_SEG, est_fecundity, survival, g0_msm),  # Replace with actual trait columns
+      .fns = ~ . * relative_fitness_22,  # Multiply each trait by relative fitness
+      .names = "{.col}_weighted22"      # Add a suffix to the adjusted columns
+    )
+  )
+
+# Join the two data frames
+BB_mean_donor_traits_23_G2 <- BB_mean_donor_traits_23_G2 %>%
+  left_join(
+    BB_mean_donor_traits_22 %>% dplyr::select(Donor, relative_fitness_22),  # Select only relevant columns
+    by = "Donor"
+  )
+
+# Weight each trait in 23_G2 by relative_fitness from 22
+BB_23_G2_weighted_by_22 <- BB_mean_donor_traits_23_G2 %>%
+  mutate(
+    across(
+      .cols = c(closed_fruits, total_fruits, filled_seeds, mean_seeds_per_fruit, 
+                fl_duration, skel_dryweight_mg, msm_all, corolla_diam_mm_SEG, 
+                SLA_SEG, d13C_SEG, est_fecundity, survival, g0_msm),  # Replace with actual trait columns
+      .fns = ~ . * relative_fitness_22,  # Multiply each trait by relative fitness
+      .names = "{.col}_weighted22"      # Add a suffix to the adjusted columns
+    )
+  )
+
+# Join the two data frames
+BO_mean_donor_traits_23_G2 <- BO_mean_donor_traits_23_G2 %>%
+  left_join(
+    BO_mean_donor_traits_22 %>% dplyr::select(Donor, relative_fitness_22),  # Select only relevant columns
+    by = "Donor"
+  )
+
+# Weight each trait in 23_G2 by relative_fitness from 22
+BO_23_G2_weighted_by_22 <- BO_mean_donor_traits_23_G2 %>%
+  mutate(
+    across(
+      .cols = c(closed_fruits, total_fruits, filled_seeds, mean_seeds_per_fruit, 
+                fl_duration, skel_dryweight_mg, msm_all, corolla_diam_mm_SEG, 
+                SLA_SEG, d13C_SEG, est_fecundity, survival, g0_msm),  # Replace with actual trait columns
+      .fns = ~ . * relative_fitness_22,  # Multiply each trait by relative fitness
+      .names = "{.col}_weighted22"      # Add a suffix to the adjusted columns
+    )
+  )
+
+# Join the two data frames
+HR_mean_donor_traits_23_G2 <- HR_mean_donor_traits_23_G2 %>%
+  left_join(
+    HR_mean_donor_traits_22 %>% dplyr::select(Donor, relative_fitness_22),  # Select only relevant columns
+    by = "Donor"
+  )
+
+# Weight each trait in 23_G2 by relative_fitness from 22
+HR_23_G2_weighted_by_22 <- HR_mean_donor_traits_23_G2 %>%
+  mutate(
+    across(
+      .cols = c(closed_fruits, total_fruits, filled_seeds, mean_seeds_per_fruit, 
+                fl_duration, skel_dryweight_mg, msm_all, corolla_diam_mm_SEG, 
+                SLA_SEG, d13C_SEG, est_fecundity, survival, g0_msm),  # Replace with actual trait columns
+      .fns = ~ . * relative_fitness_22,  # Multiply each trait by relative fitness
+      .names = "{.col}_weighted22"      # Add a suffix to the adjusted columns
+    )
+  )
+```
+
+Comparing g1 2022 and g1 2023 with paternal trait means
+```{r}
+# Add Year column and combine G1 2022 and G1 2023 data
+HR_mean_donor_traits_22_a <- HR_mean_donor_traits_22 %>%
+  dplyr::select(msm_all, fl_duration, d13C_SEG, corolla_diam_mm_SEG, SLA_SEG, g0_msm) %>%
+  mutate(Group = "HR", Year = "2022")
+
+AC_mean_donor_traits_22_a <- AC_mean_donor_traits_22 %>%
+  dplyr::select(msm_all, fl_duration, d13C_SEG, corolla_diam_mm_SEG, SLA_SEG, g0_msm) %>%
+  mutate(Group = "AC", Year = "2022")
+
+BB_mean_donor_traits_22_a <- BB_mean_donor_traits_22 %>%
+  dplyr::select(msm_all, fl_duration, d13C_SEG, corolla_diam_mm_SEG, SLA_SEG, g0_msm) %>%
+  mutate(Group = "BB", Year = "2022")
+
+BO_mean_donor_traits_22_a <- BO_mean_donor_traits_22 %>%
+  dplyr::select(msm_all, fl_duration, d13C_SEG, corolla_diam_mm_SEG, SLA_SEG, g0_msm) %>%
+  mutate(Group = "BO", Year = "2022")
+
+HR_mean_donor_traits_23_G1_a <- HR_mean_donor_traits_23_G1 %>%
+  dplyr::select(msm_all, fl_duration, d13C_SEG, corolla_diam_mm_SEG, SLA_SEG, g0_msm) %>%
+  mutate(Group = "HR", Year = "2023")
+
+AC_mean_donor_traits_23_G1_a <- AC_mean_donor_traits_23_G1 %>%
+  dplyr::select(msm_all, fl_duration, d13C_SEG, corolla_diam_mm_SEG, SLA_SEG, g0_msm) %>%
+  mutate(Group = "AC", Year = "2023")
+
+BB_mean_donor_traits_23_G1_a <- BB_mean_donor_traits_23_G1 %>%
+  dplyr::select(msm_all, fl_duration, d13C_SEG, corolla_diam_mm_SEG, SLA_SEG, g0_msm) %>%
+  mutate(Group = "BB", Year = "2023")
+
+BO_mean_donor_traits_23_G1_a <- BO_mean_donor_traits_23_G1 %>%
+  dplyr::select(msm_all, fl_duration, d13C_SEG, corolla_diam_mm_SEG, SLA_SEG, g0_msm) %>%
+  mutate(Group = "BO", Year = "2023")
+
+
+# Combine all datasets
+combined_traits <- bind_rows(
+  HR_mean_donor_traits_22_a, AC_mean_donor_traits_22_a,
+  BB_mean_donor_traits_22_a, BO_mean_donor_traits_22_a,
+  HR_mean_donor_traits_23_G1_a, AC_mean_donor_traits_23_G1_a,
+  BB_mean_donor_traits_23_G1_a, BO_mean_donor_traits_23_G1_a
+)
+
+# Convert data to long format
+data_long <- combined_traits %>%
+  pivot_longer(cols = c(msm_all, fl_duration, d13C_SEG, corolla_diam_mm_SEG, SLA_SEG, g0_msm),
+               names_to = "Trait",
+               values_to = "Value")
+
+# Convert Value to numeric
+data_long <- data_long %>% mutate(Value = as.numeric(Value))
+
+# Rename Trait values for readability
+data_long <- data_long %>%
+  mutate(
+    Trait = recode(
+      Trait,
+      "msm_all" = "Offspring Mean Seed Mass",
+      "fl_duration" = "Flowering Duration",
+      "d13C_SEG" = "δ13C",
+      "corolla_diam_mm_SEG" = "Corolla Diameter",
+      "SLA_SEG" = "Specific Leaf Area",
+      "g0_msm" = "Sewn Seed Mass"
+    )
+  )
+
+# Define axis limits for each trait
+x_limits <- list(
+  "Offspring Mean Seed Mass" = c(0, 20),
+  "Flowering Duration" = c(0, 90),
+  "δ13C" = c(-35, -25),
+  "Corolla Diameter" = c(0, 40),
+  "Specific Leaf Area" = c(0, 40),
+  "Sewn Seed Mass" = c(0, 10)
+)
+
+
+
+# Create individual density plots for each trait
+plots <- lapply(unique(data_long$Trait), function(trait) {
+  ggplot(filter(data_long, Trait == trait), aes(x = Value, fill = Year)) +
+    geom_density(alpha = 0.6) +
+    facet_grid(Group ~ Trait, scales = "free_y") +
+    labs(
+      title = paste("Distribution of", trait, "for 2022 and 2023"),
+      x = "Trait Value",
+      y = "Density"
+    ) +
+    theme_minimal() +
+    theme(
+      legend.position = "top",
+      panel.grid.major = element_blank(),
+      panel.grid.minor = element_blank(),
+      strip.text.y = element_text(angle = 0),
+      strip.text.x = element_text(face = "bold")
+    ) +
+    scale_fill_manual(values = c("2022" = "#ff6f61", "2023" = "#17becf")) +
+    scale_y_continuous(expand = c(0, 0)) +
+    scale_x_continuous(limits = x_limits[[trait]])
+})
+
+
+
+# Combine and display all plots
+combined_plot <- wrap_plots(plots)
+print(combined_plot)
+
+# Save the combined plot
+ggsave("frequency_dist_2022_vs_2023_weighted_fixed_axes.png", plot = combined_plot, width = 12, height = 10, dpi = 300)
+```
+
+
+Comparing g1 2022 and g2 2023 (weighted with g1 2022) with scaled paternal trait means
+```{r}
+
+# Add Generation column and combine G1 2022 and G2 weighted by 2022
+HR_mean_donor_traits_22_a <- HR_mean_donor_traits_22 %>%
+  dplyr::select(msm_all, fl_duration, d13C_SEG, corolla_diam_mm_SEG, SLA_SEG, g0_msm) %>%
+  mutate(Group = "HR", Generation = "G1", Year = "2022")
+
+AC_mean_donor_traits_22_a <- AC_mean_donor_traits_22 %>%
+  dplyr::select(msm_all, fl_duration, d13C_SEG, corolla_diam_mm_SEG, SLA_SEG, g0_msm) %>%
+  mutate(Group = "AC", Generation = "G1", Year = "2022")
+
+BB_mean_donor_traits_22_a <- BB_mean_donor_traits_22 %>%
+  dplyr::select(msm_all, fl_duration, d13C_SEG, corolla_diam_mm_SEG, SLA_SEG, g0_msm) %>%
+  mutate(Group = "BB", Generation = "G1", Year = "2022")
+
+BO_mean_donor_traits_22_a <- BO_mean_donor_traits_22 %>%
+  dplyr::select(msm_all, fl_duration, d13C_SEG, corolla_diam_mm_SEG, SLA_SEG, g0_msm) %>%
+  mutate(Group = "BO", Generation = "G1", Year = "2022")
+
+HR_23_G2_weighted_by_22_a <- HR_23_G2_weighted_by_22 %>%
+  dplyr::select(msm_all_weighted22, fl_duration_weighted22, d13C_SEG_weighted22, corolla_diam_mm_SEG_weighted22, SLA_SEG_weighted22, g0_msm_weighted22) %>%
+  rename_with(~ gsub("_weighted22", "", .x)) %>%
+  mutate(Group = "HR", Generation = "G2", Year = "2023")
+
+AC_23_G2_weighted_by_22_a <- AC_23_G2_weighted_by_22 %>%
+  dplyr::select(msm_all_weighted22, fl_duration_weighted22, d13C_SEG_weighted22, corolla_diam_mm_SEG_weighted22, SLA_SEG_weighted22, g0_msm_weighted22) %>%
+  rename_with(~ gsub("_weighted22", "", .x)) %>%
+  mutate(Group = "AC", Generation = "G2", Year = "2023")
+
+BB_23_G2_weighted_by_22_a <- BB_23_G2_weighted_by_22 %>%
+  dplyr::select(msm_all_weighted22, fl_duration_weighted22, d13C_SEG_weighted22, corolla_diam_mm_SEG_weighted22, SLA_SEG_weighted22, g0_msm_weighted22) %>%
+  rename_with(~ gsub("_weighted22", "", .x)) %>%
+  mutate(Group = "BB", Generation = "G2", Year = "2023")
+
+BO_23_G2_weighted_by_22_a <- BO_23_G2_weighted_by_22 %>%
+  dplyr::select(msm_all_weighted22, fl_duration_weighted22, d13C_SEG_weighted22, corolla_diam_mm_SEG_weighted22, SLA_SEG_weighted22, g0_msm_weighted22) %>%
+  rename_with(~ gsub("_weighted22", "", .x)) %>%
+  mutate(Group = "BO", Generation = "G2", Year = "2023")
+
+# Combine all data
+combined_traits <- bind_rows(
+  HR_mean_donor_traits_22_a, AC_mean_donor_traits_22_a,
+  BB_mean_donor_traits_22_a, BO_mean_donor_traits_22_a,
+  HR_23_G2_weighted_by_22_a, AC_23_G2_weighted_by_22_a,
+  BB_23_G2_weighted_by_22_a, BO_23_G2_weighted_by_22_a
+)
+# Convert data to long format
+data_long <- combined_traits %>%
+  pivot_longer(cols = c(msm_all, fl_duration, d13C_SEG, corolla_diam_mm_SEG, SLA_SEG, g0_msm),
+               names_to = "Trait",
+               values_to = "Value")
+
+# Convert Value to numeric
+data_long <- data_long %>% mutate(Value = as.numeric(Value))
+
+# Rename Trait values for readability
+data_long <- data_long %>%
+  mutate(
+    Trait = recode(
+      Trait,
+      "msm_all" = "Offspring Mean Seed Mass",
+      "fl_duration" = "Flowering Duration",
+      "d13C_SEG" = "δ13C",
+      "corolla_diam_mm_SEG" = "Corolla Diameter",
+      "SLA_SEG" = "Specific Leaf Area",
+      "g0_msm" = "Sewn Seed Mass"
+    )
+  )
+
+# Define axis limits for each trait
+x_limits <- list(
+  "Offspring Mean Seed Mass" = c(0, 20),
+  "Flowering Duration" = c(0, 70),
+  "δ13C" = c(-35, -25),
+  "Corolla Diameter" = c(0, 40),
+  "Specific Leaf Area" = c(0, 40),
+  "Sewn Seed Mass" = c(0, 10)
+)
+
+# Create individual density plots for each trait
+plots <- lapply(unique(data_long$Trait), function(trait) {
+  ggplot(filter(data_long, Trait == trait), aes(x = Value, fill = Generation)) +
+    geom_density(alpha = 0.6) +
+    facet_grid(Group ~ Trait, scales = "free_y") +
+    labs(
+      title = paste("Distribution of", trait, "for G1 and G2"),
+      x = "Trait Value",
+      y = "Density"
+    ) +
+    theme_minimal() +
+    theme(
+      legend.position = "top",
+      panel.grid.major = element_blank(),
+      panel.grid.minor = element_blank(),
+      strip.text.y = element_text(angle = 0),
+      strip.text.x = element_text(face = "bold")
+    ) +
+    scale_fill_manual(values = c("G1" = "#ff6f61", "G2" = "#17becf")) +
+    scale_y_continuous(expand = c(0, 0)) +
+    scale_x_continuous(limits = x_limits[[trait]])
+})
+
+# Combine and display all plots
+combined_plot <- wrap_plots(plots)
+print(combined_plot)
+
+# Save the combined plot
+ggsave("frequency_dist_G1_vs_G2_weighted(22)_fixed_axes.png", plot = combined_plot, width = 12, height = 10, dpi = 300)
+
+```
+
+```{r}
+# Function to calculate Cohen's d
+compute_cohens_d <- function(x1, x2) {
+  mean_diff <- mean(x1, na.rm = TRUE) - mean(x2, na.rm = TRUE)
+  pooled_sd <- sqrt((sd(x1, na.rm = TRUE)^2 + sd(x2, na.rm = TRUE)^2) / 2)
+  cohen_d <- mean_diff / pooled_sd
+  return(cohen_d)
+}
+```
+
+ANGELO COAST
+```{r}
+cohens_d_msm_all <- compute_cohens_d(AC_mean_donor_traits_22_a$msm_all, AC_mean_donor_traits_23_G1_a$msm_all)
+print(cohens_d_msm_all)
+
+
+cohens_d_fl_duration <- compute_cohens_d(AC_mean_donor_traits_22_a$fl_duration, AC_mean_donor_traits_23_G1_a$fl_duration)
+print(cohens_d_fl_duration)
+
+
+cohens_d_d13C_SEG<- compute_cohens_d(AC_mean_donor_traits_22_a$d13C_SEG, AC_mean_donor_traits_23_G1_a$d13C_SEG)
+print(cohens_d_d13C_SEG)
+
+cohens_d_corolla_diam_mm_SEG<- compute_cohens_d(AC_mean_donor_traits_22_a$corolla_diam_mm_SEG, AC_mean_donor_traits_23_G1_a$corolla_diam_mm_SEG)
+print(cohens_d_corolla_diam_mm_SEG)
+
+
+cohens_d_SLA_SEG<- compute_cohens_d(AC_mean_donor_traits_22_a$SLA_SEG, AC_mean_donor_traits_23_G1_a$SLA_SEG)
+print(cohens_d_SLA_SEG)
+
+cohens_d_g0_msm<- compute_cohens_d(AC_mean_donor_traits_22_a$g0_msm, AC_mean_donor_traits_23_G1_a$g0_msm)
+print(cohens_d_g0_msm)
+```
+
+```{r}
+cohens_d_msm_all <- compute_cohens_d(AC_mean_donor_traits_22_a$msm_all, AC_23_G2_weighted_by_22_a$msm_all)
+print(cohens_d_msm_all)
+
+
+cohens_d_fl_duration <- compute_cohens_d(AC_mean_donor_traits_22_a$fl_duration, AC_23_G2_weighted_by_22_a$fl_duration)
+print(cohens_d_fl_duration)
+
+
+cohens_d_d13C_SEG<- compute_cohens_d(AC_mean_donor_traits_22_a$d13C_SEG, AC_23_G2_weighted_by_22_a$d13C_SEG)
+print(cohens_d_d13C_SEG)
+
+cohens_d_corolla_diam_mm_SEG<- compute_cohens_d(AC_mean_donor_traits_22_a$corolla_diam_mm_SEG, AC_23_G2_weighted_by_22_a$corolla_diam_mm_SEG)
+print(cohens_d_corolla_diam_mm_SEG)
+
+
+cohens_d_SLA_SEG<- compute_cohens_d(AC_mean_donor_traits_22_a$SLA_SEG, AC_23_G2_weighted_by_22_a$SLA_SEG)
+print(cohens_d_SLA_SEG)
+
+cohens_d_g0_msm<- compute_cohens_d(AC_mean_donor_traits_22_a$g0_msm, AC_23_G2_weighted_by_22_a$g0_msm)
+print(cohens_d_g0_msm)
+```
+
+BODEGA BAY
+```{r}
+cohens_d_msm_all <- compute_cohens_d(BB_mean_donor_traits_22_a$msm_all, BB_mean_donor_traits_23_G1_a$msm_all)
+print(cohens_d_msm_all)
+
+
+cohens_d_fl_duration <- compute_cohens_d(BB_mean_donor_traits_22_a$fl_duration, BB_mean_donor_traits_23_G1_a$fl_duration)
+print(cohens_d_fl_duration)
+
+
+cohens_d_d13C_SEG<- compute_cohens_d(BB_mean_donor_traits_22_a$d13C_SEG, BB_mean_donor_traits_23_G1_a$d13C_SEG)
+print(cohens_d_d13C_SEG)
+
+cohens_d_corolla_diam_mm_SEG<- compute_cohens_d(BB_mean_donor_traits_22_a$corolla_diam_mm_SEG, BB_mean_donor_traits_23_G1_a$corolla_diam_mm_SEG)
+print(cohens_d_corolla_diam_mm_SEG)
+
+
+cohens_d_SLA_SEG<- compute_cohens_d(BB_mean_donor_traits_22_a$SLA_SEG, BB_mean_donor_traits_23_G1_a$SLA_SEG)
+print(cohens_d_SLA_SEG)
+
+cohens_d_g0_msm<- compute_cohens_d(BB_mean_donor_traits_22_a$g0_msm, BB_mean_donor_traits_23_G1_a$g0_msm)
+print(cohens_d_g0_msm)
+```
+
+```{r}
+cohens_d_msm_all <- compute_cohens_d(BB_mean_donor_traits_22_a$msm_all, BB_23_G2_weighted_by_22_a$msm_all)
+print(cohens_d_msm_all)
+
+
+cohens_d_fl_duration <- compute_cohens_d(BB_mean_donor_traits_22_a$fl_duration, BB_23_G2_weighted_by_22_a$fl_duration)
+print(cohens_d_fl_duration)
+
+
+cohens_d_d13C_SEG<- compute_cohens_d(BB_mean_donor_traits_22_a$d13C_SEG, BB_23_G2_weighted_by_22_a$d13C_SEG)
+print(cohens_d_d13C_SEG)
+
+cohens_d_corolla_diam_mm_SEG<- compute_cohens_d(BB_mean_donor_traits_22_a$corolla_diam_mm_SEG, BB_23_G2_weighted_by_22_a$corolla_diam_mm_SEG)
+print(cohens_d_corolla_diam_mm_SEG)
+
+
+cohens_d_SLA_SEG<- compute_cohens_d(BB_mean_donor_traits_22_a$SLA_SEG, BB_23_G2_weighted_by_22_a$SLA_SEG)
+print(cohens_d_SLA_SEG)
+
+cohens_d_g0_msm<- compute_cohens_d(BB_mean_donor_traits_22_a$g0_msm, BB_23_G2_weighted_by_22_a$g0_msm)
+print(cohens_d_g0_msm)
+```
+
+
+BLUE OAK
+```{r}
+# For comparisons between 22 and 23 G1
+cohens_d_msm_all <- compute_cohens_d(BO_mean_donor_traits_22_a$msm_all, BO_mean_donor_traits_23_G1_a$msm_all)
+print(cohens_d_msm_all)
+
+cohens_d_fl_duration <- compute_cohens_d(BO_mean_donor_traits_22_a$fl_duration, BO_mean_donor_traits_23_G1_a$fl_duration)
+print(cohens_d_fl_duration)
+
+cohens_d_d13C_SEG <- compute_cohens_d(BO_mean_donor_traits_22_a$d13C_SEG, BO_mean_donor_traits_23_G1_a$d13C_SEG)
+print(cohens_d_d13C_SEG)
+
+cohens_d_corolla_diam_mm_SEG <- compute_cohens_d(BO_mean_donor_traits_22_a$corolla_diam_mm_SEG, BO_mean_donor_traits_23_G1_a$corolla_diam_mm_SEG)
+print(cohens_d_corolla_diam_mm_SEG)
+
+cohens_d_SLA_SEG <- compute_cohens_d(BO_mean_donor_traits_22_a$SLA_SEG, BO_mean_donor_traits_23_G1_a$SLA_SEG)
+print(cohens_d_SLA_SEG)
+
+cohens_d_g0_msm<- compute_cohens_d(BO_mean_donor_traits_22_a$g0_msm, BO_mean_donor_traits_23_G1_a$g0_msm)
+print(cohens_d_g0_msm)
+```
+
+
+```{r}
+# For comparisons between 22 and 23 G2
+cohens_d_msm_all <- compute_cohens_d(BO_mean_donor_traits_22_a$msm_all, BO_23_G2_weighted_by_22_a$msm_all)
+print(cohens_d_msm_all)
+
+cohens_d_fl_duration <- compute_cohens_d(BO_mean_donor_traits_22_a$fl_duration, BO_23_G2_weighted_by_22_a$fl_duration)
+print(cohens_d_fl_duration)
+
+
+cohens_d_d13C_SEG <- compute_cohens_d(BO_mean_donor_traits_22_a$d13C_SEG, BO_23_G2_weighted_by_22_a$d13C_SEG)
+print(cohens_d_d13C_SEG)
+
+
+cohens_d_corolla_diam_mm_SEG <- compute_cohens_d(BO_mean_donor_traits_22_a$corolla_diam_mm_SEG, BO_23_G2_weighted_by_22_a$corolla_diam_mm_SEG)
+print(cohens_d_corolla_diam_mm_SEG)
+
+cohens_d_SLA_SEG <- compute_cohens_d(BO_mean_donor_traits_22_a$SLA_SEG, BO_23_G2_weighted_by_22_a$SLA_SEG)
+print(cohens_d_SLA_SEG)
+
+cohens_d_g0_msm<- compute_cohens_d(BO_mean_donor_traits_22_a$g0_msm, BO_23_G2_weighted_by_22_a$g0_msm)
+print(cohens_d_g0_msm)
+```
+
+HASTINGS RANCH
+```{r}
+# For comparisons between 22 and 23 G1
+cohens_d_msm_all <- compute_cohens_d(HR_mean_donor_traits_22_a$msm_all, HR_mean_donor_traits_23_G1_a$msm_all)
+print(cohens_d_msm_all)
+
+cohens_d_fl_duration <- compute_cohens_d(HR_mean_donor_traits_22_a$fl_duration, HR_mean_donor_traits_23_G1_a$fl_duration)
+print(cohens_d_fl_duration)
+
+cohens_d_d13C_SEG <- compute_cohens_d(HR_mean_donor_traits_22_a$d13C_SEG, HR_mean_donor_traits_23_G1_a$d13C_SEG)
+print(cohens_d_d13C_SEG)
+
+cohens_d_corolla_diam_mm_SEG <- compute_cohens_d(HR_mean_donor_traits_22_a$corolla_diam_mm_SEG, HR_mean_donor_traits_23_G1_a$corolla_diam_mm_SEG)
+print(cohens_d_corolla_diam_mm_SEG)
+
+cohens_d_SLA_SEG <- compute_cohens_d(HR_mean_donor_traits_22_a$SLA_SEG, HR_mean_donor_traits_23_G1_a$SLA_SEG)
+print(cohens_d_SLA_SEG)
+
+cohens_d_g0_msm<- compute_cohens_d(HR_mean_donor_traits_22_a$g0_msm, HR_mean_donor_traits_23_G1_a$g0_msm)
+print(cohens_d_g0_msm)
+
+```
+
+```{r}
+# For comparisons between 22 and 23 G2
+cohens_d_msm_all <- compute_cohens_d(HR_mean_donor_traits_22_a$msm_all, HR_23_G2_weighted_by_22_a$msm_all)
+print(cohens_d_msm_all)
+
+cohens_d_fl_duration <- compute_cohens_d(HR_mean_donor_traits_22_a$fl_duration, HR_23_G2_weighted_by_22_a$fl_duration)
+print(cohens_d_fl_duration)
+
+cohens_d_d13C_SEG <- compute_cohens_d(HR_mean_donor_traits_22_a$d13C_SEG, HR_23_G2_weighted_by_22_a$d13C_SEG)
+print(cohens_d_d13C_SEG)
+
+cohens_d_corolla_diam_mm_SEG <- compute_cohens_d(HR_mean_donor_traits_22_a$corolla_diam_mm_SEG, HR_23_G2_weighted_by_22_a$corolla_diam_mm_SEG)
+print(cohens_d_corolla_diam_mm_SEG)
+
+cohens_d_SLA_SEG <- compute_cohens_d(HR_mean_donor_traits_22_a$SLA_SEG, HR_23_G2_weighted_by_22_a$SLA_SEG)
+print(cohens_d_SLA_SEG)
+
+cohens_d_g0_msm<- compute_cohens_d(HR_mean_donor_traits_22_a$g0_msm, HR_23_G2_weighted_by_22_a$g0_msm)
+print(cohens_d_g0_msm)
+```
+

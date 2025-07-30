@@ -1,0 +1,1195 @@
+---
+title: "Aster4_test_AC"
+author: "Helen Payne"
+date: "2024-09-11"
+output: html_document
+---
+
+---
+title: "Aster3_Angelo.Rmd"
+author: "Helen Payne"
+date: "2024-08-21"
+output: html_document
+---
+
+#ANGELO RANCH
+##Generation 1 2022
+```{r}
+library(tidyverse)
+library(readr)
+library(dplyr)
+library(stringr)
+library(here)
+
+#read in the data and change the name to #surv_to_fruitpod from surv_to_fruitprods
+#AC_22 <- read_csv(here::here("data_sheets", "compiled_sheets", "AC_mastersheet_full_2022.csv")) %>%
+#  rename_at(vars(55), ~"surv_to_fruitpod")
+         
+#colnames(AC_22)
+      
+
+AC_22 <- read_csv(here::here("data_sheets", "compiled_sheets", "AC_mastersheet_full_2022.csv")) %>%
+  rename_at(vars(55), ~"surv_to_fruitpod") %>%
+  mutate(
+    # Construct sample_ID conditionally
+    sample_ID = str_c(Year, Recipient, Gen, str_pad(Transect, width = 3, pad = "0"), Plant_ID, sep = "-"),
+    # Replace leading underscores in sample_ID with hyphens
+    sample_ID = str_replace(sample_ID, "^([^_]*)_", "\\1-")
+  ) %>%
+  dplyr::select("Transect", "Donor", "Recipient", "sample_ID", "surv_to_flower", "any_FitP", "total_fruits") %>%
+  mutate(any_FitP = ifelse(any_FitP == TRUE, 1, 0))%>%
+  filter(!(Transect %in% c("W1", "W2"))) %>%
+  mutate(surv_to_flower = ifelse(total_fruits > 0 & surv_to_flower == 0, 1, surv_to_flower)) %>%
+  mutate(any_FitP = ifelse(surv_to_flower == 0, 0, any_FitP))
+
+```
+
+
+```{r}
+#make NAs for other life history stages zero
+AC_22$surv_to_flower[is.na(AC_22$surv_to_flower)] <- 0
+AC_22$total_fruits[is.na(AC_22$total_fruits)]<-0
+
+# Define the update_zeros function
+## Determines survival info
+update_zeros <- function(df) {
+  for (i in 1:nrow(df)) {
+    if (df$surv_to_flower[i] == 0) {
+      df$total_fruits[i] <- 0
+    }
+  return(df)
+  }}
+
+# Apply the function to the dataset
+AC_22 <- update_zeros(AC_22)
+```
+
+```{r}
+#check for nonsense data
+subset(AC_22, total_fruits > 0 & surv_to_flower == 0)
+subset(AC_22, total_fruits > 0 & any_FitP == 0)
+
+#Make  sire and dam factors
+AC_22$Donor <- as.factor(AC_22$Donor)
+AC_22$Recipient <- as.factor(AC_22$Recipient)
+
+#number that germinated from table 1
+AC_22 %>%
+  mutate(surv_to_flower = as.factor(surv_to_flower)) %>% 
+  group_by(surv_to_flower) %>% 
+  count()
+
+#distinct number of dams
+AC_22 %>%
+  distinct(Recipient) %>%
+  count()
+#107
+
+#distinct # sires
+AC_22  %>%
+  distinct(Donor) %>%
+  count()
+#40
+
+#number of dams, and number of individuals for each dam
+NDS<-AC_22 %>%
+  group_by(Recipient, Donor) %>% 
+  count()
+```
+
+
+###Set up aster 
+```{r}
+library(aster)
+library(reshape2)
+
+#the "vars" are the nodes in the aster graphical model.   
+vars<-c("surv_to_flower", "any_FitP", "total_fruits")
+
+#convert to a dataframe for reshape to work
+AC_22 <- as.data.frame(AC_22)
+
+#Reshape AC to longform. "varying" notes the set of variables that will be converted to longform and named in "timevar" under one column of varb. "Times" says to use vars for the newly created column varb 
+AC22_aster <- reshape(AC_22 ,varying = list(vars), direction = "long", timevar = "varb",times = as.factor(vars), v.names = "resp")
+
+#####Check that the reshape worked 
+#If it did the number of rows will be the same 
+nrow(AC22_aster)
+nrow(AC_22)*length(vars)
+
+
+#####Designate fitness variable, "total_fruits", which is the final node 
+#grep1 is like a search function
+fit<-grepl("total_fruits", as.character(AC22_aster$varb))
+fit<-as.numeric(fit)
+AC22_aster$fit<-fit
+
+#####Check "total_fruits", is designated as the fitness variable 
+with(AC22_aster, sort(unique(as.character(varb)[fit==0])))
+with(AC22_aster, sort(unique(as.character(varb)[fit==1])))
+
+#####Add "root" to ML18_aster files where value is 1 
+AC22_aster <- data.frame(AC22_aster, root=1)
+
+#####Set graphical node and distribution for fitness nodes(preds) 
+names(AC22_aster)
+
+#pred is nodes. There are 5 nodes, so five preds.
+pred <- c(0,1,2)
+
+#fam assigns a distribution to each node. 1= bernoulli, 2= poission. The subsampling nodes (node #2 and #4 in pred) is binomial so Bernouli (always). Bernouli is a specific type of binomial so the assignment for family distribution is the same
+fam<-c(1,1,2)
+```
+
+
+```{r}
+library(MASS)
+
+#check distribution of non-Bernoulli nodes
+#Evaluate distribution of total pods
+#first subset for those that survived to flowering 
+AC22_flwr<-subset(AC_22, surv_to_flower>0)
+
+#evaluate the distribution of total_fruits 
+hist(AC22_flwr$total_fruits)
+
+#get parameters for a negative binomial distribution
+AC22.param <- fitdistr(AC22_flwr$total_fruits, "negative binomial") 
+
+
+#get a random distribution with the parameters from you data and plot a histogram. Do that for poisson and negative bionoimal and compare against the histogram for total pods to see which fits the best 
+#nbinomial??
+hist(rnbinom(6575, size = 1.87, mu=1.97))
+hist(rpois(6575, lambda=1.97))
+```
+
+###Random effects aster model
+```{r}
+####Testing for Donor and Recipient significance
+#Donor is zero with Recipient
+both_AC22 <- reaster(resp ~ fit + varb + fit:Transect, random = list(Donor = ~0 + 
+    fit:Donor, Recipient = ~0 + fit:Recipient), pred = pred, fam = fam, varvar = varb, 
+    idvar = id, root = root, data = AC22_aster)
+summary(both_AC22)
+
+#Call:
+#reaster.formula(fixed = resp ~ fit + varb + fit:Transect, random = list(Donor = ~0 + 
+#    fit:Donor, Recipient = ~0 + fit:Recipient), pred = pred, 
+#    fam = fam, varvar = varb, idvar = id, root = root, data = AC22_aster)
+
+
+#Fixed Effects:
+#                     Estimate Std. Error z value Pr(>|z|)    
+#(Intercept)        -10.698582   0.164595 -65.000  < 2e-16 ***
+#fit                 13.040432   0.179595  72.610  < 2e-16 ***
+#varbsurv_to_flower  12.199793   0.172708  70.638  < 2e-16 ***
+#fit:Transect2       -0.030344   0.021675  -1.400  0.16154    
+#fit:Transect3       -0.068735   0.022121  -3.107  0.00189 ** 
+#fit:Transect4        0.002045   0.018925   0.108  0.91397    
+#fit:Transect5       -0.030331   0.019928  -1.522  0.12801    
+#fit:Transect6       -0.029415   0.020587  -1.429  0.15306    
+#fit:Transect7       -0.047794   0.020512  -2.330  0.01980 *  
+#fit:Transect8       -0.061569   0.024159  -2.549  0.01082 *  
+#fit:Transect9       -0.092435   0.022234  -4.157 3.22e-05 ***
+#---
+#Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+#
+#Square Roots of Variance Components (P-values are one-tailed):
+#          Estimate Std. Error z value Pr(>|z|)/2    
+#Donor     0.065771   0.009432   6.973   1.55e-12 ***
+#Recipient 0.026912   0.008516   3.160   0.000788 ***
+#---
+#Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+
+#Check for the effect of Donor alone. Significant. 
+Donor_AC22<- reaster(resp ~ fit + varb + fit:Transect, random = list(Donor = ~0 + 
+    fit:Donor), pred = pred, fam = fam, varvar = varb, 
+    idvar = id, root = root, data = AC22_aster)
+summary(Donor_AC22)
+
+#
+
+#Check for the effect of Recipient alone. Significant. 
+Recipient_AC22<- reaster(resp ~ varb + fit, random = list(Recipient = ~0 + 
+    fit:Recipient), pred = pred, fam = fam, varvar = varb, 
+    idvar = id, root = root, data = AC22_aster)
+
+summary(Recipient_AC22)
+
+#
+
+
+####Combine Sire and Dam into one random effect, `Parental`. The estimates are of similar magnitude 
+modmat.Donor <- model.matrix(~ 0 + fit:Donor, AC22_aster)
+modmat.Recipient <- model.matrix(~ 0 + fit:Recipient, AC22_aster)
+modmat.donorrecipient <- cbind(modmat.Donor,modmat.Recipient)
+
+rout_AC22 <- reaster(resp ~ fit + varb, list(Parental = ~ 0 + modmat.donorrecipient),pred, fam, varb, id, root, data = AC22_aster)
+sout_AC22 <-summary(rout_AC22)
+sout_AC22
+
+save(rout_AC22, file = "rout_AC22.rdata")
+
+#Call:
+#reaster.formula(fixed = resp ~ fit + varb, random = list(Parental = ~0 + 
+#    modmat.donorrecipient), pred = pred, fam = fam, varvar = varb, 
+#    idvar = id, root = root, data = AC22_aster)
+
+
+#Fixed Effects:
+#                   Estimate Std. Error z value Pr(>|z|)    
+#(Intercept)        -10.7477     0.1646  -65.31   <2e-16 ***
+#fit                 13.0597     0.1795   72.74   <2e-16 ***
+#varbsurv_to_flower  12.2490     0.1727   70.93   <2e-16 ***
+#---
+#Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+#Square Roots of Variance Components (P-values are one-tailed):
+#         Estimate Std. Error z value Pr(>|z|)/2    
+#Parental 0.047227   0.004795   9.849     <2e-16 ***
+#---
+#Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+#model comparison for significance of Transect. Significant.
+rout_AC22_2 <- reaster(resp ~ fit + varb + fit:Transect, list(Parental = ~ 0 + modmat.donorrecipient),
+    pred, fam, varb, id, root, data = AC22_aster)
+sout_AC22_2 <-summary(rout_AC22_2)
+sout_AC22_2
+
+#Call:
+#reaster.formula(fixed = resp ~ fit + varb + fit:Transect, random = list(Parental = ~0 + 
+#    modmat.donorrecipient), pred = pred, fam = fam, varvar = varb, 
+#    idvar = id, root = root, data = AC22_aster)
+
+
+#Fixed Effects:
+#                     Estimate Std. Error z value Pr(>|z|)    
+#(Intercept)        -10.708274   0.164666 -65.030  < 2e-16 ***
+#fit                 13.052399   0.179563  72.690  < 2e-16 ***
+#varbsurv_to_flower  12.209485   0.172776  70.666  < 2e-16 ***
+#fit:Transect2       -0.033624   0.022418  -1.500  0.13366    
+#fit:Transect3       -0.063914   0.022543  -2.835  0.00458 ** 
+#fit:Transect4        0.000293   0.019429   0.015  0.98797    
+#fit:Transect5       -0.028648   0.020383  -1.405  0.15988    
+#fit:Transect6       -0.026749   0.020997  -1.274  0.20267    
+#fit:Transect7       -0.049681   0.020791  -2.390  0.01687 *  
+#fit:Transect8       -0.061384   0.024528  -2.503  0.01233 *  
+#fit:Transect9       -0.088286   0.022614  -3.904 9.46e-05 ***
+#---
+#Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+#Square Roots of Variance Components (P-values are one-tailed):
+#         Estimate Std. Error z value Pr(>|z|)/2    
+#Parental 0.047354   0.004827    9.81     <2e-16 ***
+#---
+#Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+
+anova(rout_AC22, rout_AC22_2)
+
+#Analysis of Deviance Table
+
+#Model 1: resp ~ fit + varb, ~0 + modmat.donorrecipient
+#Model 2: resp ~ fit + varb + fit:Transect, ~0 + modmat.donorrecipient
+#  Mod Df Fix Mod Df Rand Mod Dev Df Fix Df Rand Deviance    P-value
+#1          3           1  6793.2                                   
+#2         11           1  6823.7      8       0   30.549 0.00016901
+
+####Now look at parameter estimates to be sure we have the model intended.
+sout_AC22_2 <-summary(rout_AC22_2)
+sout_AC22_2
+```
+
+###Mapping function 
+```{r}
+#following Geyer et al. 2022
+library(numDeriv)
+fishinv<-solve(sout_AC22_2$fisher)
+map.factory <- function(rout, is.subsamp) {
+  stopifnot(inherits(rout, "reaster"))
+  stopifnot(is.logical(is.subsamp))
+  aout <- rout$obj
+  stopifnot(inherits(aout, "aster"))
+  nnode <- ncol(aout$x)
+  if (nnode != length(is.subsamp))
+    stop("length(is.subsamp) not the number of nodes in the aster graph")
+  alpha <- rout$alpha
+  ifit <- which(names(alpha) == "fit")
+  if (length(ifit) != 1)
+    stop("no fixed effect named fit")
+  modmat <- rout$obj$modmat[1, , , drop = FALSE]
+  # set root = 1
+  root <- array(1, dim = dim(modmat)[1:2])
+  x <- aout$x[1, c(1:3)] # added, 3 is the number of nodes 
+  # return map function
+  function (b) {
+    stopifnot(is.numeric(b))
+    stopifnot(is.finite(b))
+    stopifnot(length(b) == 1)
+    alpha[ifit] <- alpha[ifit] + b
+    xi <- predict(
+      aout,
+      x = x, # added
+      newcoef = alpha,
+      modmat = modmat,
+      root = root,
+      model.type = "conditional",
+      is.always.parameter = TRUE)
+  
+    xi <- matrix(xi, ncol = nnode)
+    # always use drop = FALSE unless you are sure you don't want that
+    # here if we omit drop = FALSE and there is only one non-subsampling
+    # node, the code will break (apply will give an error)
+    xi <- xi[,!is.subsamp, drop = FALSE]
+    mu <- apply(xi, 1, prod) #every individual
+    # mu is unconditional mean values for model without subsampling
+    # in this application all components mu are the same because no
+    # covariates except varb, so just return only one
+    mu[1] 
+  }
+}
+
+map <- map.factory(rout_AC22_2, vars %in% ("any_FitP"))
+
+
+#MEAN FITNESS
+mf<-map(0)
+mf
+#7.72693
+
+#ADDITIVE GENETIC VARIANCE FOR FITNESS
+vaw <- rout_AC22_2$sigma["Parental"]^2 * grad(map, 0)^2
+# get rid of name
+vaw <- as.numeric(vaw)
+vaw <- vaw * 4
+vaw
+#1.345213
+
+####FFTNS
+fftns <- vaw / mf
+fftns
+#0.1740942
+
+#prediction of progeny generation mean fitness
+mf+fftns
+#7.901024
+
+# get SE
+map.factory.too <- function(rout, is.subsamp) {
+  stopifnot(inherits(rout, "reaster"))
+  stopifnot(is.logical(is.subsamp))
+  aout <- rout$obj
+  stopifnot(inherits(aout, "aster"))
+  nnode <- ncol(aout$x)
+  if (nnode != length(is.subsamp))
+    stop("length(is.subsamp) not the number of nodes in the aster graph")
+  alpha <- rout$alpha
+  ifit <- which(names(alpha) == "fit")
+  if (length(ifit) != 1)
+    stop("no fixed effect named fit")
+  # modmat for one individual. Taking the first row of modmat- there is one row for each individual
+  modmat <- rout$obj$modmat[1, , , drop = FALSE] #this only takes the first row 
+  # set root = 1
+  root <- array(1, dim = dim(modmat)[1:2])
+  x <- aout$x[1, c(1:3)] # added, second number is number of nodes 
+  # return map function
+  function (balpha) {
+    stopifnot(is.numeric(balpha))
+    stopifnot(is.finite(balpha))
+    stopifnot(length(balpha) == 1 + length(alpha))
+    b <- balpha[1]
+    alpha <- balpha[-1]
+    alpha[ifit] <- alpha[ifit] + b
+    xi <- predict(
+      aout,
+      x = x, # added
+      newcoef = alpha,
+      modmat = modmat,
+      root = root,
+      model.type = "conditional",
+      is.always.parameter = TRUE
+    )
+    xi <- matrix(xi, ncol = nnode)
+    xi <- xi[,!is.subsamp, drop = FALSE]
+    mu <- apply(xi, 1, prod)
+    # mu is unconditional mean values for model without subsampling
+    mu[1]
+  }
+}
+
+map.too <- map.factory.too(rout_AC22_2, vars %in% ("any_FitP"))
+
+
+#centering sire on zero
+balpha.hat <- c(0, rout_AC22_2$alpha)
+
+map.too(balpha.hat)
+#7.72693
+
+all.equal(map(0), map.too(balpha.hat))
+
+#first and second derivatives
+g<-grad(map.too, balpha.hat)
+
+#calculates the nxn matrix
+h <- hessian(map.too, balpha.hat)
+
+#these are partial derivatives
+dmu.db <- g[1]
+dmu.dalpha <- g[-1]
+d2mu.db.dalpha <- h[1, -1]
+
+# give names to the estimators in our formulas
+mu.hat <- map.too(balpha.hat)
+nu.hat <- rout_AC22_2$nu["Parental"]
+
+#FFTNS SE
+#calculations for the gradient vector of the FFTNS prediction with respect to the parameters of the models (fixed effects and variance components) 
+#zero removed
+dfftns <- c(- 4 * nu.hat * dmu.dalpha * dmu.db^2 / mu.hat^2 +
+8 * nu.hat * d2mu.db.dalpha / mu.hat, 4 * dmu.db^2 / mu.hat)
+
+#And apply the delta method.
+fftns.se <- t(dfftns) %*% fishinv %*% dfftns
+fftns.se <- sqrt(as.vector(fftns.se))
+fftns.se
+#0.03602792
+
+#ADDITIVE GENETIC VARIANCE SE 
+#calculate the gradient vector VA(W) with respect to the parameters of the model using these formulae
+dvaw <- c(8 * nu.hat * d2mu.db.dalpha, 4 * dmu.db^2)
+
+#And then apply the delta method to get standard errors for this estimator
+vaw.se <- t(dvaw) %*% fishinv %*% dvaw
+vaw.se <- sqrt(as.vector(vaw.se))
+vaw.se
+#0.2721986
+
+#MEAN FITNESS SE
+dmf <- c(dmu.dalpha, 0)
+mf.se <- t(dmf) %*% fishinv %*% dmf
+mf.se <- sqrt(as.vector(mf.se))
+mf.se
+#0.2403227
+```
+
+###breeding values 
+```{r}
+#extract breeding values
+bhat <- rout_AC22_2$b 
+bhat.Donor<- bhat[grep("Donor", names(bhat))]
+
+#check this is the correct number of sires (46)
+length(bhat.Donor)
+
+#convert canonical values to mean value parameter values using mapping function. "total_pods_collected" is the subsampling node 
+map <- map.factory(rout_AC22_2, vars %in% ("any_FitP")
+vectorized.map <- Vectorize(map)
+curve(vectorized.map, from = -1 / 2, to = 1/2, xlab="b", ylab=expression(mu(b)))
+
+#breeding values for sire groups on the mean value parameter scale 
+bhat.Donor.mu <- vectorized.map(bhat.Donor)
+bhat.Donor.mu<-as.data.frame(bhat.Donor.mu)
+write.csv(bhat.Donor.mu, "bhat.Donor.mu.csv")
+
+#plot the distribution of breeding values
+# Extract the numeric column from bhat.Donor.mu
+numeric_values <- bhat.Donor.mu[["bhat.Donor.mu"]]  # Column name is the same as the data frame name
+
+# Calculate and plot the density
+prob_den <- density(numeric_values)
+plot(prob_den)
+```
+#ANGELO RANCH
+##Generation 1 2023
+```{r}
+library(tidyverse)
+
+#load year 2 (2023) life history data for AC site
+AC_23 <- read_csv(here::here("data_sheets", "compiled_sheets", "AC_mastersheet_full_2023.csv")) %>%
+  dplyr::select("Transect", "Gen", "Donor", "Recipient", "sample_ID_SEG", "surv_to_flower", "F_plant", "total_fruits") %>%
+  mutate(F_plant = ifelse(F_plant == TRUE, 1, 0)) %>%
+  mutate(surv_to_flower = ifelse(total_fruits > 0 & surv_to_flower == 0, 1, surv_to_flower)) %>%
+  mutate(F_plant = ifelse(surv_to_flower == 0, 0, F_plant)) %>%
+  filter(Donor != "random seeds")
+
+
+####make NAs for other life history stages zero
+AC_23[is.na(AC_23$surv_to_flower),]$surv_to_flower <- 0
+AC_23[is.na(AC_23$total_fruits),]$total_fruits <- 0
+AC_23[is.na(AC_23$F_plant),]$F_plant <- 0
+
+####check for nonsense data
+subset(AC_23, total_fruits > 0 & surv_to_flower  == 0)
+
+
+#make factors
+AC_23$Donor <- as.factor(AC_23$Donor)
+AC_23$Recipient <- as.factor(AC_23$Recipient)
+AC_23$Gen<-as.factor(AC_23$Gen)
+```
+
+```{r}
+# Enforce logical constraints in your data
+
+# Condition 1: If surv_to_flower is 0, then total_fruits, closed_fruits, and mean_seeds_per_fruit should be 0
+AC_23$surv_to_flower[AC_23$surv_to_flower == 0] <- 0
+AC_23$total_fruits[AC_23$surv_to_flower == 0] <- 0
+```
+
+####Germination in parental vs progeny
+```{r}
+library(tidyverse)
+#data for table 1
+#counts the number of Recipients in parental and progeny generation
+AC_23 %>%
+  group_by(Gen) %>% 
+  distinct(Recipient) %>%
+  arrange(Gen, Recipient) %>%
+  count()
+
+#counts the number of Donors in each group. For progeny number of sires is grand-Donors as they were open pollinated in the field 
+AC_23 %>%
+  group_by(Gen) %>% 
+  distinct(Donor) %>%
+  count()
+
+AC_23 %>%
+  group_by(Gen, Recipient, Donor) %>% 
+  count()
+```
+
+
+####check distributions
+```{r}
+AC23_aster_a<-subset(AC_23, Gen=="G1")
+
+library(MASS)
+
+#total_fruits
+#negative binomial is better
+ACyr2_flwr<-subset(AC23_aster_a, surv_to_flower>0)
+hist(ACyr2_flwr$total_fruits)
+
+AC2.param <- fitdistr(ACyr2_flwr$total_fruits, "negative binomial") 
+hist(rnbinom(736, size =0.18, mu=1.6))
+hist(rpois(736, lambda=1.6))
+
+```
+
+###Set up aster
+```{r}
+#subset the data to only Gen 1
+AC23_aster_a<-subset(AC_23, Gen=="G1")
+
+#set the nodes for the aster graphical model as "vars". "Pods_collected" is the sub sampled node 
+vars<-c("surv_to_flower", "F_plant", "total_fruits")
+
+AC23_aster_a <- as.data.frame(AC23_aster_a)
+
+#reshape AC23_aster_a to longform
+AC23_aster <- reshape(AC23_aster_a,varying = list(vars), direction = "long", timevar = "varb",times = as.factor(vars), v.names = "resp")
+
+#Check that the reshape worked 
+nrow(AC23_aster)
+nrow(AC23_aster_a)*length(vars)
+
+#designate fitness variable as terminal node, "total_fruits"
+fit<-grepl("total_fruits", as.character(AC23_aster$varb))
+fit<-as.numeric(fit)
+AC23_aster$fit<-fit
+
+#check that "mean_seeds_per_fruit" is designated as the fitness variable
+with(AC23_aster, sort(unique(as.character(varb)[fit==0])))
+with(AC23_aster, sort(unique(as.character(varb)[fit==1])))
+
+#Add a variable "root" to AC23_aster where value is 1
+AC23_aster <- data.frame(AC23_aster, root=1)
+
+#give each node a number
+pred <- c(0,1,2)
+
+#designate each node with a distribution. 1= Bernoulli, 2= poisson. sub sampling node (pods_collected) is binomial(Bernoulli is a type of binomial distribution so the family assignment is the same)
+fam<-c(1,1,2)
+
+```
+
+
+###Random effects aster model
+```{r}
+
+####Fit random effects model. sire estimate is zero with dam  
+both_AC23<- reaster(resp ~ varb + fit + fit:Transect, random = list(Donor = ~0 + 
+    fit:Donor, Recipient = ~0 + fit:Recipient), pred = pred, fam = fam, varvar = varb, 
+    idvar = id, root = root, data = AC23_aster)
+summary(both_AC23)
+
+#Call:
+#reaster.formula(fixed = resp ~ varb + fit + fit:Transect, random = list(Donor = ~0 + 
+#    fit:Donor, Recipient = ~0 + fit:Recipient), pred = pred, 
+#    fam = fam, varvar = varb, idvar = id, root = root, data = AC23_aster)
+
+
+#Fixed Effects:
+#                    Estimate Std. Error z value Pr(>|z|)    
+#(Intercept)        -4.026819   0.151235 -26.626  < 2e-16 ***
+#varbsurv_to_flower  4.121176   0.174334  23.640  < 2e-16 ***
+#varbtotal_fruits    5.602934   0.176897  31.673  < 2e-16 ***
+#fit:Transect       -0.018625   0.005586  -3.335 0.000854 ***
+#---
+#Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+#Square Roots of Variance Components (P-values are one-tailed):
+#          Estimate Std. Error z value Pr(>|z|)/2  
+#Donor      0.04475    0.02705   1.654      0.049 *
+#Recipient  0.02805    0.05782   0.485      0.314  
+#---
+#Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+#Check for the effect of sire alone. Significant. 
+donor_AC23<- reaster(resp ~ fit + varb + fit:Transect, random = list(Donor = ~0 + 
+    fit:Donor), pred = pred, fam = fam, varvar = varb, 
+    idvar = id, root = root, data = AC23_aster)
+summary(donor_AC23)
+
+#
+
+#check for the effect of dam alone. significant  
+recipient_AC23<- reaster(resp ~ fit + varb + fit:Transect, random = list(Recipient = ~0 + 
+    fit:Recipient), pred = pred, fam = fam, varvar = varb, #in model dam_ML19 shouldn't this say "fit:Dam"
+    idvar = id, root = root, data = AC23_aster)
+summary(recipient_AC23)
+
+#
+
+####Combine Donor and Recipient into one random effect, `Parental`. The estimates are of similar magnitude 
+modmat.Donor <- model.matrix(~ 0 + fit:Donor, AC23_aster)
+modmat.Recipient <- model.matrix(~ 0 + fit:Recipient, AC23_aster)
+modmat.donorrecipient <- cbind(modmat.Donor,modmat.Recipient)
+
+
+rout_AC23 <- reaster(resp ~ fit + varb, list(Parental = ~ 0 + modmat.donorrecipient),pred, fam, varb, id, root, data = AC23_aster)
+sout_AC23 <-summary(rout_AC23)
+sout_AC23
+
+#Call:
+#reaster.formula(fixed = resp ~ fit + varb, random = list(Parental = ~0 + 
+#    modmat.donorrecipient), pred = pred, fam = fam, varvar = varb, 
+#    idvar = id, root = root, data = AC23_aster)
+
+
+#Fixed Effects:
+#                   Estimate Std. Error z value Pr(>|z|)    
+#(Intercept)         -4.0462     0.1513  -26.74   <2e-16 ***
+#fit                  5.5408     0.1774   31.24   <2e-16 ***
+#varbsurv_to_flower   4.1406     0.1744   23.74   <2e-16 ***
+#---
+#Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+#Square Roots of Variance Components (P-values are one-tailed):
+#         Estimate Std. Error z value Pr(>|z|)/2   
+#Parental  0.04354    0.01631   2.669     0.0038 **
+#---
+#Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+save(rout_AC23, file = "rout_AC23.rdata")
+
+#model comparison for significance of yloc. Significant.
+rout_AC23_2 <- reaster(resp ~ fit + varb + fit:Transect, list(Parental = ~ 0 + modmat.donorrecipient),
+    pred, fam, varb, id, root, data = AC23_aster)
+sout_AC23_2 <-summary(rout_AC23_2)
+sout_AC23_2
+
+#Call:
+#reaster.formula(fixed = resp ~ fit + varb + fit:Transect, random = list(Parental = ~0 + 
+#    modmat.donorrecipient), pred = pred, fam = fam, varvar = varb, 
+#    idvar = id, root = root, data = AC23_aster)
+
+
+#Fixed Effects:
+#                    Estimate Std. Error z value Pr(>|z|)    
+#(Intercept)        -4.027050   0.151231 -26.628  < 2e-16 ***
+#fit                 5.603054   0.176900  31.674  < 2e-16 ***
+#varbsurv_to_flower  4.121407   0.174330  23.641  < 2e-16 ***
+#fit:Transect       -0.018574   0.005604  -3.315 0.000918 ***
+#---
+#Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+#Square Roots of Variance Components (P-values are one-tailed):
+#         Estimate Std. Error z value Pr(>|z|)/2  
+#Parental  0.03904    0.01728   2.259     0.0119 *
+#---
+#Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+anova(rout_AC23, rout_AC23_2)
+
+#Analysis of Deviance Table
+
+#Model 1: resp ~ fit + varb, ~0 + modmat.donorrecipient
+#Model 2: resp ~ fit + varb + fit:Transect, ~0 + modmat.donorrecipient
+#  Mod Df Fix Mod Df Rand Mod Dev Df Fix Df Rand Deviance    P-value
+#1          3           1 -1983.1                                   
+#2          4           1 -1971.8      1       0   11.313 0.00076967
+
+```
+
+###Mapping function 
+```{r}
+#following Geyer et al. 2022
+
+library(numDeriv)
+fishinv<-solve(sout_AC23_2$fisher)
+map.factory <- function(rout, is.subsamp) {
+  stopifnot(inherits(rout, "reaster"))
+  stopifnot(is.logical(is.subsamp))
+  aout <- rout$obj
+  stopifnot(inherits(aout, "aster"))
+  nnode <- ncol(aout$x)
+  if (nnode != length(is.subsamp))
+    stop("length(is.subsamp) not the number of nodes in the aster graph")
+  alpha <- rout$alpha
+  ifit <- which(names(alpha) == "fit")
+  if (length(ifit) != 1)
+    stop("no fixed effect named fit")
+  modmat <- rout$obj$modmat[1, , , drop = FALSE]
+  # set root = 1
+  root <- array(1, dim = dim(modmat)[1:2])
+  x <- aout$x[1, c(1:3)] # added, 5 is the number of nodes 
+  # return map function
+  function (b) {
+    stopifnot(is.numeric(b))
+    stopifnot(is.finite(b))
+    stopifnot(length(b) == 1)
+    alpha[ifit] <- alpha[ifit] + b
+    xi <- predict(
+      aout,
+      x = x, # added
+      newcoef = alpha,
+      modmat = modmat,
+      root = root,
+      model.type = "conditional",
+      is.always.parameter = TRUE)
+  
+    xi <- matrix(xi, ncol = nnode)
+    # always use drop = FALSE unless you are sure you don't want that
+    # here if we omit drop = FALSE and there is only one non-subsampling
+    # node, the code will break (apply will give an error)
+    xi <- xi[,!is.subsamp, drop = FALSE]
+    mu <- apply(xi, 1, prod) #every individual
+    # mu is unconditional mean values for model without subsampling
+    # in this application all components mu are the same because no
+    # covariates except varb, so just return only one
+    mu[1] 
+  }
+}
+
+map <- map.factory(rout_AC23_2, vars %in% ("F_plant"))
+
+#MEAN FITNESS
+mf<-map(0)
+mf
+# 2.330512
+
+#VA(W)
+vaw <- rout_AC23_2$sigma["Parental"]^2 * grad(map, 0)^2
+# get rid of name
+vaw <- as.numeric(vaw)
+vaw <- vaw * 4
+vaw
+#0.1377381
+
+####FFTNS
+fftns <- vaw / mf
+fftns
+#0.05910208
+
+# get SE
+map.factory.too <- function(rout, is.subsamp) {
+  stopifnot(inherits(rout, "reaster"))
+  stopifnot(is.logical(is.subsamp))
+  aout <- rout$obj
+  stopifnot(inherits(aout, "aster"))
+  nnode <- ncol(aout$x)
+  if (nnode != length(is.subsamp))
+    stop("length(is.subsamp) not the number of nodes in the aster graph")
+  alpha <- rout$alpha
+  ifit <- which(names(alpha) == "fit")
+  if (length(ifit) != 1)
+    stop("no fixed effect named fit")
+  # modmat for one individual. Taking the first row of modmat- there is one row for each individual
+  modmat <- rout$obj$modmat[1, , , drop = FALSE] #this only takes the first row 
+  # set root = 1
+  root <- array(1, dim = dim(modmat)[1:2])
+  x <- aout$x[1, c(1:3)] # added, second number is number of nodes 
+  # return map function
+  function (balpha) {
+    stopifnot(is.numeric(balpha))
+    stopifnot(is.finite(balpha))
+    stopifnot(length(balpha) == 1 + length(alpha))
+    b <- balpha[1]
+    alpha <- balpha[-1]
+    alpha[ifit] <- alpha[ifit] + b
+    xi <- predict(
+      aout,
+      x = x, # added
+      newcoef = alpha,
+      modmat = modmat,
+      root = root,
+      model.type = "conditional",
+      is.always.parameter = TRUE
+    )
+    xi <- matrix(xi, ncol = nnode)
+    xi <- xi[,!is.subsamp, drop = FALSE]
+    mu <- apply(xi, 1, prod)
+    # mu is unconditional mean values for model without subsampling
+    # Here Yloc was set to zero so there in only one value in the Xi matrix 
+    mu[1]
+  }
+}
+
+map.too <- map.factory.too(rout_AC23_2, vars %in% ("F_plant"))
+
+#centering sire on zero
+balpha.hat <- c(0, rout_AC23_2$alpha)
+
+map.too(balpha.hat)
+#2.330512
+
+all.equal(map(0), map.too(balpha.hat))
+
+#first and second derivatives
+g<-grad(map.too, balpha.hat)
+
+#calculates the nxn matrix
+h <- hessian(map.too, balpha.hat)
+
+#these are partial derivatives
+dmu.db <- g[1]
+dmu.dalpha <- g[-1]
+d2mu.db.dalpha <- h[1, -1]
+
+# give names to the estimators in our formulas
+mu.hat <- map.too(balpha.hat)
+nu.hat <- rout_AC23_2$nu["Parental"]
+
+#FFTNS SE
+#calculations for the gradient vector of the FFTNS prediction with respect to the parameters of the models (fixed effects and variance components) 
+#zero removed
+dfftns <- c(- 4 * nu.hat * dmu.dalpha * dmu.db^2 / mu.hat^2 +
+8 * nu.hat * d2mu.db.dalpha / mu.hat, 4 * dmu.db^2 / mu.hat)
+
+#And apply the delta method.
+fftns.se <- t(dfftns) %*% fishinv %*% dfftns
+fftns.se <- sqrt(as.vector(fftns.se))
+fftns.se
+#0.05245719
+
+#ADDITIVE GENETIC VARIANCE SE 
+#calculate the gradient vector VA(W) with respect to the parameters of the model using these formulae
+dvaw <- c(8 * nu.hat * d2mu.db.dalpha, 4 * dmu.db^2)
+
+#And then apply the delta method to get standard errors for this estimator
+vaw.se <- t(dvaw) %*% fishinv %*% dvaw
+vaw.se <- sqrt(as.vector(vaw.se))
+vaw.se
+#0.1214638
+
+#MEAN FITNESS SE
+dmf <- c(dmu.dalpha, 0)
+mf.se <- t(dmf) %*% fishinv %*% dmf
+mf.se <- sqrt(as.vector(mf.se))
+mf.se
+#0.1308324
+```
+
+###breeding values
+```{r}
+bhat <- rout_AC23_2$b 
+bhat.donor<- bhat[grep("Donor", names(bhat))]
+
+#check this is the correct number of sires (40)
+length(bhat.donor)
+
+#convert canonical values to mean value parameter values using mapping function
+map <- map.factory(rout_AC23_2, vars %in% ("F_plant"))
+vectorized.map <- Vectorize(map)
+
+#breeding values for sire groups on the mean value parameter scale 
+bhat.donor.mu <- vectorized.map(bhat.donor)
+bhat.donor.mu<-as.data.frame(bhat.donor.mu)
+write.csv(bhat.donor.mu, "bhat.donor.mu.csv")
+```
+
+#ANGELO RANCH
+##Generation 2 2023
+```{r}
+#subset the dataframe for the progeny generation
+AC23_aster_b<-subset(AC_23, Gen=="G2")
+AC23_aster_b<-droplevels(AC23_aster_b)
+levels(AC23_aster_b$Gen)
+```
+
+
+```{r}
+#total_fruits
+#negative binomial is better
+ACyr2_flwr_b <- subset(AC23_aster_b, surv_to_flower>0)
+hist(ACyr2_flwr_b$total_fruits)
+
+AC2b.prog.param <- fitdistr(ACyr2_flwr_b$total_fruits, "negative binomial") 
+hist(rnbinom(691, size =0.215, mu=1.873))
+hist(rpois(691, lambda=1.873))
+alpha.ACyr2 <- round(AC2b.prog.param$estimate[1],2)
+
+```
+
+###Set up aster
+```{r}
+#establish nodes as vars. "pods_collected" is the subsampled node
+vars<-c("surv_to_flower", "F_plant", "total_fruits")
+
+AC23_aster_b <- as.data.frame(AC23_aster_b)
+
+#reshape ML19_aster_b to long form
+AC23_aster_g2 <- reshape(AC23_aster_b,varying = list(vars), direction = "long", timevar = "varb",times = as.factor(vars), v.names = "resp")
+
+#Check that the reshape worked 
+nrow(AC23_aster_g2)
+nrow(AC23_aster_b)*length(vars)
+
+#designate fitness node, "total_fruits"
+fit<-grepl("total_fruits", as.character(AC23_aster_g2$varb))
+fit<-as.numeric(fit)
+AC23_aster_g2$fit<-fit
+
+#check "Total_seeds" is designated as the fitness variable 
+with(AC23_aster_g2, sort(unique(as.character(varb)[fit==0])))
+with(AC23_aster_g2, sort(unique(as.character(varb)[fit==1])))
+
+#Add a variable "root" to ML19_aster files where value is 1
+AC23_aster_g2 <- data.frame(AC23_aster_g2, root=1)
+
+#give each node a number
+pred <- c(0,1,2)
+
+#designate each node with a distribution. 1= Bernoulli, 2= poisson, subsampling node (pods_collected) is binomial which is the same family as Bernoulli
+fam<-c(1,1,2)
+
+#show graphical model
+foo <- c("root", vars)
+pvars <- foo[pred +1]
+bar <-data.frame(pvars, vars, sapply(fam.default(), as.character)[fam])
+colnames(bar) <- c("pred", "succ", "fam")
+print(bar, right = FALSE, row.names = FALSE)
+```
+
+###fixed effect aster model
+```{r}
+AC23_g2 <- aster(resp ~ fit + varb + fit:Transect, pred, fam, varb, id, root, data = AC23_aster_g2) 
+
+summary(AC23_g2, info.tol = 1e-9, se.fit=TRUE)
+
+#Call:
+#aster.formula(formula = resp ~ fit + varb + fit:Transect, pred = pred, 
+#    fam = fam, varvar = varb, idvar = id, root = root, data = AC23_aster_g2)
+
+#                    Estimate Std. Error z value Pr(>|z|)    
+#(Intercept)        -4.145717   0.153011 -27.094  < 2e-16 ***
+#fit                 5.777370   0.177123  32.618  < 2e-16 ***
+#varbsurv_to_flower  4.073062   0.178050  22.876  < 2e-16 ***
+#fit:Transect       -0.016365   0.004877  -3.356 0.000792 ***
+#---
+#Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+#Original predictor variables dropped (aliased)
+#     varbtotal_fruits
+
+AC_23_hyp <- subset(AC23_aster_g2, id == 1)
+# set Transect to 0
+AC_23_hyp$Transect <- 0
+# set resp to 1
+AC_23_hyp$resp <- 1
+
+# predict conditional fitness estimates for this hypothetical individual
+AC_23_hyp.p <- predict(AC23_g2, varvar = varb, idvar = id, root = root,
+  newdata = AC_23_hyp, model.type = "conditional")
+
+# take the product of these conditional estimates, EXCEPT for the sub sampling node (1st and 4th node)
+mu.fit<-prod(AC_23_hyp.p[-2])
+mu.fit
+#2.442212
+```
+
+####mean fitness with negative binomial distributions
+```{r}
+#change the terminal node to negative binomial in the aster set up 
+pred <- c(0,1,2)
+
+#designate each node with a distribution
+fam<-c(1,1,2)
+
+#fam<-c(1,1,2)
+famlist <- list(fam.bernoulli(), fam.negative.binomial(size = alpha.ACyr2))
+sapply(famlist, as.character)[fam] 
+famlist
+
+AC23_g2_b <- aster(resp ~ fit + varb + fit:(Transect), pred, fam, famlist=famlist, varb, id, root, data = AC23_aster_g2) 
+summary(AC23_g2_b, se.fit=T, info.tol=1e-9)
+
+#Call:
+#aster.formula(formula = resp ~ fit + varb + fit:(Transect), pred = pred, 
+#    fam = fam, varvar = varb, idvar = id, root = root, data = AC23_aster_g2, 
+#    famlist = famlist)
+
+#                    Estimate Std. Error z value Pr(>|z|)    
+#(Intercept)        -1.006653   0.082615 -12.185  < 2e-16 ***
+#fit                 1.975153   0.084583  23.352  < 2e-16 ***
+#varbsurv_to_flower  0.933999   0.122942   7.597 3.03e-14 ***
+#fit:Transect       -0.003030   0.002093  -1.448    0.148    
+#---
+#Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+#Original predictor variables dropped (aliased)
+#     varbtotal_fruits 
+
+AC_23_hyp <- subset(AC23_aster_g2, id == 1)
+# set Transect to 0
+AC_23_hyp$Transect <- 0
+# set resp to 1
+AC_23_hyp$resp <- 1
+
+# predict conditional fitness estimates for this hypothetical individual
+AC_23_hyp.p <- predict(AC23_g2_b, varvar = varb, famlist=famlist,idvar = id, root = root,
+  newdata = AC_23_hyp, model.type = "conditional")
+
+# take the product of these conditional estimates, EXCEPT for the subsampling nodes (1st and 4th node)
+mu.fit<-prod(AC_23_hyp.p[-2])
+mu.fit
+#the estimate is not that different from the model with a poisson node 
+#3.044252
+```
+
+###estimate mean fitness and se 
+```{r}
+##This is using code from the switch-too-MR technical report 
+#use poisson nodes 
+#use the estimates from the hypothetical data frame where you set yloc to zero
+
+#conditional
+nnode <- length(vars)
+nind <- length(unique(AC_23_hyp$id))
+nnode * nind == nrow(AC_23_hyp)
+
+pout.cond <- predict(AC23_g2_b, newdata = AC_23_hyp, varvar = varb, idvar = id, root = root, model.type = "conditional", is.always.parameter = TRUE, gradient= TRUE)
+xi<-pout.cond$fit
+
+class(xi)
+length(xi)==nind*nnode
+
+xi <- matrix(xi, nrow = nind)
+colnames(xi) <- vars
+xi
+
+#unconditional
+pout.unco<-predict(AC23_g2_b, newdata = AC_23_hyp, varvar = varb, idvar = id, root = root, gradient=TRUE)
+mu<-pout.unco$fit
+mu <- matrix(mu, nrow = nind)
+colnames(mu) <- vars
+mu
+
+
+is.fruits<-grep("total_fruits", vars)
+
+
+is.fruits
+
+#unconditional estimate of total fruits 
+mu.fruits<-mu[, is.fruits]
+
+
+mu.seeds <- mu.fruits 
+# Total_fruits
+#  1.705203
+
+#make a  function
+foo <- function(x) {
+# x is xi and mu strung out as one vector
+xi <- x[1:length(xi)]
+mu <- x[- (1:length(xi))]
+xi <- matrix(xi, nrow = nind)
+mu <- matrix(mu, nrow = nind)
+mu.fruits <- mu[ , is.fruits]
+mu.seeds <- mu.fruits
+}
+
+#vector of conditional and unconditional estimates for each node 
+ximu <- c(xi, mu)
+all.equal(foo(ximu), mu.seeds)
+
+foo(ximu)
+mu.seeds
+#total_fruits 
+#   1.263314  
+
+library(numDeriv)
+# R package numDeriv figures out the Jacobian matrix for this transformation.
+#We also need the Jacobian matrix for the transformation from the “coefficients” vector to the vector ximu
+
+jac.foo <- jacobian(foo, ximu)
+jac.ximu <- rbind(pout.cond$gradient, pout.unco$gradient)
+jac.total <- jac.foo %*% jac.ximu
+#Now the delta method says the variance-covariance matrix of all the fitnesses (the vector estimate mu.fit) is JI−1JT, where J is the overall Jacobian matrix jar.total and I is Fisher information for the “coefficients” vector
+#there are six coefficients from the model
+V <- jac.total %*% solve(AC23_g2_b$fisher) %*% t(jac.total)
+#and the standard errors are square roots of the variances (the diagonal elements of V)
+se <- sqrt(diag(V))
+bar.pois <- cbind(mu.fit, se)
+colnames(bar.pois) <- c("Estimate", "SE")
+bar.pois
+# Estimate SE
+# 3.044252 0.4845221
+```
+
+#Figure 2: predicted and realized fitness
+```{r}
+library(tidyverse)
+library(ggplot2)
+
+#load data
+fitness <- read_csv(here::here("Aster", "w_bothyears_test.csv"))
+
+#make year a factor
+fitness$Year<-as.factor(fitness$Year)
+
+fitness_new <- fitness %>%
+  mutate(fitness_var = paste(Generation, Year)) %>%
+  mutate(Site = fct_relevel(Site, "Angelo Coast (AC)", "Bodega Bay (BB)", "Blue Oak (BO)", "Hastings Ranch (HR)"),
+         fitness_var = fct_relevel(fitness_var, "Parental estimate 2022", "FTNS prediction for progeny 2022", "Parental estimate 2023", "Progeny estimate 2023"))
+
+my.labels <- c("G1 Year 1", 
+               "G2 FTNS prediction",
+               "G1 Year 2", 
+               "G2 Year 2")
+#plot
+ggplot(fitness_new, aes(x = fitness_var, y = Fitness)) +
+  geom_point(size=3) +
+  geom_errorbar(aes(ymin = Fitness - SE, ymax = Fitness + SE), width = 0.1) +
+  scale_x_discrete(position = "top", labels = my.labels) +
+  labs(x = "") +
+  geom_hline(yintercept=1, lty=2) +
+  ylab('Mean lifetime fitness')+
+  facet_wrap(~Site, nrow = 3, scales = "free_y")+
+   theme(panel.grid.major = element_blank(), 
+         panel.grid.minor = element_blank(), 
+         panel.background = element_blank(),
+         panel.border = element_rect(fill=NA),
+         axis.line.y = element_line(colour = "black"),
+         strip.text = element_text(face = "bold", size = 14),
+         axis.text.x = element_text(size=7),
+         axis.text.y = element_text(size=13),
+         axis.title.y = element_text(face="bold",size=13))
+
+#this is code to save the figure        
+ggsave("yr1_yr2_fitness_prediction_test.png", device = "png", dpi = 1200)
+```

@@ -1,0 +1,3340 @@
+---
+title: "Trait means across populations"
+author: "Helen Payne"
+date: "2024-11-26"
+output: html_document
+---
+
+```{r}
+# Load the lme4 package
+library(lme4)
+library(dplyr)
+library(tidyverse)
+library(patchwork)
+
+
+### Load and preprocess data
+## Data for fitness plants only
+# Read the CSV file and create 'sample_ID' column
+AC_fit <- read_csv(here::here("data_sheets", "compiled_sheets", "AC_22_23_fit.csv")) %>%
+  rename_at(vars(48), ~"surv_to_fruitpod") %>% #rename this column which was miss spelled
+  mutate(
+    # Construct sample_ID conditionally
+    sample_ID = case_when(
+      is.na(SegPos) ~ paste(Year, Recipient, Gen, str_pad(Transect, width = 3, pad = "0"), Plant_ID, sep = "-"),
+      TRUE ~ paste(Year, Recipient, Gen, str_pad(Transect, width = 3, pad = "0"), SegPos, Plant_ID, sep = "-")
+    ),
+    # Replace leading underscores in sample_ID with hyphens
+    sample_ID = str_replace(sample_ID, "^([^_]*)_", "\\1-")
+  )
+
+# Read in data from non-fitness plants- this is to get survival data from
+AC_22_23_full <- read_csv(here::here("data_sheets", "compiled_sheets", "AC_22_23_full.csv"))
+
+#create the variable "prop_surv_to_flower"
+AC_22_23_full <- AC_22_23_full %>%
+  group_by(Year, Gen, Transect, Sequence, Donor, Recipient, SegPos) %>%
+  mutate(prop_surv_to_flower = mean(surv_to_flower, na.rm = TRUE)) %>%
+  ungroup()  # Remove grouping
+
+#select for certain columns
+AC_prop_sample <- AC_22_23_full %>%
+  dplyr::select(c(Year, Gen, Transect, Sequence, Donor, Recipient, SegPos, prop_surv_to_flower))  %>%
+    distinct()
+
+#add "prop_surv_to_flower" based on the columns listed
+AC_fit <- AC_fit %>%
+  left_join(AC_prop_sample %>% dplyr::select(Year, Gen, Transect, Sequence, Donor, Recipient, SegPos, prop_surv_to_flower),
+            by = c("Year", "Gen", "Transect", "Sequence", "Donor", "Recipient", "SegPos"))
+
+# Create the new column for "est_fitness" and rename "prop_surv_to_flower" to "survival"
+AC_fit <- AC_fit %>%
+  mutate(est_fitness = prop_surv_to_flower * est_fecundity) %>%
+  mutate(est_fitness = replace_na(est_fitness, 0)) %>%
+  rename(survival = prop_surv_to_flower)
+
+#isolate AC 2022
+AC_fit_22 <- AC_fit %>%
+  filter(Year == "2022")
+
+#isolate AC 2023 G1
+AC_fit_23_G1 <- AC_fit %>%
+  filter(Year == "2023", Gen == "G1")
+
+#isolate AC 2023 G2
+AC_fit_23_G2 <- AC_fit %>%
+  filter(Year == "2023", Gen == "G2")
+
+#isolate all G1 together
+AC_fit_G1 <- AC_fit %>%
+  filter(Gen == "G1")
+
+#isolate by year
+AC_fit_23 <- AC_fit %>%
+  filter(Year == "2023")
+
+```
+
+```{r}
+### Load and preprocess data
+## Data for fitness plants only
+# Read the CSV file and create 'sample_ID' column
+BB_fit <- read_csv(here::here("data_sheets", "compiled_sheets", "BB_22_23_fit.csv")) %>%
+  mutate(
+    # Construct sample_ID conditionally
+    sample_ID = case_when(
+      is.na(SegPos) ~ paste(Year, Recipient, Gen, str_pad(Location, width = 3, pad = "0"), Plant_ID, sep = "-"),
+      TRUE ~ paste(Year, Recipient, Gen, str_pad(Location, width = 3, pad = "0"), SegPos, Plant_ID, sep = "-")
+    ),
+    # Replace leading underscores in sample_ID with hyphens
+    sample_ID = str_replace(sample_ID, "^([^_]*)_", "\\1-")
+  )
+
+# Read in data from non-fitness plants- this is to get survival data from
+BB_22_23_full <- read_csv(here::here("data_sheets", "compiled_sheets", "BB_22_23_full.csv"))
+
+#create the variable "prop_surv_to_flower"
+BB_22_23_full <- BB_22_23_full %>%
+  group_by(Year, Gen, Location, Sequence, Donor, Recipient, SegPos) %>%
+  mutate(prop_surv_to_flower = mean(surv_to_flower, na.rm = TRUE)) %>%
+  ungroup()  # Remove grouping
+
+#select for certain columns
+BB_prop_sample <- BB_22_23_full %>%
+  dplyr::select(c(Year, Gen, Location, Sequence, Donor, Recipient, SegPos, prop_surv_to_flower))  %>%
+    distinct()
+
+#add "prop_surv_to_flower" based on the columns listed
+BB_fit <- BB_fit %>%
+  left_join(BB_prop_sample %>% dplyr::select(Year, Gen, Location, Sequence, Donor, Recipient, SegPos, prop_surv_to_flower),
+            by = c("Year", "Gen", "Location", "Sequence", "Donor", "Recipient", "SegPos"))
+
+# Create the new column for "est_fitness" and rename "prop_surv_to_flower" to "survival"
+BB_fit <- BB_fit %>%
+  mutate(est_fitness = prop_surv_to_flower * est_fecundity) %>%
+  mutate(est_fitness = replace_na(est_fitness, 0)) %>%
+  rename(survival = prop_surv_to_flower)
+
+#isolate BB 2022
+BB_fit_22 <- BB_fit %>%
+  filter(Year == "2022")
+
+#isolate BB 2023 G1
+BB_fit_23_G1 <- BB_fit %>%
+  filter(Year == "2023", Gen == "G1")
+
+#isolate BB 2023 G2
+BB_fit_23_G2 <- BB_fit %>%
+  filter(Year == "2023", Gen == "G2")
+
+#isolate all G1 together
+BB_fit_G1 <- BB_fit %>%
+  filter(Gen == "G1")
+
+#isolate by year
+BB_fit_23 <- BB_fit %>%
+  filter(Year == "2023")
+
+```
+
+```{r}
+### Load and preprocess data
+## Data for fitness plants only
+# Read the CSV file and create 'sample_ID' column
+BO_fit <- read_csv(here::here("data_sheets", "compiled_sheets", "BO_22_23_fit.csv")) %>%
+  rename_at(vars(49), ~"surv_to_fruitpod") %>% #rename this column which was miss spelled
+  mutate(
+    # Construct sample_ID conditionally
+    sample_ID = case_when(
+      is.na(SegPos) ~ paste(Year, Recipient, Gen, str_pad(Transect, width = 3, pad = "0"), Plant_ID, sep = "-"),
+      TRUE ~ paste(Year, Recipient, Gen, str_pad(Transect, width = 3, pad = "0"), SegPos, Plant_ID, sep = "-")
+    ),
+    # Replace leading underscores in sample_ID with hyphens
+    sample_ID = str_replace(sample_ID, "^([^_]*)_", "\\1-")
+  )
+
+# Read in data from non-fitness plants- this is to get survival data from
+BO_22_23_full <- read_csv(here::here("data_sheets", "compiled_sheets", "BO_22_23_full.csv"))
+
+#create the variable "prop_surv_to_flower"
+BO_22_23_full <- BO_22_23_full %>%
+  group_by(Year, Gen, Transect, Sequence, Donor, Recipient, SegPos) %>%
+  mutate(prop_surv_to_flower = mean(surv_to_flower, na.rm = TRUE)) %>%
+  ungroup()  # Remove grouping
+
+#select for certain columns
+BO_prop_sample <- BO_22_23_full %>%
+  dplyr::select(c(Year, Gen, Transect, Sequence, Donor, Recipient, SegPos, prop_surv_to_flower))  %>%
+    distinct()
+
+#add "prop_surv_to_flower" based on the columns listed
+BO_fit <- BO_fit %>%
+  left_join(BO_prop_sample %>% dplyr::select(Year, Gen, Transect, Sequence, Donor, Recipient, SegPos, prop_surv_to_flower),
+            by = c("Year", "Gen", "Transect", "Sequence", "Donor", "Recipient", "SegPos"))
+
+# Create the new column for "est_fitness" and rename "prop_surv_to_flower" to "survival"
+BO_fit <- BO_fit %>%
+  mutate(est_fitness = prop_surv_to_flower * est_fecundity) %>%
+  mutate(est_fitness = replace_na(est_fitness, 0)) %>%
+  rename(survival = prop_surv_to_flower)
+
+#isolate BO 2022
+BO_fit_22 <- BO_fit %>%
+  filter(Year == "2022")
+
+#isolate BO 2023 G1
+BO_fit_23_G1 <- BO_fit %>%
+  filter(Year == "2023", Gen == "G1")
+
+#isolate BO 2023 G2
+BO_fit_23_G2 <- BO_fit %>%
+  filter(Year == "2023", Gen == "G2")
+
+#isolate all G1 together
+BO_fit_G1 <- BO_fit %>%
+  filter(Gen == "G1")
+
+#isolate by year
+BO_fit_23 <- BO_fit %>%
+  filter(Year == "2023")
+
+```
+
+```{r}
+### Load and preprocess data
+## Data for fitness plants only
+# Read the CSV file and create 'sample_ID' column
+HR_fit <- read_csv(here::here("data_sheets", "compiled_sheets", "HR_22_23_fit.csv")) %>%
+  mutate(
+    # Construct sample_ID conditionally
+    sample_ID = case_when(
+      is.na(SegPos) ~ paste(Year, Recipient, Gen, str_pad(Transect, width = 3, pad = "0"), Plant_ID, sep = "-"),
+      TRUE ~ paste(Year, Recipient, Gen, str_pad(Transect, width = 3, pad = "0"), SegPos, Plant_ID, sep = "-")
+    ),
+    # Replace leading underscores in sample_ID with hyphens
+    sample_ID = str_replace(sample_ID, "^([^_]*)_", "\\1-") )
+
+# Read in data from non-fitness plants- this is to get survival data from
+HR_22_23_full <- read_csv(here::here("data_sheets", "compiled_sheets", "HR_22_23_full.csv"))
+
+#create the variable "prop_surv_to_flower"
+HR_22_23_full <- HR_22_23_full %>%
+  group_by(Year, Gen, Transect, Sequence, Donor, Recipient, SegPos) %>%
+  mutate(prop_surv_to_flower = mean(surv_to_flower, na.rm = TRUE)) %>%
+  ungroup()  # Remove grouping
+
+#select for certain columns
+HR_prop_sample <- HR_22_23_full %>%
+  dplyr::select(c(Year, Gen, Transect, Sequence, Donor, Recipient, SegPos, prop_surv_to_flower))  %>%
+    distinct()
+
+#add "prop_surv_to_flower" based on the columns listed
+HR_fit <- HR_fit %>%
+  left_join(HR_prop_sample %>% dplyr::select(Year, Gen, Transect, Sequence, Donor, Recipient, SegPos, prop_surv_to_flower),
+            by = c("Year", "Gen", "Transect", "Sequence", "Donor", "Recipient", "SegPos"))
+
+# Create the new column for "est_fitness" and rename "prop_surv_to_flower" to "survival"
+HR_fit <- HR_fit %>%
+  mutate(est_fitness = prop_surv_to_flower * est_fecundity) %>%
+  mutate(est_fitness = replace_na(est_fitness, 0)) %>%
+  rename(survival = prop_surv_to_flower)
+
+#isolate HR 2022
+HR_fit_22 <- HR_fit %>%
+  filter(Year == "2022")
+
+#isolate HR 2023 G1
+HR_fit_23_G1 <- HR_fit %>%
+  filter(Year == "2023", Gen == "G1")
+
+#isolate HR 2023 G2
+HR_fit_23_G2 <- HR_fit %>%
+  filter(Year == "2023", Gen == "G2")
+
+#isolate all G1 together
+HR_fit_G1 <- HR_fit %>%
+  filter(Gen == "G1")
+
+#isolate by year
+HR_fit_23 <- HR_fit %>%
+  filter(Year == "2023")
+
+```
+
+
+```{r}
+library(dplyr)
+
+# Subset for HR_fit_22
+HR_traits <- HR_fit_22 %>%
+  dplyr::select(msm_all, fl_duration, d13C_SEG, corolla_diam_mm_SEG, SLA_SEG)
+
+# Subset for AC_fit_22
+AC_traits <- AC_fit_22 %>%
+  dplyr::select(msm_all, fl_duration, d13C_SEG, corolla_diam_mm_SEG, SLA_SEG)
+
+# Subset for BB_fit_22
+BB_traits <- BB_fit_22 %>%
+  dplyr::select(msm_all, fl_duration, d13C_SEG, corolla_diam_mm_SEG, SLA_SEG)
+
+# Subset for BO_fit_22
+BO_traits <- BO_fit_22 %>%
+  dplyr::select(msm_all, fl_duration, d13C_SEG, corolla_diam_mm_SEG, SLA_SEG)
+
+HR_traits <- HR_traits %>% mutate(Group = "HR")
+AC_traits <- AC_traits %>% mutate(Group = "AC")
+BB_traits <- BB_traits %>% mutate(Group = "BB")
+BO_traits <- BO_traits %>% mutate(Group = "BO")
+
+# Combine all subsets
+combined_traits <- bind_rows(HR_traits, AC_traits, BB_traits, BO_traits)
+
+
+library(dplyr)
+
+# Calculate means and standard errors by Group and Trait
+trait_summary <- combined_traits %>%
+  dplyr::select(Group, msm_all, fl_duration, d13C_SEG, corolla_diam_mm_SEG, SLA_SEG) %>%
+  pivot_longer(-Group, names_to = "Trait", values_to = "Value") %>%
+  group_by(Group, Trait) %>%
+  summarise(
+    Mean = mean(Value, na.rm = TRUE),
+    SE = sd(Value, na.rm = TRUE) / sqrt(n()),
+    .groups = "drop"  # Prevent nested grouping issues
+  )
+
+
+
+library(ggplot2)
+
+
+trait_summary$Trait <- recode(trait_summary$Trait,
+                              "msm_all" = "Mean Seed Mass",
+                              "fl_duration" = "Flowering Duration",
+                              "d13C_SEG" = "Delta Carbon 13",
+                              "corolla_diam_mm_SEG" = "Corolla Diameter",
+                              "SLA_SEG" = "SLA")
+
+facet_wrap(~Trait, scales = "free", ncol = 1)
+
+
+trait_means_22_plot <- ggplot(trait_summary, aes(x = Group, y = Mean, fill = Group)) +
+  geom_bar(stat = "identity", position = position_dodge(width = 0.8), width = 0.7) +
+  geom_errorbar(aes(ymin = Mean - SE, ymax = Mean + SE), 
+                position = position_dodge(width = 0.8), width = 0.2) +
+  labs(
+    title = "Comparison of Trait Means Across Populations",
+    x = "Population",
+    y = "Mean ± SE"
+  ) +
+  scale_fill_brewer(palette = "Set2") +
+  facet_wrap(~Trait, scales = "free", ncol = 2) +
+  theme(
+    panel.background = element_rect(fill = "white", color = NA),  # White background
+    panel.grid.major = element_blank(),  # Remove major grid lines
+    panel.grid.minor = element_blank(),  # Remove minor grid lines
+    axis.line = element_line(color = "black"),  # Add axis lines
+    axis.text.x = element_text(angle = 45, hjust = 1),  # Adjust x-axis text
+    axis.ticks = element_line(color = "black")  # Ensure ticks are visible
+  )
+
+
+
+ggsave("C:/Users/Helen Payne/Documents/trait_means_22_plot.png", plot = trait_means_22_plot, width = 10, height = 8, dpi = 300)
+
+
+```
+
+
+```{r}
+
+# Subset for HR_fit_23_G1
+HR_traits <- HR_fit_23_G1 %>%
+  dplyr::select(msm_all, fl_duration, d13C_SEG, corolla_diam_mm_SEG, SLA_SEG)
+
+# Subset for AC_fit_23_G1
+AC_traits <- AC_fit_23_G1 %>%
+  dplyr::select(msm_all, fl_duration, d13C_SEG, corolla_diam_mm_SEG, SLA_SEG)
+
+# Subset for BB_fit_23_G1
+BB_traits <- BB_fit_23_G1 %>%
+  dplyr::select(msm_all, fl_duration, d13C_SEG, corolla_diam_mm_SEG, SLA_SEG)
+
+# Subset for BO_fit_23_G1
+BO_traits <- BO_fit_23_G1 %>%
+  dplyr::select(msm_all, fl_duration, d13C_SEG, corolla_diam_mm_SEG, SLA_SEG)
+
+HR_traits <- HR_traits %>% mutate(Group = "HR")
+AC_traits <- AC_traits %>% mutate(Group = "AC")
+BB_traits <- BB_traits %>% mutate(Group = "BB")
+BO_traits <- BO_traits %>% mutate(Group = "BO")
+
+# Combine all subsets
+combined_traits <- bind_rows(HR_traits, AC_traits, BB_traits, BO_traits)
+
+
+library(dplyr)
+
+# Calculate means and standard errors by Group and Trait
+trait_summary <- combined_traits %>%
+  dplyr::select(Group, msm_all, fl_duration, d13C_SEG, corolla_diam_mm_SEG, SLA_SEG) %>%
+  pivot_longer(-Group, names_to = "Trait", values_to = "Value") %>%
+  group_by(Group, Trait) %>%
+  summarise(
+    Mean = mean(Value, na.rm = TRUE),
+    SE = sd(Value, na.rm = TRUE) / sqrt(n()),
+    .groups = "drop"  # Prevent nested grouping issues
+  )
+
+
+
+library(ggplot2)
+
+
+trait_summary$Trait <- recode(trait_summary$Trait,
+                              "msm_all" = "Mean Seed Mass",
+                              "fl_duration" = "Flowering Duration",
+                              "d13C_SEG" = "Delta Carbon 13",
+                              "corolla_diam_mm_SEG" = "Corolla Diameter",
+                              "SLA_SEG" = "SLA")
+
+facet_wrap(~Trait, scales = "free", ncol = 1)
+
+
+trait_means_23_G1_plot <- ggplot(trait_summary, aes(x = Group, y = Mean, fill = Group)) +
+  geom_bar(stat = "identity", position = position_dodge(width = 0.8), width = 0.7) +
+  geom_errorbar(aes(ymin = Mean - SE, ymax = Mean + SE), 
+                position = position_dodge(width = 0.8), width = 0.2) +
+  labs(
+    title = "Comparison of Trait Means Across Populations",
+    x = "Population",
+    y = "Mean ± SE"
+  ) +
+  scale_fill_brewer(palette = "Set2") +
+  facet_wrap(~Trait, scales = "free", ncol = 2) +
+  theme(
+    panel.background = element_rect(fill = "white", color = NA),  # White background
+    panel.grid.major = element_blank(),  # Remove major grid lines
+    panel.grid.minor = element_blank(),  # Remove minor grid lines
+    axis.line = element_line(color = "black"),  # Add axis lines
+    axis.text.x = element_text(angle = 45, hjust = 1),  # Adjust x-axis text
+    axis.ticks = element_line(color = "black")  # Ensure ticks are visible
+  )
+
+
+
+ggsave("C:/Users/Helen Payne/Documents/trait_means_23_G1_plot.png", plot = trait_means_23_G1_plot, width = 10, height = 8, dpi = 300)
+
+
+```
+
+```{r}
+
+# Subset for HR_fit_23_G2
+HR_traits <- HR_fit_23_G2 %>%
+  dplyr::select(msm_all, fl_duration, d13C_SEG, corolla_diam_mm_SEG, SLA_SEG)
+
+# Subset for AC_fit_23_G2
+AC_traits <- AC_fit_23_G2 %>%
+  dplyr::select(msm_all, fl_duration, d13C_SEG, corolla_diam_mm_SEG, SLA_SEG)
+
+# Subset for BB_fit_23_G2
+BB_traits <- BB_fit_23_G2 %>%
+  dplyr::select(msm_all, fl_duration, d13C_SEG, corolla_diam_mm_SEG, SLA_SEG)
+
+# Subset for BO_fit_23_G2
+BO_traits <- BO_fit_23_G2 %>%
+  dplyr::select(msm_all, fl_duration, d13C_SEG, corolla_diam_mm_SEG, SLA_SEG)
+
+HR_traits <- HR_traits %>% mutate(Group = "HR")
+AC_traits <- AC_traits %>% mutate(Group = "AC")
+BB_traits <- BB_traits %>% mutate(Group = "BB")
+BO_traits <- BO_traits %>% mutate(Group = "BO")
+
+# Combine all subsets
+combined_traits <- bind_rows(HR_traits, AC_traits, BB_traits, BO_traits)
+
+
+library(dplyr)
+
+# Calculate means and standard errors by Group and Trait
+trait_summary <- combined_traits %>%
+  dplyr::select(Group, msm_all, fl_duration, d13C_SEG, corolla_diam_mm_SEG, SLA_SEG) %>%
+  pivot_longer(-Group, names_to = "Trait", values_to = "Value") %>%
+  group_by(Group, Trait) %>%
+  summarise(
+    Mean = mean(Value, na.rm = TRUE),
+    SE = sd(Value, na.rm = TRUE) / sqrt(n()),
+    .groups = "drop"  # Prevent nested grouping issues
+  )
+
+
+
+library(ggplot2)
+
+
+trait_summary$Trait <- recode(trait_summary$Trait,
+                              "msm_all" = "Mean Seed Mass",
+                              "fl_duration" = "Flowering Duration",
+                              "d13C_SEG" = "Delta Carbon 13",
+                              "corolla_diam_mm_SEG" = "Corolla Diameter",
+                              "SLA_SEG" = "SLA")
+
+facet_wrap(~Trait, scales = "free", ncol = 1)
+
+
+trait_means_23_G2_plot <- ggplot(trait_summary, aes(x = Group, y = Mean, fill = Group)) +
+  geom_bar(stat = "identity", position = position_dodge(width = 0.8), width = 0.7) +
+  geom_errorbar(aes(ymin = Mean - SE, ymax = Mean + SE), 
+                position = position_dodge(width = 0.8), width = 0.2) +
+  labs(
+    title = "Comparison of Trait Means Across Populations",
+    x = "Population",
+    y = "Mean ± SE"
+  ) +
+  scale_fill_brewer(palette = "Set2") +
+  facet_wrap(~Trait, scales = "free", ncol = 2) +
+  theme(
+    panel.background = element_rect(fill = "white", color = NA),  # White background
+    panel.grid.major = element_blank(),  # Remove major grid lines
+    panel.grid.minor = element_blank(),  # Remove minor grid lines
+    axis.line = element_line(color = "black"),  # Add axis lines
+    axis.text.x = element_text(angle = 45, hjust = 1),  # Adjust x-axis text
+    axis.ticks = element_line(color = "black")  # Ensure ticks are visible
+  )
+
+
+
+ggsave("C:/Users/Helen Payne/Documents/trait_means_23_G2_plot.png", plot = trait_means_23_G2_plot, width = 10, height = 8, dpi = 300)
+
+
+```
+
+```{r}
+
+# Subset for HR_fit_G1
+HR_traits <- HR_fit_G1 %>%
+  dplyr::select(msm_all, fl_duration, d13C_SEG, corolla_diam_mm_SEG, SLA_SEG)
+
+# Subset for AC_fit_G1
+AC_traits <- AC_fit_G1 %>%
+  dplyr::select(msm_all, fl_duration, d13C_SEG, corolla_diam_mm_SEG, SLA_SEG)
+
+# Subset for BB_fit_G1
+BB_traits <- BB_fit_G1 %>%
+  dplyr::select(msm_all, fl_duration, d13C_SEG, corolla_diam_mm_SEG, SLA_SEG)
+
+# Subset for BO_fit_G1
+BO_traits <- BO_fit_G1 %>%
+  dplyr::select(msm_all, fl_duration, d13C_SEG, corolla_diam_mm_SEG, SLA_SEG)
+
+HR_traits <- HR_traits %>% mutate(Group = "HR")
+AC_traits <- AC_traits %>% mutate(Group = "AC")
+BB_traits <- BB_traits %>% mutate(Group = "BB")
+BO_traits <- BO_traits %>% mutate(Group = "BO")
+
+# Combine all subsets
+combined_traits <- bind_rows(HR_traits, AC_traits, BB_traits, BO_traits)
+
+
+# Calculate means and standard errors by Group and Trait
+trait_summary <- combined_traits %>%
+  dplyr::select(Group, msm_all, fl_duration, d13C_SEG, corolla_diam_mm_SEG, SLA_SEG) %>%
+  pivot_longer(-Group, names_to = "Trait", values_to = "Value") %>%
+  group_by(Group, Trait) %>%
+  summarise(
+    Mean = mean(Value, na.rm = TRUE),
+    SE = sd(Value, na.rm = TRUE) / sqrt(n()),
+    .groups = "drop"  # Prevent nested grouping issues
+  )
+
+
+
+library(ggplot2)
+
+
+trait_summary$Trait <- recode(trait_summary$Trait,
+                              "msm_all" = "Mean Seed Mass",
+                              "fl_duration" = "Flowering Duration",
+                              "d13C_SEG" = "Delta Carbon 13",
+                              "corolla_diam_mm_SEG" = "Corolla Diameter",
+                              "SLA_SEG" = "SLA")
+
+facet_wrap(~Trait, scales = "free", ncol = 1)
+
+
+trait_means_G1_plot <- ggplot(trait_summary, aes(x = Group, y = Mean, fill = Group)) +
+  geom_bar(stat = "identity", position = position_dodge(width = 0.8), width = 0.7) +
+  geom_errorbar(aes(ymin = Mean - SE, ymax = Mean + SE), 
+                position = position_dodge(width = 0.8), width = 0.2) +
+  labs(
+    title = "Comparison of Trait Means Across Populations",
+    x = "Population",
+    y = "Mean ± SE"
+  ) +
+  scale_fill_brewer(palette = "Set2") +
+  facet_wrap(~Trait, scales = "free", ncol = 2) +
+  theme(
+    panel.background = element_rect(fill = "white", color = NA),  # White background
+    panel.grid.major = element_blank(),  # Remove major grid lines
+    panel.grid.minor = element_blank(),  # Remove minor grid lines
+    axis.line = element_line(color = "black"),  # Add axis lines
+    axis.text.x = element_text(angle = 45, hjust = 1),  # Adjust x-axis text
+    axis.ticks = element_line(color = "black")  # Ensure ticks are visible
+  )
+
+
+
+ggsave("C:/Users/Helen Payne/Documents/trait_means_G1_plot.png", plot = trait_means_G1_plot, width = 10, height = 8, dpi = 300)
+
+
+```
+
+
+
+```{r}
+
+# Subset for HR_fit_23
+HR_traits <- HR_fit_23 %>%
+  dplyr::select(msm_all, fl_duration, d13C_SEG, corolla_diam_mm_SEG, SLA_SEG)
+
+# Subset for AC_fit_23
+AC_traits <- AC_fit_23 %>%
+  dplyr::select(msm_all, fl_duration, d13C_SEG, corolla_diam_mm_SEG, SLA_SEG)
+
+# Subset for BB_fit_23
+BB_traits <- BB_fit_G1 %>%
+  dplyr::select(msm_all, fl_duration, d13C_SEG, corolla_diam_mm_SEG, SLA_SEG)
+
+# Subset for BO_fit_23
+BO_traits <- BO_fit_23 %>%
+  dplyr::select(msm_all, fl_duration, d13C_SEG, corolla_diam_mm_SEG, SLA_SEG)
+
+HR_traits <- HR_traits %>% mutate(Group = "HR")
+AC_traits <- AC_traits %>% mutate(Group = "AC")
+BB_traits <- BB_traits %>% mutate(Group = "BB")
+BO_traits <- BO_traits %>% mutate(Group = "BO")
+
+# Combine all subsets
+combined_traits <- bind_rows(HR_traits, AC_traits, BB_traits, BO_traits)
+
+
+# Calculate means and standard errors by Group and Trait
+trait_summary <- combined_traits %>%
+  dplyr::select(Group, msm_all, fl_duration, d13C_SEG, corolla_diam_mm_SEG, SLA_SEG) %>%
+  pivot_longer(-Group, names_to = "Trait", values_to = "Value") %>%
+  group_by(Group, Trait) %>%
+  summarise(
+    Mean = mean(Value, na.rm = TRUE),
+    SE = sd(Value, na.rm = TRUE) / sqrt(n()),
+    .groups = "drop"  # Prevent nested grouping issues
+  )
+
+
+
+library(ggplot2)
+
+
+trait_summary$Trait <- recode(trait_summary$Trait,
+                              "msm_all" = "Mean Seed Mass",
+                              "fl_duration" = "Flowering Duration",
+                              "d13C_SEG" = "Delta Carbon 13",
+                              "corolla_diam_mm_SEG" = "Corolla Diameter",
+                              "SLA_SEG" = "SLA")
+
+facet_wrap(~Trait, scales = "free", ncol = 1)
+
+
+trait_means_23_plot <- ggplot(trait_summary, aes(x = Group, y = Mean, fill = Group)) +
+  geom_bar(stat = "identity", position = position_dodge(width = 0.8), width = 0.7) +
+  geom_errorbar(aes(ymin = Mean - SE, ymax = Mean + SE), 
+                position = position_dodge(width = 0.8), width = 0.2) +
+  labs(
+    title = "Comparison of Trait Means Across Populations",
+    x = "Population",
+    y = "Mean ± SE"
+  ) +
+  scale_fill_brewer(palette = "Set2") +
+  facet_wrap(~Trait, scales = "free", ncol = 2) +
+  theme(
+    panel.background = element_rect(fill = "white", color = NA),  # White background
+    panel.grid.major = element_blank(),  # Remove major grid lines
+    panel.grid.minor = element_blank(),  # Remove minor grid lines
+    axis.line = element_line(color = "black"),  # Add axis lines
+    axis.text.x = element_text(angle = 45, hjust = 1),  # Adjust x-axis text
+    axis.ticks = element_line(color = "black")  # Ensure ticks are visible
+  )
+
+
+
+ggsave("C:/Users/Helen Payne/Documents/trait_means_23_plot.png", plot = trait_means_23_plot, width = 10, height = 8, dpi = 300)
+
+
+```
+
+
+```{r}
+
+# Subset for HR_fit
+HR_traits <- HR_fit %>%
+  dplyr::select(msm_all, fl_duration, d13C_SEG, corolla_diam_mm_SEG, SLA_SEG)
+
+# Subset for AC_fit
+AC_traits <- AC_fit %>%
+  dplyr::select(msm_all, fl_duration, d13C_SEG, corolla_diam_mm_SEG, SLA_SEG)
+
+# Subset for BB_fit
+BB_traits <- BB_fit %>%
+  dplyr::select(msm_all, fl_duration, d13C_SEG, corolla_diam_mm_SEG, SLA_SEG)
+
+# Subset for BO_fit
+BO_traits <- BO_fit %>%
+  dplyr::select(msm_all, fl_duration, d13C_SEG, corolla_diam_mm_SEG, SLA_SEG)
+
+HR_traits <- HR_traits %>% mutate(Group = "HR")
+AC_traits <- AC_traits %>% mutate(Group = "AC")
+BB_traits <- BB_traits %>% mutate(Group = "BB")
+BO_traits <- BO_traits %>% mutate(Group = "BO")
+
+# Combine all subsets
+combined_traits <- bind_rows(HR_traits, AC_traits, BB_traits, BO_traits)
+
+
+# Calculate means and standard errors by Group and Trait
+trait_summary <- combined_traits %>%
+  dplyr::select(Group, msm_all, fl_duration, d13C_SEG, corolla_diam_mm_SEG, SLA_SEG) %>%
+  pivot_longer(-Group, names_to = "Trait", values_to = "Value") %>%
+  group_by(Group, Trait) %>%
+  summarise(
+    Mean = mean(Value, na.rm = TRUE),
+    SE = sd(Value, na.rm = TRUE) / sqrt(n()),
+    .groups = "drop"  # Prevent nested grouping issues
+  )
+
+
+
+library(ggplot2)
+
+
+trait_summary$Trait <- recode(trait_summary$Trait,
+                              "msm_all" = "Mean Seed Mass",
+                              "fl_duration" = "Flowering Duration",
+                              "d13C_SEG" = "Delta Carbon 13",
+                              "corolla_diam_mm_SEG" = "Corolla Diameter",
+                              "SLA_SEG" = "SLA")
+
+facet_wrap(~Trait, scales = "free", ncol = 1)
+
+
+trait_means_all_plot <- ggplot(trait_summary, aes(x = Group, y = Mean, fill = Group)) +
+  geom_bar(stat = "identity", position = position_dodge(width = 0.8), width = 0.7) +
+  geom_errorbar(aes(ymin = Mean - SE, ymax = Mean + SE), 
+                position = position_dodge(width = 0.8), width = 0.2) +
+  labs(
+    title = "Comparison of Trait Means Across Populations",
+    x = "Population",
+    y = "Mean ± SE"
+  ) +
+  scale_fill_brewer(palette = "Set2") +
+  facet_wrap(~Trait, scales = "free", ncol = 2) +
+  theme(
+    panel.background = element_rect(fill = "white", color = NA),  # White background
+    panel.grid.major = element_blank(),  # Remove major grid lines
+    panel.grid.minor = element_blank(),  # Remove minor grid lines
+    axis.line = element_line(color = "black"),  # Add axis lines
+    axis.text.x = element_text(angle = 45, hjust = 1),  # Adjust x-axis text
+    axis.ticks = element_line(color = "black")  # Ensure ticks are visible
+  )
+
+trait_means_all_plot
+
+ggsave("C:/Users/Helen Payne/Documents/trait_means_all_plot.png", plot = trait_means_all_plot, width = 10, height = 8, dpi = 300)
+
+
+```
+
+
+```{r}
+library(dplyr)
+library(ggplot2)
+
+# Add Year column and combine datasets for 2022 and 2023
+HR_traits_22 <- HR_fit_22 %>%
+  dplyr::select(msm_all, fl_duration, d13C_SEG, corolla_diam_mm_SEG, SLA_SEG) %>%
+  mutate(Group = "HR", Year = "2022")
+
+AC_traits_22 <- AC_fit_22 %>%
+  dplyr::select(msm_all, fl_duration, d13C_SEG, corolla_diam_mm_SEG, SLA_SEG) %>%
+  mutate(Group = "AC", Year = "2022")
+
+BB_traits_22 <- BB_fit_22 %>%
+  dplyr::select(msm_all, fl_duration, d13C_SEG, corolla_diam_mm_SEG, SLA_SEG) %>%
+  mutate(Group = "BB", Year = "2022")
+
+BO_traits_22 <- BO_fit_22 %>%
+  dplyr::select(msm_all, fl_duration, d13C_SEG, corolla_diam_mm_SEG, SLA_SEG) %>%
+  mutate(Group = "BO", Year = "2022")
+
+HR_traits_23 <- HR_fit_23_G1 %>%
+  dplyr::select(msm_all, fl_duration, d13C_SEG, corolla_diam_mm_SEG, SLA_SEG) %>%
+  mutate(Group = "HR", Year = "2023")
+
+AC_traits_23 <- AC_fit_23_G1 %>%
+  dplyr::select(msm_all, fl_duration, d13C_SEG, corolla_diam_mm_SEG, SLA_SEG) %>%
+  mutate(Group = "AC", Year = "2023")
+
+BB_traits_23 <- BB_fit_23_G1 %>%
+  dplyr::select(msm_all, fl_duration, d13C_SEG, corolla_diam_mm_SEG, SLA_SEG) %>%
+  mutate(Group = "BB", Year = "2023")
+
+BO_traits_23 <- BO_fit_23_G1 %>%
+  dplyr::select(msm_all, fl_duration, d13C_SEG, corolla_diam_mm_SEG, SLA_SEG) %>%
+  mutate(Group = "BO", Year = "2023")
+
+# Combine all data
+combined_traits <- bind_rows(HR_traits_22, AC_traits_22, BB_traits_22, BO_traits_22,
+                              HR_traits_23, AC_traits_23, BB_traits_23, BO_traits_23)
+
+# Calculate means and standard errors by Group, Trait, and Year
+trait_summary <- combined_traits %>%
+  pivot_longer(cols = -c(Group, Year), names_to = "Trait", values_to = "Value") %>%
+  group_by(Group, Trait, Year) %>%
+  summarise(
+    Mean = mean(Value, na.rm = TRUE),
+    SE = sd(Value, na.rm = TRUE) / sqrt(n()),
+    .groups = "drop"
+  )
+
+# Rename traits for clarity
+trait_summary$Trait <- recode(trait_summary$Trait,
+                              "msm_all" = "Mean Seed Mass",
+                              "fl_duration" = "Flowering Duration",
+                              "d13C_SEG" = "Delta Carbon 13",
+                              "corolla_diam_mm_SEG" = "Corolla Diameter",
+                              "SLA_SEG" = "SLA")
+
+# Create the plot
+trait_means_plot <- ggplot(trait_summary, aes(x = Group, y = Mean, fill = Year)) +
+  geom_bar(stat = "identity", position = position_dodge(width = 0.8), width = 0.7) +
+  geom_errorbar(aes(ymin = Mean - SE, ymax = Mean + SE), 
+                position = position_dodge(width = 0.8), width = 0.2) +
+  labs(
+    title = "Comparison of Trait Means Across Populations and Years",
+    x = "Population",
+    y = "Mean ± SE"
+  ) +
+  scale_fill_brewer(palette = "Set2") +
+  facet_wrap(~Trait, scales = "free", ncol = 2) +
+  theme_minimal() +
+  theme(
+    panel.background = element_rect(fill = "white", color = NA),
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    axis.line = element_line(color = "black"),
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    axis.ticks = element_line(color = "black")
+  )
+
+# Save the plot
+ggsave("trait_means_comparison_plot.png", plot = trait_means_plot, width = 12, height = 8, dpi = 300)
+
+# Display the plot
+print(trait_means_plot)
+
+```
+
+####
+
+
+Now I am going to take the mean of the paternal genotypes for each population, and standardize the g2 2023 population based on the g1 2022 relative fitness. 
+
+```{r}
+##Obtain paternal genotypic values - this is what we are interested in
+# Aggregate data by donor
+AC_mean_donor_traits_22 <- AC_fit_22 %>%
+  group_by(Donor) %>%  # Group by donor
+  summarise(
+    closed_fruits = mean(closed_fruits, na.rm = TRUE),
+    total_fruits = mean(total_fruits, na.rm = TRUE),
+    filled_seeds = mean(filled_seeds, na.rm = TRUE),
+    mean_seeds_per_fruit = mean(mean_seeds_per_fruit, na.rm = TRUE),
+    fl_duration = mean(fl_duration, na.rm = TRUE),
+    skel_dryweight_mg = mean(skel_dryweight_mg, na.rm = TRUE),
+    msm_all = mean(msm_all, na.rm = TRUE),
+    corolla_diam_mm_SEG = mean(corolla_diam_mm_SEG, na.rm = TRUE),
+    SLA_SEG = mean(SLA_SEG, na.rm = TRUE),
+    d13C_SEG = mean(d13C_SEG, na.rm = TRUE),
+    est_fecundity = mean(est_fecundity, na.rm = TRUE),
+    survival = mean(survival, na.rm = TRUE),
+    est_fitness = mean(est_fitness, na.rm = TRUE)
+   ) %>%
+  mutate(
+     # Standardize each trait
+     closed_fruits_std = (closed_fruits - mean(closed_fruits, na.rm = TRUE)) / sd(closed_fruits, na.rm = TRUE),
+    total_fruits_std = (total_fruits - mean(total_fruits, na.rm = TRUE)) / sd(total_fruits, na.rm = TRUE),
+     filled_seeds_std = (filled_seeds - mean(filled_seeds, na.rm = TRUE)) / sd(filled_seeds, na.rm = TRUE),
+     mean_seeds_per_fruit_std = (mean_seeds_per_fruit - mean(mean_seeds_per_fruit, na.rm = TRUE)) / sd(mean_seeds_per_fruit, na.rm = TRUE),
+     fl_duration_std = (fl_duration - mean(fl_duration, na.rm = TRUE)) / sd(fl_duration, na.rm = TRUE),
+    skel_dryweight_mg_std = (skel_dryweight_mg - mean(skel_dryweight_mg, na.rm = TRUE)) / sd(skel_dryweight_mg, na.rm = TRUE),
+     msm_all_std = (msm_all - mean(msm_all, na.rm = TRUE)) / sd(msm_all, na.rm = TRUE),
+     corolla_diam_mm_SEG_std = (corolla_diam_mm_SEG - mean(corolla_diam_mm_SEG, na.rm = TRUE)) / sd(corolla_diam_mm_SEG, na.rm = TRUE),
+    SLA_SEG_std = (SLA_SEG - mean(SLA_SEG, na.rm = TRUE)) / sd(SLA_SEG, na.rm = TRUE),
+     d13C_SEG_std = (d13C_SEG - mean(d13C_SEG, na.rm = TRUE)) / sd(d13C_SEG, na.rm = TRUE),
+     est_fecundity_std = (est_fecundity - mean(est_fecundity, na.rm = TRUE)) / sd(est_fecundity, na.rm = TRUE),
+     survival_std = (survival - mean(survival, na.rm = TRUE)) / sd(survival, na.rm = TRUE),
+    est_fitness_std = (est_fitness - mean(est_fitness, na.rm = TRUE)) / sd(est_fitness, na.rm = TRUE),
+     # Calculate relative fitness by dividing by the mean fitness
+     relative_fitness_22 = est_fitness / mean(est_fitness, na.rm = TRUE)
+   )
+
+  
+
+
+
+# Aggregate data by donor
+AC_mean_donor_traits_23_G1 <- AC_fit_23_G1 %>%
+  group_by(Donor) %>%  # Group by donor
+  summarise(
+    closed_fruits = mean(closed_fruits, na.rm = TRUE),
+    total_fruits = mean(total_fruits, na.rm = TRUE),
+    filled_seeds = mean(filled_seeds, na.rm = TRUE),
+    mean_seeds_per_fruit = mean(mean_seeds_per_fruit, na.rm = TRUE),
+    fl_duration = mean(fl_duration, na.rm = TRUE),
+    skel_dryweight_mg = mean(skel_dryweight_mg, na.rm = TRUE),
+    msm_all = mean(msm_all, na.rm = TRUE),
+    corolla_diam_mm_SEG = mean(corolla_diam_mm_SEG, na.rm = TRUE),
+    SLA_SEG = mean(SLA_SEG, na.rm = TRUE),
+    d13C_SEG = mean(d13C_SEG, na.rm = TRUE),
+    est_fecundity = mean(est_fecundity, na.rm = TRUE),
+    survival = mean(survival, na.rm = TRUE),
+    est_fitness = mean(est_fitness, na.rm = TRUE)
+   ) %>%
+  mutate(
+     # Standardize each trait
+     closed_fruits_std = (closed_fruits - mean(closed_fruits, na.rm = TRUE)) / sd(closed_fruits, na.rm = TRUE),
+    total_fruits_std = (total_fruits - mean(total_fruits, na.rm = TRUE)) / sd(total_fruits, na.rm = TRUE),
+     filled_seeds_std = (filled_seeds - mean(filled_seeds, na.rm = TRUE)) / sd(filled_seeds, na.rm = TRUE),
+     mean_seeds_per_fruit_std = (mean_seeds_per_fruit - mean(mean_seeds_per_fruit, na.rm = TRUE)) / sd(mean_seeds_per_fruit, na.rm = TRUE),
+     fl_duration_std = (fl_duration - mean(fl_duration, na.rm = TRUE)) / sd(fl_duration, na.rm = TRUE),
+    skel_dryweight_mg_std = (skel_dryweight_mg - mean(skel_dryweight_mg, na.rm = TRUE)) / sd(skel_dryweight_mg, na.rm = TRUE),
+     msm_all_std = (msm_all - mean(msm_all, na.rm = TRUE)) / sd(msm_all, na.rm = TRUE),
+     corolla_diam_mm_SEG_std = (corolla_diam_mm_SEG - mean(corolla_diam_mm_SEG, na.rm = TRUE)) / sd(corolla_diam_mm_SEG, na.rm = TRUE),
+    SLA_SEG_std = (SLA_SEG - mean(SLA_SEG, na.rm = TRUE)) / sd(SLA_SEG, na.rm = TRUE),
+     d13C_SEG_std = (d13C_SEG - mean(d13C_SEG, na.rm = TRUE)) / sd(d13C_SEG, na.rm = TRUE),
+     est_fecundity_std = (est_fecundity - mean(est_fecundity, na.rm = TRUE)) / sd(est_fecundity, na.rm = TRUE),
+     survival_std = (survival - mean(survival, na.rm = TRUE)) / sd(survival, na.rm = TRUE),
+    est_fitness_std = (est_fitness - mean(est_fitness, na.rm = TRUE)) / sd(est_fitness, na.rm = TRUE),
+     # Calculate relative fitness by dividing by the mean fitness
+     relative_fitness_23_1 = est_fitness / mean(est_fitness, na.rm = TRUE)
+   )
+
+
+
+# Aggregate data by donor
+AC_mean_donor_traits_23_G2 <- AC_fit_23_G2 %>%
+  group_by(Donor) %>%  # Group by donor
+  summarise(
+    closed_fruits = mean(closed_fruits, na.rm = TRUE),
+    total_fruits = mean(total_fruits, na.rm = TRUE),
+    filled_seeds = mean(filled_seeds, na.rm = TRUE),
+    mean_seeds_per_fruit = mean(mean_seeds_per_fruit, na.rm = TRUE),
+    fl_duration = mean(fl_duration, na.rm = TRUE),
+    skel_dryweight_mg = mean(skel_dryweight_mg, na.rm = TRUE),
+    msm_all = mean(msm_all, na.rm = TRUE),
+    corolla_diam_mm_SEG = mean(corolla_diam_mm_SEG, na.rm = TRUE),
+    SLA_SEG = mean(SLA_SEG, na.rm = TRUE),
+    d13C_SEG = mean(d13C_SEG, na.rm = TRUE),
+    est_fecundity = mean(est_fecundity, na.rm = TRUE),
+    survival = mean(survival, na.rm = TRUE),
+    est_fitness = mean(est_fitness, na.rm = TRUE)
+   ) %>%
+  mutate(
+     # Standardize each trait
+     closed_fruits_std = (closed_fruits - mean(closed_fruits, na.rm = TRUE)) / sd(closed_fruits, na.rm = TRUE),
+    total_fruits_std = (total_fruits - mean(total_fruits, na.rm = TRUE)) / sd(total_fruits, na.rm = TRUE),
+     filled_seeds_std = (filled_seeds - mean(filled_seeds, na.rm = TRUE)) / sd(filled_seeds, na.rm = TRUE),
+     mean_seeds_per_fruit_std = (mean_seeds_per_fruit - mean(mean_seeds_per_fruit, na.rm = TRUE)) / sd(mean_seeds_per_fruit, na.rm = TRUE),
+     fl_duration_std = (fl_duration - mean(fl_duration, na.rm = TRUE)) / sd(fl_duration, na.rm = TRUE),
+    skel_dryweight_mg_std = (skel_dryweight_mg - mean(skel_dryweight_mg, na.rm = TRUE)) / sd(skel_dryweight_mg, na.rm = TRUE),
+     msm_all_std = (msm_all - mean(msm_all, na.rm = TRUE)) / sd(msm_all, na.rm = TRUE),
+     corolla_diam_mm_SEG_std = (corolla_diam_mm_SEG - mean(corolla_diam_mm_SEG, na.rm = TRUE)) / sd(corolla_diam_mm_SEG, na.rm = TRUE),
+    SLA_SEG_std = (SLA_SEG - mean(SLA_SEG, na.rm = TRUE)) / sd(SLA_SEG, na.rm = TRUE),
+     d13C_SEG_std = (d13C_SEG - mean(d13C_SEG, na.rm = TRUE)) / sd(d13C_SEG, na.rm = TRUE),
+     est_fecundity_std = (est_fecundity - mean(est_fecundity, na.rm = TRUE)) / sd(est_fecundity, na.rm = TRUE),
+     survival_std = (survival - mean(survival, na.rm = TRUE)) / sd(survival, na.rm = TRUE),
+    est_fitness_std = (est_fitness - mean(est_fitness, na.rm = TRUE)) / sd(est_fitness, na.rm = TRUE),
+     # Calculate relative fitness by dividing by the mean fitness
+     relative_fitness_23_2 = est_fitness / mean(est_fitness, na.rm = TRUE)
+   )
+
+
+
+
+# Join the two data frames
+AC_mean_donor_traits_23_G2 <- AC_mean_donor_traits_23_G2 %>%
+  left_join(
+    AC_mean_donor_traits_22 %>% dplyr::select(Donor, relative_fitness_22),  # Select only relevant columns
+    by = "Donor"
+  )
+
+# Weight each trait in 23_G2 by relative_fitness from 22
+AC_23_G2_weighted_by_22 <- AC_mean_donor_traits_23_G2 %>%
+  mutate(
+    across(
+      .cols = c(closed_fruits_std, total_fruits_std, filled_seeds_std, mean_seeds_per_fruit_std, 
+                fl_duration_std, skel_dryweight_mg_std, msm_all_std, corolla_diam_mm_SEG_std, 
+                SLA_SEG_std, d13C_SEG_std, est_fecundity_std, survival_std),  # Replace with actual trait columns
+      .fns = ~ . * relative_fitness_22,  # Multiply each trait by relative fitness
+      .names = "{.col}_weighted22"      # Add a suffix to the adjusted columns
+    )
+  )
+
+# Join the two data frames
+AC_mean_donor_traits_23_G2 <- AC_mean_donor_traits_23_G2 %>%
+  left_join(
+    AC_mean_donor_traits_23_G1 %>% dplyr::select(Donor, relative_fitness_23_1),  # Select only relevant columns
+    by = "Donor"
+  )
+
+# Weight each trait in 23_G2 by relative_fitness from 23
+AC_23_G2_weighted_by_23 <- AC_mean_donor_traits_23_G1 %>%
+  mutate(
+    across(
+      .cols = c(closed_fruits_std, total_fruits_std, filled_seeds_std, mean_seeds_per_fruit_std, 
+                fl_duration_std, skel_dryweight_mg_std, msm_all_std, corolla_diam_mm_SEG_std, 
+                SLA_SEG_std, d13C_SEG_std, est_fecundity_std, survival_std),  # Replace with actual trait columns
+      .fns = ~ . * relative_fitness_23_1,  # Multiply each trait by relative fitness
+      .names = "{.col}_weighted23"      # Add a suffix to the adjusted columns
+    )
+  )
+
+```
+
+
+```{r}
+##Obtain paternal genotypic values - this is what we are interested in
+# Aggregate data by donor
+BB_mean_donor_traits_22 <- BB_fit_22 %>%
+  group_by(Donor) %>%  # Group by donor
+  summarise(
+    closed_fruits = mean(closed_fruits, na.rm = TRUE),
+    total_fruits = mean(total_fruits, na.rm = TRUE),
+    filled_seeds = mean(filled_seeds, na.rm = TRUE),
+    mean_seeds_per_fruit = mean(mean_seeds_per_fruit, na.rm = TRUE),
+    fl_duration = mean(fl_duration, na.rm = TRUE),
+    skel_dryweight_mg = mean(skel_dryweight_mg, na.rm = TRUE),
+    msm_all = mean(msm_all, na.rm = TRUE),
+    corolla_diam_mm_SEG = mean(corolla_diam_mm_SEG, na.rm = TRUE),
+    SLA_SEG = mean(SLA_SEG, na.rm = TRUE),
+    d13C_SEG = mean(d13C_SEG, na.rm = TRUE),
+    est_fecundity = mean(est_fecundity, na.rm = TRUE),
+    survival = mean(survival, na.rm = TRUE),
+    est_fitness = mean(est_fitness, na.rm = TRUE)
+  ) %>%
+  mutate(
+    # Standardize each trait
+    closed_fruits_std = (closed_fruits - mean(closed_fruits, na.rm = TRUE)) / sd(closed_fruits, na.rm = TRUE),
+    total_fruits_std = (total_fruits - mean(total_fruits, na.rm = TRUE)) / sd(total_fruits, na.rm = TRUE),
+    filled_seeds_std = (filled_seeds - mean(filled_seeds, na.rm = TRUE)) / sd(filled_seeds, na.rm = TRUE),
+    mean_seeds_per_fruit_std = (mean_seeds_per_fruit - mean(mean_seeds_per_fruit, na.rm = TRUE)) / sd(mean_seeds_per_fruit, na.rm = TRUE),
+    fl_duration_std = (fl_duration - mean(fl_duration, na.rm = TRUE)) / sd(fl_duration, na.rm = TRUE),
+    skel_dryweight_mg_std = (skel_dryweight_mg - mean(skel_dryweight_mg, na.rm = TRUE)) / sd(skel_dryweight_mg, na.rm = TRUE),
+    msm_all_std = (msm_all - mean(msm_all, na.rm = TRUE)) / sd(msm_all, na.rm = TRUE),
+    corolla_diam_mm_SEG_std = (corolla_diam_mm_SEG - mean(corolla_diam_mm_SEG, na.rm = TRUE)) / sd(corolla_diam_mm_SEG, na.rm = TRUE),
+    SLA_SEG_std = (SLA_SEG - mean(SLA_SEG, na.rm = TRUE)) / sd(SLA_SEG, na.rm = TRUE),
+    d13C_SEG_std = (d13C_SEG - mean(d13C_SEG, na.rm = TRUE)) / sd(d13C_SEG, na.rm = TRUE),
+    est_fecundity_std = (est_fecundity - mean(est_fecundity, na.rm = TRUE)) / sd(est_fecundity, na.rm = TRUE),
+    survival_std = (survival - mean(survival, na.rm = TRUE)) / sd(survival, na.rm = TRUE),
+    est_fitness_std = (est_fitness - mean(est_fitness, na.rm = TRUE)) / sd(est_fitness, na.rm = TRUE),
+    # Calculate relative fitness by dividing by the mean fitness
+    relative_fitness_22 = est_fitness / mean(est_fitness, na.rm = TRUE)
+  )
+
+  
+
+
+
+# Aggregate data by donor
+BB_mean_donor_traits_23_G1 <- BB_fit_23_G1 %>%
+  group_by(Donor) %>%  # Group by donor
+  summarise(
+    closed_fruits = mean(closed_fruits, na.rm = TRUE),
+    total_fruits = mean(total_fruits, na.rm = TRUE),
+    filled_seeds = mean(filled_seeds, na.rm = TRUE),
+    mean_seeds_per_fruit = mean(mean_seeds_per_fruit, na.rm = TRUE),
+    fl_duration = mean(fl_duration, na.rm = TRUE),
+    skel_dryweight_mg = mean(skel_dryweight_mg, na.rm = TRUE),
+    msm_all = mean(msm_all, na.rm = TRUE),
+    corolla_diam_mm_SEG = mean(corolla_diam_mm_SEG, na.rm = TRUE),
+    SLA_SEG = mean(SLA_SEG, na.rm = TRUE),
+    d13C_SEG = mean(d13C_SEG, na.rm = TRUE),
+    est_fecundity = mean(est_fecundity, na.rm = TRUE),
+    survival = mean(survival, na.rm = TRUE),
+    est_fitness = mean(est_fitness, na.rm = TRUE)
+  ) %>%
+  mutate(
+    # Standardize each trait
+    closed_fruits_std = (closed_fruits - mean(closed_fruits, na.rm = TRUE)) / sd(closed_fruits, na.rm = TRUE),
+    total_fruits_std = (total_fruits - mean(total_fruits, na.rm = TRUE)) / sd(total_fruits, na.rm = TRUE),
+    filled_seeds_std = (filled_seeds - mean(filled_seeds, na.rm = TRUE)) / sd(filled_seeds, na.rm = TRUE),
+    mean_seeds_per_fruit_std = (mean_seeds_per_fruit - mean(mean_seeds_per_fruit, na.rm = TRUE)) / sd(mean_seeds_per_fruit, na.rm = TRUE),
+    fl_duration_std = (fl_duration - mean(fl_duration, na.rm = TRUE)) / sd(fl_duration, na.rm = TRUE),
+    skel_dryweight_mg_std = (skel_dryweight_mg - mean(skel_dryweight_mg, na.rm = TRUE)) / sd(skel_dryweight_mg, na.rm = TRUE),
+    msm_all_std = (msm_all - mean(msm_all, na.rm = TRUE)) / sd(msm_all, na.rm = TRUE),
+    corolla_diam_mm_SEG_std = (corolla_diam_mm_SEG - mean(corolla_diam_mm_SEG, na.rm = TRUE)) / sd(corolla_diam_mm_SEG, na.rm = TRUE),
+    SLA_SEG_std = (SLA_SEG - mean(SLA_SEG, na.rm = TRUE)) / sd(SLA_SEG, na.rm = TRUE),
+    d13C_SEG_std = (d13C_SEG - mean(d13C_SEG, na.rm = TRUE)) / sd(d13C_SEG, na.rm = TRUE),
+    est_fecundity_std = (est_fecundity - mean(est_fecundity, na.rm = TRUE)) / sd(est_fecundity, na.rm = TRUE),
+    survival_std = (survival - mean(survival, na.rm = TRUE)) / sd(survival, na.rm = TRUE),
+    est_fitness_std = (est_fitness - mean(est_fitness, na.rm = TRUE)) / sd(est_fitness, na.rm = TRUE),
+    # Calculate relative fitness by dividing by the mean fitness
+    relative_fitness_23_1 = est_fitness / mean(est_fitness, na.rm = TRUE)
+  )
+
+
+
+# Aggregate data by donor
+BB_mean_donor_traits_23_G2 <- BB_fit_23_G2 %>%
+  group_by(Donor) %>%  # Group by donor
+  summarise(
+    closed_fruits = mean(closed_fruits, na.rm = TRUE),
+    total_fruits = mean(total_fruits, na.rm = TRUE),
+    filled_seeds = mean(filled_seeds, na.rm = TRUE),
+    mean_seeds_per_fruit = mean(mean_seeds_per_fruit, na.rm = TRUE),
+    fl_duration = mean(fl_duration, na.rm = TRUE),
+    skel_dryweight_mg = mean(skel_dryweight_mg, na.rm = TRUE),
+    msm_all = mean(msm_all, na.rm = TRUE),
+    corolla_diam_mm_SEG = mean(corolla_diam_mm_SEG, na.rm = TRUE),
+    SLA_SEG = mean(SLA_SEG, na.rm = TRUE),
+    d13C_SEG = mean(d13C_SEG, na.rm = TRUE),
+    est_fecundity = mean(est_fecundity, na.rm = TRUE),
+    survival = mean(survival, na.rm = TRUE),
+    est_fitness = mean(est_fitness, na.rm = TRUE)
+  ) %>%
+  mutate(
+    # Standardize each trait
+    closed_fruits_std = (closed_fruits - mean(closed_fruits, na.rm = TRUE)) / sd(closed_fruits, na.rm = TRUE),
+    total_fruits_std = (total_fruits - mean(total_fruits, na.rm = TRUE)) / sd(total_fruits, na.rm = TRUE),
+    filled_seeds_std = (filled_seeds - mean(filled_seeds, na.rm = TRUE)) / sd(filled_seeds, na.rm = TRUE),
+    mean_seeds_per_fruit_std = (mean_seeds_per_fruit - mean(mean_seeds_per_fruit, na.rm = TRUE)) / sd(mean_seeds_per_fruit, na.rm = TRUE),
+    fl_duration_std = (fl_duration - mean(fl_duration, na.rm = TRUE)) / sd(fl_duration, na.rm = TRUE),
+    skel_dryweight_mg_std = (skel_dryweight_mg - mean(skel_dryweight_mg, na.rm = TRUE)) / sd(skel_dryweight_mg, na.rm = TRUE),
+    msm_all_std = (msm_all - mean(msm_all, na.rm = TRUE)) / sd(msm_all, na.rm = TRUE),
+    corolla_diam_mm_SEG_std = (corolla_diam_mm_SEG - mean(corolla_diam_mm_SEG, na.rm = TRUE)) / sd(corolla_diam_mm_SEG, na.rm = TRUE),
+    SLA_SEG_std = (SLA_SEG - mean(SLA_SEG, na.rm = TRUE)) / sd(SLA_SEG, na.rm = TRUE),
+    d13C_SEG_std = (d13C_SEG - mean(d13C_SEG, na.rm = TRUE)) / sd(d13C_SEG, na.rm = TRUE),
+    est_fecundity_std = (est_fecundity - mean(est_fecundity, na.rm = TRUE)) / sd(est_fecundity, na.rm = TRUE),
+    survival_std = (survival - mean(survival, na.rm = TRUE)) / sd(survival, na.rm = TRUE),
+    est_fitness_std = (est_fitness - mean(est_fitness, na.rm = TRUE)) / sd(est_fitness, na.rm = TRUE),
+    # Calculate relative fitness by dividing by the mean fitness
+    relative_fitness_23_2 = est_fitness / mean(est_fitness, na.rm = TRUE)
+  )
+  
+
+
+# Join the two data frames
+BB_mean_donor_traits_23_G2 <- BB_mean_donor_traits_23_G2 %>%
+  left_join(
+    BB_mean_donor_traits_22 %>% dplyr::select(Donor, relative_fitness_22),  # Select only relevant columns
+    by = "Donor"
+  )
+
+# Weight each trait in 23_G2 by relative_fitness from 22
+BB_23_G2_weighted_by_22 <- BB_mean_donor_traits_23_G2 %>%
+  mutate(
+    across(
+      .cols = c(closed_fruits_std, total_fruits_std, filled_seeds_std, mean_seeds_per_fruit_std, 
+                fl_duration_std, skel_dryweight_mg_std, msm_all_std, corolla_diam_mm_SEG_std, 
+                SLA_SEG_std, d13C_SEG_std, est_fecundity_std, survival_std),  # Replace with actual trait columns
+      .fns = ~ . * relative_fitness_22,  # Multiply each trait by relative fitness
+      .names = "{.col}_weighted22"      # Add a suffix to the adjusted columns
+    )
+  )
+
+# Join the two data frames
+BB_mean_donor_traits_23_G2 <- BB_mean_donor_traits_23_G2 %>%
+  left_join(
+    BB_mean_donor_traits_23_G1 %>% dplyr::select(Donor, relative_fitness_23_1),  # Select only relevant columns
+    by = "Donor"
+  )
+
+# Weight each trait in 23_G2 by relative_fitness from 23
+BB_23_G2_weighted_by_23 <- BB_mean_donor_traits_23_G2 %>%
+  mutate(
+    across(
+      .cols = c(closed_fruits_std, total_fruits_std, filled_seeds_std, mean_seeds_per_fruit_std, 
+                fl_duration_std, skel_dryweight_mg_std, msm_all_std, corolla_diam_mm_SEG_std, 
+                SLA_SEG_std, d13C_SEG_std, est_fecundity_std, survival_std),  # Replace with actual trait columns
+      .fns = ~ . * relative_fitness_23_1,  # Multiply each trait by relative fitness
+      .names = "{.col}_weighted23"      # Add a suffix to the adjusted columns
+    )
+  )
+
+```
+
+
+```{r}
+##Obtain paternal genotypic values - this is what we are interested in
+# Aggregate data by donor
+BO_mean_donor_traits_22 <- BO_fit_22 %>%
+  group_by(Donor) %>%  # Group by donor
+  summarise(
+    closed_fruits = mean(closed_fruits, na.rm = TRUE),
+    total_fruits = mean(total_fruits, na.rm = TRUE),
+    filled_seeds = mean(filled_seeds, na.rm = TRUE),
+    mean_seeds_per_fruit = mean(mean_seeds_per_fruit, na.rm = TRUE),
+    fl_duration = mean(fl_duration, na.rm = TRUE),
+    skel_dryweight_mg = mean(skel_dryweight_mg, na.rm = TRUE),
+    msm_all = mean(msm_all, na.rm = TRUE),
+    corolla_diam_mm_SEG = mean(corolla_diam_mm_SEG, na.rm = TRUE),
+    SLA_SEG = mean(SLA_SEG, na.rm = TRUE),
+    d13C_SEG = mean(d13C_SEG, na.rm = TRUE),
+    est_fecundity = mean(est_fecundity, na.rm = TRUE),
+    survival = mean(survival, na.rm = TRUE),
+    est_fitness = mean(est_fitness, na.rm = TRUE)
+  ) %>%
+  mutate(
+    # Standardize each trait
+    closed_fruits_std = (closed_fruits - mean(closed_fruits, na.rm = TRUE)) / sd(closed_fruits, na.rm = TRUE),
+    total_fruits_std = (total_fruits - mean(total_fruits, na.rm = TRUE)) / sd(total_fruits, na.rm = TRUE),
+    filled_seeds_std = (filled_seeds - mean(filled_seeds, na.rm = TRUE)) / sd(filled_seeds, na.rm = TRUE),
+    mean_seeds_per_fruit_std = (mean_seeds_per_fruit - mean(mean_seeds_per_fruit, na.rm = TRUE)) / sd(mean_seeds_per_fruit, na.rm = TRUE),
+    fl_duration_std = (fl_duration - mean(fl_duration, na.rm = TRUE)) / sd(fl_duration, na.rm = TRUE),
+    skel_dryweight_mg_std = (skel_dryweight_mg - mean(skel_dryweight_mg, na.rm = TRUE)) / sd(skel_dryweight_mg, na.rm = TRUE),
+    msm_all_std = (msm_all - mean(msm_all, na.rm = TRUE)) / sd(msm_all, na.rm = TRUE),
+    corolla_diam_mm_SEG_std = (corolla_diam_mm_SEG - mean(corolla_diam_mm_SEG, na.rm = TRUE)) / sd(corolla_diam_mm_SEG, na.rm = TRUE),
+    SLA_SEG_std = (SLA_SEG - mean(SLA_SEG, na.rm = TRUE)) / sd(SLA_SEG, na.rm = TRUE),
+    d13C_SEG_std = (d13C_SEG - mean(d13C_SEG, na.rm = TRUE)) / sd(d13C_SEG, na.rm = TRUE),
+    est_fecundity_std = (est_fecundity - mean(est_fecundity, na.rm = TRUE)) / sd(est_fecundity, na.rm = TRUE),
+    survival_std = (survival - mean(survival, na.rm = TRUE)) / sd(survival, na.rm = TRUE),
+    est_fitness_std = (est_fitness - mean(est_fitness, na.rm = TRUE)) / sd(est_fitness, na.rm = TRUE),
+    # Calculate relative fitness by dividing by the mean fitness
+    relative_fitness_22 = est_fitness / mean(est_fitness, na.rm = TRUE)
+  )
+
+  
+
+
+
+# Aggregate data by donor
+BO_mean_donor_traits_23_G1 <- BO_fit_23_G1 %>%
+  group_by(Donor) %>%  # Group by donor
+  summarise(
+    closed_fruits = mean(closed_fruits, na.rm = TRUE),
+    total_fruits = mean(total_fruits, na.rm = TRUE),
+    filled_seeds = mean(filled_seeds, na.rm = TRUE),
+    mean_seeds_per_fruit = mean(mean_seeds_per_fruit, na.rm = TRUE),
+    fl_duration = mean(fl_duration, na.rm = TRUE),
+    skel_dryweight_mg = mean(skel_dryweight_mg, na.rm = TRUE),
+    msm_all = mean(msm_all, na.rm = TRUE),
+    corolla_diam_mm_SEG = mean(corolla_diam_mm_SEG, na.rm = TRUE),
+    SLA_SEG = mean(SLA_SEG, na.rm = TRUE),
+    d13C_SEG = mean(d13C_SEG, na.rm = TRUE),
+    est_fecundity = mean(est_fecundity, na.rm = TRUE),
+    survival = mean(survival, na.rm = TRUE),
+    est_fitness = mean(est_fitness, na.rm = TRUE)
+  ) %>%
+  mutate(
+    # Standardize each trait
+    closed_fruits_std = (closed_fruits - mean(closed_fruits, na.rm = TRUE)) / sd(closed_fruits, na.rm = TRUE),
+    total_fruits_std = (total_fruits - mean(total_fruits, na.rm = TRUE)) / sd(total_fruits, na.rm = TRUE),
+    filled_seeds_std = (filled_seeds - mean(filled_seeds, na.rm = TRUE)) / sd(filled_seeds, na.rm = TRUE),
+    mean_seeds_per_fruit_std = (mean_seeds_per_fruit - mean(mean_seeds_per_fruit, na.rm = TRUE)) / sd(mean_seeds_per_fruit, na.rm = TRUE),
+    fl_duration_std = (fl_duration - mean(fl_duration, na.rm = TRUE)) / sd(fl_duration, na.rm = TRUE),
+    skel_dryweight_mg_std = (skel_dryweight_mg - mean(skel_dryweight_mg, na.rm = TRUE)) / sd(skel_dryweight_mg, na.rm = TRUE),
+    msm_all_std = (msm_all - mean(msm_all, na.rm = TRUE)) / sd(msm_all, na.rm = TRUE),
+    corolla_diam_mm_SEG_std = (corolla_diam_mm_SEG - mean(corolla_diam_mm_SEG, na.rm = TRUE)) / sd(corolla_diam_mm_SEG, na.rm = TRUE),
+    SLA_SEG_std = (SLA_SEG - mean(SLA_SEG, na.rm = TRUE)) / sd(SLA_SEG, na.rm = TRUE),
+    d13C_SEG_std = (d13C_SEG - mean(d13C_SEG, na.rm = TRUE)) / sd(d13C_SEG, na.rm = TRUE),
+    est_fecundity_std = (est_fecundity - mean(est_fecundity, na.rm = TRUE)) / sd(est_fecundity, na.rm = TRUE),
+    survival_std = (survival - mean(survival, na.rm = TRUE)) / sd(survival, na.rm = TRUE),
+    est_fitness_std = (est_fitness - mean(est_fitness, na.rm = TRUE)) / sd(est_fitness, na.rm = TRUE),
+    # Calculate relative fitness by dividing by the mean fitness
+    relative_fitness_23_1 = est_fitness / mean(est_fitness, na.rm = TRUE)
+  )
+
+
+
+# Aggregate data by donor
+BO_mean_donor_traits_23_G2 <- BO_fit_23_G2 %>%
+  group_by(Donor) %>%  # Group by donor
+  summarise(
+    closed_fruits = mean(closed_fruits, na.rm = TRUE),
+    total_fruits = mean(total_fruits, na.rm = TRUE),
+    filled_seeds = mean(filled_seeds, na.rm = TRUE),
+    mean_seeds_per_fruit = mean(mean_seeds_per_fruit, na.rm = TRUE),
+    fl_duration = mean(fl_duration, na.rm = TRUE),
+    skel_dryweight_mg = mean(skel_dryweight_mg, na.rm = TRUE),
+    msm_all = mean(msm_all, na.rm = TRUE),
+    corolla_diam_mm_SEG = mean(corolla_diam_mm_SEG, na.rm = TRUE),
+    SLA_SEG = mean(SLA_SEG, na.rm = TRUE),
+    d13C_SEG = mean(d13C_SEG, na.rm = TRUE),
+    est_fecundity = mean(est_fecundity, na.rm = TRUE),
+    survival = mean(survival, na.rm = TRUE),
+    est_fitness = mean(est_fitness, na.rm = TRUE)
+  ) %>%
+  mutate(
+    # Standardize each trait
+    closed_fruits_std = (closed_fruits - mean(closed_fruits, na.rm = TRUE)) / sd(closed_fruits, na.rm = TRUE),
+    total_fruits_std = (total_fruits - mean(total_fruits, na.rm = TRUE)) / sd(total_fruits, na.rm = TRUE),
+    filled_seeds_std = (filled_seeds - mean(filled_seeds, na.rm = TRUE)) / sd(filled_seeds, na.rm = TRUE),
+    mean_seeds_per_fruit_std = (mean_seeds_per_fruit - mean(mean_seeds_per_fruit, na.rm = TRUE)) / sd(mean_seeds_per_fruit, na.rm = TRUE),
+    fl_duration_std = (fl_duration - mean(fl_duration, na.rm = TRUE)) / sd(fl_duration, na.rm = TRUE),
+    skel_dryweight_mg_std = (skel_dryweight_mg - mean(skel_dryweight_mg, na.rm = TRUE)) / sd(skel_dryweight_mg, na.rm = TRUE),
+    msm_all_std = (msm_all - mean(msm_all, na.rm = TRUE)) / sd(msm_all, na.rm = TRUE),
+    corolla_diam_mm_SEG_std = (corolla_diam_mm_SEG - mean(corolla_diam_mm_SEG, na.rm = TRUE)) / sd(corolla_diam_mm_SEG, na.rm = TRUE),
+    SLA_SEG_std = (SLA_SEG - mean(SLA_SEG, na.rm = TRUE)) / sd(SLA_SEG, na.rm = TRUE),
+    d13C_SEG_std = (d13C_SEG - mean(d13C_SEG, na.rm = TRUE)) / sd(d13C_SEG, na.rm = TRUE),
+    est_fecundity_std = (est_fecundity - mean(est_fecundity, na.rm = TRUE)) / sd(est_fecundity, na.rm = TRUE),
+    survival_std = (survival - mean(survival, na.rm = TRUE)) / sd(survival, na.rm = TRUE),
+    est_fitness_std = (est_fitness - mean(est_fitness, na.rm = TRUE)) / sd(est_fitness, na.rm = TRUE),
+    # Calculate relative fitness by dividing by the mean fitness
+    relative_fitness_23_2 = est_fitness / mean(est_fitness, na.rm = TRUE)
+  )
+  
+
+
+# Join the two data frames
+BO_mean_donor_traits_23_G2 <- BO_mean_donor_traits_23_G2 %>%
+  left_join(
+    BO_mean_donor_traits_22 %>% dplyr::select(Donor, relative_fitness_22),  # Select only relevant columns
+    by = "Donor"
+  )
+
+# Weight each trait in 23_G2 by relative_fitness from 22
+BO_23_G2_weighted_by_22 <- BO_mean_donor_traits_23_G2 %>%
+  mutate(
+    across(
+      .cols = c(closed_fruits_std, total_fruits_std, filled_seeds_std, mean_seeds_per_fruit_std, 
+                fl_duration_std, skel_dryweight_mg_std, msm_all_std, corolla_diam_mm_SEG_std, 
+                SLA_SEG_std, d13C_SEG_std, est_fecundity_std, survival_std),  # Replace with actual trait columns
+      .fns = ~ . * relative_fitness_22,  # Multiply each trait by relative fitness
+      .names = "{.col}_weighted22"      # Add a suffix to the adjusted columns
+    )
+  )
+
+BO_mean_donor_traits_23_G2 <- BO_mean_donor_traits_23_G2 %>%
+  left_join(
+    BO_mean_donor_traits_23_G1 %>% dplyr::select(Donor, relative_fitness_23_1),  # Select only relevant columns
+    by = "Donor"
+  )
+
+
+# Weight each trait in 23_G2 by relative_fitness from 23
+BO_23_G2_weighted_by_23 <- BO_mean_donor_traits_23_G1 %>%
+  mutate(
+    across(
+      .cols = c(closed_fruits_std, total_fruits_std, filled_seeds_std, mean_seeds_per_fruit_std, 
+                fl_duration_std, skel_dryweight_mg_std, msm_all_std, corolla_diam_mm_SEG_std, 
+                SLA_SEG_std, d13C_SEG_std, est_fecundity_std, survival_std),  # Replace with actual trait columns
+      .fns = ~ . * relative_fitness_23_1,  # Multiply each trait by relative fitness
+      .names = "{.col}_weighted23"      # Add a suffix to the adjusted columns
+    )
+  )
+
+```
+
+
+```{r}
+##Obtain paternal genotypic values - this is what we are interested in
+# Aggregate data by donor
+HR_mean_donor_traits_22 <- HR_fit_22 %>%
+  group_by(Donor) %>%  # Group by donor
+  summarise(
+    closed_fruits = mean(closed_fruits, na.rm = TRUE),
+    total_fruits = mean(total_fruits, na.rm = TRUE),
+    filled_seeds = mean(filled_seeds, na.rm = TRUE),
+    mean_seeds_per_fruit = mean(mean_seeds_per_fruit, na.rm = TRUE),
+    fl_duration = mean(fl_duration, na.rm = TRUE),
+    skel_dryweight_mg = mean(skel_dryweight_mg, na.rm = TRUE),
+    msm_all = mean(msm_all, na.rm = TRUE),
+    corolla_diam_mm_SEG = mean(corolla_diam_mm_SEG, na.rm = TRUE),
+    SLA_SEG = mean(SLA_SEG, na.rm = TRUE),
+    d13C_SEG = mean(d13C_SEG, na.rm = TRUE),
+    est_fecundity = mean(est_fecundity, na.rm = TRUE),
+    survival = mean(survival, na.rm = TRUE),
+    est_fitness = mean(est_fitness, na.rm = TRUE)
+  ) %>%
+  mutate(
+    # Standardize each trait
+    closed_fruits_std = (closed_fruits - mean(closed_fruits, na.rm = TRUE)) / sd(closed_fruits, na.rm = TRUE),
+    total_fruits_std = (total_fruits - mean(total_fruits, na.rm = TRUE)) / sd(total_fruits, na.rm = TRUE),
+    filled_seeds_std = (filled_seeds - mean(filled_seeds, na.rm = TRUE)) / sd(filled_seeds, na.rm = TRUE),
+    mean_seeds_per_fruit_std = (mean_seeds_per_fruit - mean(mean_seeds_per_fruit, na.rm = TRUE)) / sd(mean_seeds_per_fruit, na.rm = TRUE),
+    fl_duration_std = (fl_duration - mean(fl_duration, na.rm = TRUE)) / sd(fl_duration, na.rm = TRUE),
+    skel_dryweight_mg_std = (skel_dryweight_mg - mean(skel_dryweight_mg, na.rm = TRUE)) / sd(skel_dryweight_mg, na.rm = TRUE),
+    msm_all_std = (msm_all - mean(msm_all, na.rm = TRUE)) / sd(msm_all, na.rm = TRUE),
+    corolla_diam_mm_SEG_std = (corolla_diam_mm_SEG - mean(corolla_diam_mm_SEG, na.rm = TRUE)) / sd(corolla_diam_mm_SEG, na.rm = TRUE),
+    SLA_SEG_std = (SLA_SEG - mean(SLA_SEG, na.rm = TRUE)) / sd(SLA_SEG, na.rm = TRUE),
+    d13C_SEG_std = (d13C_SEG - mean(d13C_SEG, na.rm = TRUE)) / sd(d13C_SEG, na.rm = TRUE),
+    est_fecundity_std = (est_fecundity - mean(est_fecundity, na.rm = TRUE)) / sd(est_fecundity, na.rm = TRUE),
+    survival_std = (survival - mean(survival, na.rm = TRUE)) / sd(survival, na.rm = TRUE),
+    est_fitness_std = (est_fitness - mean(est_fitness, na.rm = TRUE)) / sd(est_fitness, na.rm = TRUE),
+    # Calculate relative fitness by dividing by the mean fitness
+    relative_fitness_22 = est_fitness / mean(est_fitness, na.rm = TRUE)
+  )
+
+  
+
+
+
+# Aggregate data by donor
+HR_mean_donor_traits_23_G1 <- HR_fit_23_G1 %>%
+  group_by(Donor) %>%  # Group by donor
+  summarise(
+    closed_fruits = mean(closed_fruits, na.rm = TRUE),
+    total_fruits = mean(total_fruits, na.rm = TRUE),
+    filled_seeds = mean(filled_seeds, na.rm = TRUE),
+    mean_seeds_per_fruit = mean(mean_seeds_per_fruit, na.rm = TRUE),
+    fl_duration = mean(fl_duration, na.rm = TRUE),
+    skel_dryweight_mg = mean(skel_dryweight_mg, na.rm = TRUE),
+    msm_all = mean(msm_all, na.rm = TRUE),
+    corolla_diam_mm_SEG = mean(corolla_diam_mm_SEG, na.rm = TRUE),
+    SLA_SEG = mean(SLA_SEG, na.rm = TRUE),
+    d13C_SEG = mean(d13C_SEG, na.rm = TRUE),
+    est_fecundity = mean(est_fecundity, na.rm = TRUE),
+    survival = mean(survival, na.rm = TRUE),
+    est_fitness = mean(est_fitness, na.rm = TRUE)
+   ) %>%
+  mutate(
+    # Standardize each trait
+    closed_fruits_std = (closed_fruits - mean(closed_fruits, na.rm = TRUE)) / sd(closed_fruits, na.rm = TRUE),
+    total_fruits_std = (total_fruits - mean(total_fruits, na.rm = TRUE)) / sd(total_fruits, na.rm = TRUE),
+    filled_seeds_std = (filled_seeds - mean(filled_seeds, na.rm = TRUE)) / sd(filled_seeds, na.rm = TRUE),
+    mean_seeds_per_fruit_std = (mean_seeds_per_fruit - mean(mean_seeds_per_fruit, na.rm = TRUE)) / sd(mean_seeds_per_fruit, na.rm = TRUE),
+    fl_duration_std = (fl_duration - mean(fl_duration, na.rm = TRUE)) / sd(fl_duration, na.rm = TRUE),
+    skel_dryweight_mg_std = (skel_dryweight_mg - mean(skel_dryweight_mg, na.rm = TRUE)) / sd(skel_dryweight_mg, na.rm = TRUE),
+    msm_all_std = (msm_all - mean(msm_all, na.rm = TRUE)) / sd(msm_all, na.rm = TRUE),
+    corolla_diam_mm_SEG_std = (corolla_diam_mm_SEG - mean(corolla_diam_mm_SEG, na.rm = TRUE)) / sd(corolla_diam_mm_SEG, na.rm = TRUE),
+    SLA_SEG_std = (SLA_SEG - mean(SLA_SEG, na.rm = TRUE)) / sd(SLA_SEG, na.rm = TRUE),
+    d13C_SEG_std = (d13C_SEG - mean(d13C_SEG, na.rm = TRUE)) / sd(d13C_SEG, na.rm = TRUE),
+    est_fecundity_std = (est_fecundity - mean(est_fecundity, na.rm = TRUE)) / sd(est_fecundity, na.rm = TRUE),
+    survival_std = (survival - mean(survival, na.rm = TRUE)) / sd(survival, na.rm = TRUE),
+    est_fitness_std = (est_fitness - mean(est_fitness, na.rm = TRUE)) / sd(est_fitness, na.rm = TRUE),
+    # Calculate relative fitness by dividing by the mean fitness
+    relative_fitness_23_1 = est_fitness / mean(est_fitness, na.rm = TRUE)
+  )
+
+
+
+# Aggregate data by donor
+HR_mean_donor_traits_23_G2 <- HR_fit_23_G2 %>%
+  group_by(Donor) %>%  # Group by donor
+  summarise(
+    closed_fruits = mean(closed_fruits, na.rm = TRUE),
+    total_fruits = mean(total_fruits, na.rm = TRUE),
+    filled_seeds = mean(filled_seeds, na.rm = TRUE),
+    mean_seeds_per_fruit = mean(mean_seeds_per_fruit, na.rm = TRUE),
+    fl_duration = mean(fl_duration, na.rm = TRUE),
+    skel_dryweight_mg = mean(skel_dryweight_mg, na.rm = TRUE),
+    msm_all = mean(msm_all, na.rm = TRUE),
+    corolla_diam_mm_SEG = mean(corolla_diam_mm_SEG, na.rm = TRUE),
+    SLA_SEG = mean(SLA_SEG, na.rm = TRUE),
+    d13C_SEG = mean(d13C_SEG, na.rm = TRUE),
+    est_fecundity = mean(est_fecundity, na.rm = TRUE),
+    survival = mean(survival, na.rm = TRUE),
+    est_fitness = mean(est_fitness, na.rm = TRUE)
+   ) %>%
+  mutate(
+    # Standardize each trait
+    closed_fruits_std = (closed_fruits - mean(closed_fruits, na.rm = TRUE)) / sd(closed_fruits, na.rm = TRUE),
+    total_fruits_std = (total_fruits - mean(total_fruits, na.rm = TRUE)) / sd(total_fruits, na.rm = TRUE),
+    filled_seeds_std = (filled_seeds - mean(filled_seeds, na.rm = TRUE)) / sd(filled_seeds, na.rm = TRUE),
+    mean_seeds_per_fruit_std = (mean_seeds_per_fruit - mean(mean_seeds_per_fruit, na.rm = TRUE)) / sd(mean_seeds_per_fruit, na.rm = TRUE),
+    fl_duration_std = (fl_duration - mean(fl_duration, na.rm = TRUE)) / sd(fl_duration, na.rm = TRUE),
+    skel_dryweight_mg_std = (skel_dryweight_mg - mean(skel_dryweight_mg, na.rm = TRUE)) / sd(skel_dryweight_mg, na.rm = TRUE),
+    msm_all_std = (msm_all - mean(msm_all, na.rm = TRUE)) / sd(msm_all, na.rm = TRUE),
+    corolla_diam_mm_SEG_std = (corolla_diam_mm_SEG - mean(corolla_diam_mm_SEG, na.rm = TRUE)) / sd(corolla_diam_mm_SEG, na.rm = TRUE),
+    SLA_SEG_std = (SLA_SEG - mean(SLA_SEG, na.rm = TRUE)) / sd(SLA_SEG, na.rm = TRUE),
+    d13C_SEG_std = (d13C_SEG - mean(d13C_SEG, na.rm = TRUE)) / sd(d13C_SEG, na.rm = TRUE),
+    est_fecundity_std = (est_fecundity - mean(est_fecundity, na.rm = TRUE)) / sd(est_fecundity, na.rm = TRUE),
+    survival_std = (survival - mean(survival, na.rm = TRUE)) / sd(survival, na.rm = TRUE),
+    est_fitness_std = (est_fitness - mean(est_fitness, na.rm = TRUE)) / sd(est_fitness, na.rm = TRUE),
+    # Calculate relative fitness by dividing by the mean fitness
+    relative_fitness_23_2 = est_fitness / mean(est_fitness, na.rm = TRUE)
+  )
+  
+
+
+# Join the two data frames
+HR_mean_donor_traits_23_G2 <- HR_mean_donor_traits_23_G2 %>%
+  left_join(
+    HR_mean_donor_traits_22 %>% dplyr::select(Donor, relative_fitness_22),  # Select only relevant columns
+    by = "Donor"
+  )
+
+# Weight each trait in 23_G2 by relative_fitness from 22
+HR_23_G2_weighted_by_22 <- HR_mean_donor_traits_23_G2 %>%
+  mutate(
+    across(
+      .cols = c(closed_fruits_std, total_fruits_std, filled_seeds_std, mean_seeds_per_fruit_std, 
+                fl_duration_std, skel_dryweight_mg_std, msm_all_std, corolla_diam_mm_SEG_std, 
+                SLA_SEG_std, d13C_SEG_std, est_fecundity_std, survival_std),  # Replace with actual trait columns
+      .fns = ~ . * relative_fitness_22,  # Multiply each trait by relative fitness
+      .names = "{.col}_weighted22"      # Add a suffix to the adjusted columns
+    )
+  )
+
+HR_mean_donor_traits_23_G2 <- HR_mean_donor_traits_23_G2 %>%
+  left_join(
+    HR_mean_donor_traits_23_G1 %>% dplyr::select(Donor, relative_fitness_23_1),  # Select only relevant columns
+    by = "Donor"
+  )
+
+# Weight each trait in 23_G2 by relative_fitness from 23
+HR_23_G2_weighted_by_23 <- HR_mean_donor_traits_23_G1 %>%
+  mutate(
+    across(
+      .cols = c(closed_fruits_std, total_fruits_std, filled_seeds_std, mean_seeds_per_fruit_std, 
+                fl_duration_std, skel_dryweight_mg_std, msm_all_std, corolla_diam_mm_SEG_std, 
+                SLA_SEG_std, d13C_SEG_std, est_fecundity_std, survival_std),  # Replace with actual trait columns
+      .fns = ~ . * relative_fitness_23_1,  # Multiply each trait by relative fitness
+      .names = "{.col}_weighted23"      # Add a suffix to the adjusted columns
+    )
+  )
+
+```
+
+
+Comparing g1 2022 and g1 2023 with scaled paternal trait means
+```{r}
+# Add Year column and combine G1 2022 and G1 2023 data
+HR_mean_donor_traits_22_a <- HR_mean_donor_traits_22 %>%
+  dplyr::select(msm_all_std, fl_duration_std, d13C_SEG_std, corolla_diam_mm_SEG_std, SLA_SEG_std) %>%
+  mutate(Group = "HR", Year = "2022")
+
+AC_mean_donor_traits_22_a <- AC_mean_donor_traits_22 %>%
+  dplyr::select(msm_all_std, fl_duration_std, d13C_SEG_std, corolla_diam_mm_SEG_std, SLA_SEG_std) %>%
+  mutate(Group = "AC", Year = "2022")
+
+BB_mean_donor_traits_22_a <- BB_mean_donor_traits_22 %>%
+  dplyr::select(msm_all_std, fl_duration_std, d13C_SEG_std, corolla_diam_mm_SEG_std, SLA_SEG_std) %>%
+  mutate(Group = "BB", Year = "2022")
+
+BO_mean_donor_traits_22_a <- BO_mean_donor_traits_22 %>%
+  dplyr::select(msm_all_std, fl_duration_std, d13C_SEG_std, corolla_diam_mm_SEG_std, SLA_SEG_std) %>%
+  mutate(Group = "BO", Year = "2022")
+
+HR_mean_donor_traits_23_G1_a <- HR_mean_donor_traits_23_G1 %>%
+  dplyr::select(msm_all_std, fl_duration_std, d13C_SEG_std, corolla_diam_mm_SEG_std, SLA_SEG_std) %>%
+  mutate(Group = "HR", Year = "2023")
+
+AC_mean_donor_traits_23_G1_a <- AC_mean_donor_traits_23_G1 %>%
+  dplyr::select(msm_all_std, fl_duration_std, d13C_SEG_std, corolla_diam_mm_SEG_std, SLA_SEG_std) %>%
+  mutate(Group = "AC", Year = "2023")
+
+BB_mean_donor_traits_23_G1_a <- BB_mean_donor_traits_23_G1 %>%
+  dplyr::select(msm_all_std, fl_duration_std, d13C_SEG_std, corolla_diam_mm_SEG_std, SLA_SEG_std) %>%
+  mutate(Group = "BB", Year = "2023")
+
+BO_mean_donor_traits_23_G1_a <- BO_mean_donor_traits_23_G1 %>%
+  dplyr::select(msm_all_std, fl_duration_std, d13C_SEG_std, corolla_diam_mm_SEG_std, SLA_SEG_std) %>%
+  mutate(Group = "BO", Year = "2023")
+
+# Combine all data
+combined_traits <- bind_rows(
+  HR_mean_donor_traits_22_a, AC_mean_donor_traits_22_a,
+  BB_mean_donor_traits_22_a, BO_mean_donor_traits_22_a,
+  HR_mean_donor_traits_23_G1_a, AC_mean_donor_traits_23_G1_a,
+  BB_mean_donor_traits_23_G1_a, BO_mean_donor_traits_23_G1_a
+)
+
+# Reshape into long format for plotting
+data_long <- combined_traits %>%
+  pivot_longer(
+    cols = c(msm_all_std, fl_duration_std, d13C_SEG_std, corolla_diam_mm_SEG_std, SLA_SEG_std),
+    names_to = "Trait",
+    values_to = "Value"
+  ) %>%
+  mutate(
+    Trait = recode(
+      Trait,
+      "msm_all_std" = "Mean Seed Mass",
+      "fl_duration_std" = "Flowering Duration",
+      "d13C_SEG_std" = "δ13C",
+      "corolla_diam_mm_SEG_std" = "Corolla Diameter",
+      "SLA_SEG_std" = "Specific Leaf Area"
+    )
+  )
+
+# Create the combined plot
+frequency_dist_traits <- ggplot(data_long, aes(x = Value, fill = Year)) +
+  geom_density(alpha = 0.6) +
+  facet_grid(Group ~ Trait, scales = "free_y") +
+  labs(
+    title = "Frequency Distribution of Traits for G1 (2022 vs 2023)",
+    x = "Trait Value",
+    y = "Density"
+  ) +
+  theme_minimal() +
+  theme(
+    legend.position = "top",
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    strip.text.y = element_text(angle = 0),
+    strip.text.x = element_text(face = "bold")
+  ) +
+  scale_fill_manual(values = c("2022" = "#ff6f61", "2023" = "#17becf")) +  # Use chosen colors
+  scale_y_continuous(expand = c(0, 0)) +
+  scale_x_continuous(limits = c(-7, 7), expand = c(0, 0))  # Set x-axis limits
+
+frequency_dist_traits
+
+# Save the plot
+ggsave("combined_frequency_dist_G1_2022_vs_2023.png", plot = frequency_dist_traits, width = 12, height = 10, dpi = 300)
+
+```
+
+
+
+Comparing g1 2022 and g2 2023 (weighted with g1 2022) with scaled paternal trait means
+```{r}
+# Add Year column and combine G1 2022 and G1 2023 data
+HR_mean_donor_traits_22_a <- HR_mean_donor_traits_22 %>%
+  dplyr::select(msm_all_std, fl_duration_std, d13C_SEG_std, corolla_diam_mm_SEG_std, SLA_SEG_std) %>%
+  mutate(Group = "HR", Year = "2022")
+
+AC_mean_donor_traits_22_a <- AC_mean_donor_traits_22 %>%
+  dplyr::select(msm_all_std, fl_duration_std, d13C_SEG_std, corolla_diam_mm_SEG_std, SLA_SEG_std) %>%
+  mutate(Group = "AC", Year = "2022")
+
+BB_mean_donor_traits_22_a <- BB_mean_donor_traits_22 %>%
+  dplyr::select(msm_all_std, fl_duration_std, d13C_SEG_std, corolla_diam_mm_SEG_std, SLA_SEG_std) %>%
+  mutate(Group = "BB", Year = "2022")
+
+BO_mean_donor_traits_22_a <- BO_mean_donor_traits_22 %>%
+  dplyr::select(msm_all_std, fl_duration_std, d13C_SEG_std, corolla_diam_mm_SEG_std, SLA_SEG_std) %>%
+  mutate(Group = "BO", Year = "2022")
+
+HR_23_G2_weighted_by_22_a <- HR_23_G2_weighted_by_22 %>%
+  dplyr::select(msm_all_std_weighted22, fl_duration_std_weighted22, d13C_SEG_std_weighted22, corolla_diam_mm_SEG_std_weighted22, SLA_SEG_std_weighted22) %>%
+  rename_with(~ gsub("_weighted22", "", .x)) %>%
+  mutate(Group = "HR", Generation = "G2", Year = "2023")
+
+AC_23_G2_weighted_by_22_a <- AC_23_G2_weighted_by_22 %>%
+  dplyr::select(msm_all_std_weighted22, fl_duration_std_weighted22, d13C_SEG_std_weighted22, corolla_diam_mm_SEG_std_weighted22, SLA_SEG_std_weighted22) %>%
+  rename_with(~ gsub("_weighted22", "", .x)) %>%
+  mutate(Group = "AC", Generation = "G2", Year = "2023")
+
+BB_23_G2_weighted_by_22_a <- BB_23_G2_weighted_by_22 %>%
+  dplyr::select(msm_all_std_weighted22, fl_duration_std_weighted22, d13C_SEG_std_weighted22, corolla_diam_mm_SEG_std_weighted22, SLA_SEG_std_weighted22) %>%
+  rename_with(~ gsub("_weighted22", "", .x)) %>%
+  mutate(Group = "BB", Generation = "G2", Year = "2023")
+
+BO_23_G2_weighted_by_22_a <- BO_23_G2_weighted_by_22 %>%
+  dplyr::select(msm_all_std_weighted22, fl_duration_std_weighted22, d13C_SEG_std_weighted22, corolla_diam_mm_SEG_std_weighted22, SLA_SEG_std_weighted22) %>%
+  rename_with(~ gsub("_weighted22", "", .x)) %>%
+  mutate(Group = "BO", Generation = "G2", Year = "2023")
+
+
+# Combine all data
+combined_traits <- bind_rows(
+  HR_mean_donor_traits_22_a, AC_mean_donor_traits_22_a,
+  BB_mean_donor_traits_22_a, BO_mean_donor_traits_22_a,
+  HR_23_G2_weighted_by_22_a, AC_23_G2_weighted_by_22_a,
+  BB_23_G2_weighted_by_22_a, BO_23_G2_weighted_by_22_a
+)
+
+# Reshape into long format for plotting
+data_long <- combined_traits %>%
+  pivot_longer(
+    cols = c(msm_all_std, fl_duration_std, d13C_SEG_std, corolla_diam_mm_SEG_std, SLA_SEG_std),
+    names_to = "Trait",
+    values_to = "Value"
+  ) %>%
+  mutate(
+    Trait = recode(
+      Trait,
+      "msm_all_std" = "Mean Seed Mass",
+      "fl_duration_std" = "Flowering Duration",
+      "d13C_SEG_std" = "δ13C",
+      "corolla_diam_mm_SEG_std" = "Corolla Diameter",
+      "SLA_SEG_std" = "Specific Leaf Area"
+    )
+  )
+
+# Create the combined plot
+frequency_dist_traits <- ggplot(data_long, aes(x = Value, fill = Year)) +
+  geom_density(alpha = 0.6) +
+  facet_grid(Group ~ Trait, scales = "free_y") +
+  labs(
+    title = "Frequency Distribution of Traits for G1 (2022 vs 2023)",
+    x = "Trait Value",
+    y = "Density"
+  ) +
+  theme_minimal() +
+  theme(
+    legend.position = "top",
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    strip.text.y = element_text(angle = 0),
+    strip.text.x = element_text(face = "bold")
+  ) +
+  scale_fill_manual(values = c("2022" = "#ff6f61", "2023" = "#17becf")) +  # Use chosen colors
+  scale_y_continuous(expand = c(0, 0)) +
+  scale_x_continuous(limits = c(-7, 7), expand = c(0, 0))  # Set x-axis limits
+
+frequency_dist_traits
+
+# Save the plot
+ggsave("combined_frequency_dist_G1_and_weighted_G2(22).png", plot = frequency_dist_traits, width = 12, height = 10, dpi = 300)
+
+```
+
+
+Comparing g1 2022 and g2 2023 (weighted with g1 2023) with scaled paternal trait means
+```{r}
+# Add Generation column and combine G1 2022 and G2 weighted by 2022
+HR_mean_donor_traits_22_a <- HR_mean_donor_traits_22 %>%
+  dplyr::select(msm_all_std, fl_duration_std, d13C_SEG_std, corolla_diam_mm_SEG_std, SLA_SEG_std) %>%
+  mutate(Group = "HR", Generation = "G1", Year = "2022")
+
+AC_mean_donor_traits_22_a <- AC_mean_donor_traits_22 %>%
+  dplyr::select(msm_all_std, fl_duration_std, d13C_SEG_std, corolla_diam_mm_SEG_std, SLA_SEG_std) %>%
+  mutate(Group = "AC", Generation = "G1", Year = "2022")
+
+BB_mean_donor_traits_22_a <- BB_mean_donor_traits_22 %>%
+  dplyr::select(msm_all_std, fl_duration_std, d13C_SEG_std, corolla_diam_mm_SEG_std, SLA_SEG_std) %>%
+  mutate(Group = "BB", Generation = "G1", Year = "2022")
+
+BO_mean_donor_traits_22_a <- BO_mean_donor_traits_22 %>%
+  dplyr::select(msm_all_std, fl_duration_std, d13C_SEG_std, corolla_diam_mm_SEG_std, SLA_SEG_std) %>%
+  mutate(Group = "BO", Generation = "G1", Year = "2022")
+
+HR_23_G2_weighted_by_23_a <- HR_23_G2_weighted_by_23 %>%
+  dplyr::select(msm_all_std_weighted23, fl_duration_std_weighted23, d13C_SEG_std_weighted23, corolla_diam_mm_SEG_std_weighted23, SLA_SEG_std_weighted23) %>%
+  rename_with(~ gsub("_weighted23", "", .x)) %>%
+  mutate(Group = "HR", Generation = "G2", Year = "2023")
+
+AC_23_G2_weighted_by_23_a <- AC_23_G2_weighted_by_23 %>%
+  dplyr::select(msm_all_std_weighted23, fl_duration_std_weighted23, d13C_SEG_std_weighted23, corolla_diam_mm_SEG_std_weighted23, SLA_SEG_std_weighted23) %>%
+  rename_with(~ gsub("_weighted23", "", .x)) %>%
+  mutate(Group = "AC", Generation = "G2", Year = "2023")
+
+BB_23_G2_weighted_by_23_a <- BB_23_G2_weighted_by_23 %>%
+  dplyr::select(msm_all_std_weighted23, fl_duration_std_weighted23, d13C_SEG_std_weighted23, corolla_diam_mm_SEG_std_weighted23, SLA_SEG_std_weighted23) %>%
+  rename_with(~ gsub("_weighted23", "", .x)) %>%
+  mutate(Group = "BB", Generation = "G2", Year = "2023")
+
+BO_23_G2_weighted_by_23_a <- BO_23_G2_weighted_by_23 %>%
+  dplyr::select(msm_all_std_weighted23, fl_duration_std_weighted23, d13C_SEG_std_weighted23, corolla_diam_mm_SEG_std_weighted23, SLA_SEG_std_weighted23) %>%
+  rename_with(~ gsub("_weighted23", "", .x)) %>%
+  mutate(Group = "BO", Generation = "G2", Year = "2023")
+
+# Combine all data
+combined_traits <- bind_rows(
+  HR_mean_donor_traits_22_a, AC_mean_donor_traits_22_a,
+  BB_mean_donor_traits_22_a, BO_mean_donor_traits_22_a,
+  HR_23_G2_weighted_by_23_a, AC_23_G2_weighted_by_23_a,
+  BB_23_G2_weighted_by_23_a, BO_23_G2_weighted_by_23_a
+)
+
+
+# Reshape into long format
+data_long <- combined_traits %>%
+  pivot_longer(
+    cols = c(msm_all_std, fl_duration_std, d13C_SEG_std, corolla_diam_mm_SEG_std, SLA_SEG_std),
+    names_to = "Trait",
+    values_to = "Value"
+  ) %>%
+  mutate(
+    Trait = recode(
+      Trait,
+      "msm_all_std" = "Mean Seed Mass",
+      "fl_duration_std" = "Flowering Duration",
+      "d13C_SEG_std" = "δ13C",
+      "corolla_diam_mm_SEG_std" = "Corolla Diameter",
+      "SLA_SEG_std" = "Specific Leaf Area"
+    )
+  )
+
+# Create the combined plot with adjusted x-axis limits
+frequency_dist_traits <- ggplot(data_long, aes(x = Value, fill = Generation)) +
+  geom_density(alpha = 0.7) +
+  facet_grid(Group ~ Trait, scales = "free_y") +
+  labs(
+    title = "Frequency Distribution of Traits with Responses to Selection",
+    x = "Trait Value",
+    y = "Density"
+  ) +
+  theme_minimal() +
+  theme(
+    legend.position = "top",
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    strip.text.y = element_text(angle = 0),
+    strip.text.x = element_text(face = "bold")
+  ) +
+  scale_fill_manual(values = c("G1" = "#ff6f61", "G2" = "#17becf")) +
+  scale_y_continuous(expand = c(0, 0)) +
+  scale_x_continuous(limits = c(-7, 7), expand = c(0, 0)) # Set x-axis limits
+
+frequency_dist_traits
+
+# Save the plot
+ggsave("combined_frequency_dist_G1_and_weighted_G2(23).png", plot = frequency_dist_traits, width = 12, height = 10, dpi = 300)
+
+```
+
+
+
+
+
+
+##$$$$$LETS TRY THIS AGAIN$$$$$$$$$$$$##
+
+
+```{r}
+AC_fit_22 <- read_csv(here::here("data_sheets", "compiled_sheets", "AC_fit_22.csv"))
+BB_fit_22 <- read_csv(here::here("data_sheets", "compiled_sheets", "BB_fit_22.csv"))
+BO_fit_22 <- read_csv(here::here("data_sheets", "compiled_sheets", "BO_fit_22.csv"))
+HR_fit_22 <- read_csv(here::here("data_sheets", "compiled_sheets", "HR_fit_22.csv"))
+
+AC_fit_23_G1 <- read_csv(here::here("data_sheets", "compiled_sheets", "AC_fit_23_G1.csv"))
+BB_fit_23_G1 <- read_csv(here::here("data_sheets", "compiled_sheets", "BB_fit_23_G1.csv"))
+BO_fit_23_G1 <- read_csv(here::here("data_sheets", "compiled_sheets", "BO_fit_23_G1.csv"))
+HR_fit_23_G1 <- read_csv(here::here("data_sheets", "compiled_sheets", "HR_fit_23_G1.csv"))
+
+AC_fit_23_G2 <- read_csv(here::here("data_sheets", "compiled_sheets", "AC_fit_23_G2.csv"))
+BB_fit_23_G2 <- read_csv(here::here("data_sheets", "compiled_sheets", "BB_fit_23_G2.csv"))
+BO_fit_23_G2 <- read_csv(here::here("data_sheets", "compiled_sheets", "BO_fit_23_G2.csv"))
+HR_fit_23_G2 <- read_csv(here::here("data_sheets", "compiled_sheets", "HR_fit_23_G2.csv"))
+```
+
+```{r}
+##Obtain paternal genotypic values - this is what we are interested in
+# Aggregate data by donor
+AC_mean_donor_traits_22 <- AC_fit_22 %>%
+  group_by(Donor) %>%  # Group by donor
+  summarise(
+    closed_fruits = mean(closed_fruits, na.rm = TRUE),
+    total_fruits = mean(total_fruits, na.rm = TRUE),
+    filled_seeds = mean(filled_seeds, na.rm = TRUE),
+    mean_seeds_per_fruit = mean(mean_seeds_per_fruit, na.rm = TRUE),
+    fl_duration = mean(fl_duration, na.rm = TRUE),
+    skel_dryweight_mg = mean(skel_dryweight_mg, na.rm = TRUE),
+    msm_all = mean(msm_all, na.rm = TRUE),
+    corolla_diam_mm_SEG = mean(corolla_diam_mm_SEG, na.rm = TRUE),
+    SLA_SEG = mean(SLA_SEG, na.rm = TRUE),
+    d13C_SEG = mean(d13C_SEG, na.rm = TRUE),
+    est_fecundity = mean(est_fecundity, na.rm = TRUE),
+    survival = mean(survival, na.rm = TRUE),
+    est_fitness = mean(est_fitness, na.rm = TRUE)
+
+) %>%
+  mutate(relative_fitness_22 = est_fitness / mean(est_fitness, na.rm = TRUE))
+
+
+
+# Aggregate data by donor
+AC_mean_donor_traits_23_G1 <- AC_fit_23_G1 %>%
+  group_by(Donor) %>%  # Group by donor
+  summarise(
+    closed_fruits = mean(closed_fruits, na.rm = TRUE),
+    total_fruits = mean(total_fruits, na.rm = TRUE),
+    filled_seeds = mean(filled_seeds, na.rm = TRUE),
+    mean_seeds_per_fruit = mean(mean_seeds_per_fruit, na.rm = TRUE),
+    fl_duration = mean(fl_duration, na.rm = TRUE),
+    skel_dryweight_mg = mean(skel_dryweight_mg, na.rm = TRUE),
+    msm_all = mean(msm_all, na.rm = TRUE),
+    corolla_diam_mm_SEG = mean(corolla_diam_mm_SEG, na.rm = TRUE),
+    SLA_SEG = mean(SLA_SEG, na.rm = TRUE),
+    d13C_SEG = mean(d13C_SEG, na.rm = TRUE),
+    est_fecundity = mean(est_fecundity, na.rm = TRUE),
+    survival = mean(survival, na.rm = TRUE),
+    est_fitness = mean(est_fitness, na.rm = TRUE),
+    g0_msm = mean (g0_msm, na.rm = TRUE)
+   ) %>%
+  mutate(relative_fitness_23_1 = est_fitness / mean(est_fitness, na.rm = TRUE))
+
+# Aggregate data by donor
+AC_mean_donor_traits_23_G2 <- AC_fit_23_G2 %>%
+  group_by(Donor) %>%  # Group by donor
+  summarise(
+    closed_fruits = mean(closed_fruits, na.rm = TRUE),
+    total_fruits = mean(total_fruits, na.rm = TRUE),
+    filled_seeds = mean(filled_seeds, na.rm = TRUE),
+    mean_seeds_per_fruit = mean(mean_seeds_per_fruit, na.rm = TRUE),
+    fl_duration = mean(fl_duration, na.rm = TRUE),
+    skel_dryweight_mg = mean(skel_dryweight_mg, na.rm = TRUE),
+    msm_all = mean(msm_all, na.rm = TRUE),
+    corolla_diam_mm_SEG = mean(corolla_diam_mm_SEG, na.rm = TRUE),
+    SLA_SEG = mean(SLA_SEG, na.rm = TRUE),
+    d13C_SEG = mean(d13C_SEG, na.rm = TRUE),
+    est_fecundity = mean(est_fecundity, na.rm = TRUE),
+    survival = mean(survival, na.rm = TRUE),
+    est_fitness = mean(est_fitness, na.rm = TRUE),
+    g0_msm = mean (g0_msm, na.rm = TRUE)
+   ) %>%
+  mutate(relative_fitness_23_2 = est_fitness / mean(est_fitness, na.rm = TRUE))
+
+
+# Join the two data frames
+AC_mean_donor_traits_23_G2 <- AC_mean_donor_traits_23_G2 %>%
+  left_join(
+    AC_mean_donor_traits_22 %>% dplyr::select(Donor, relative_fitness_22),  # Select only relevant columns
+    by = "Donor"
+  )
+
+# Weight each trait in 23_G2 by relative_fitness from 22
+AC_23_G2_weighted_by_22 <- AC_mean_donor_traits_23_G2 %>%
+  mutate(
+    across(
+      .cols = c(closed_fruits, total_fruits, filled_seeds, mean_seeds_per_fruit, 
+                fl_duration, skel_dryweight_mg, msm_all, corolla_diam_mm_SEG, 
+                SLA_SEG, d13C_SEG, est_fecundity, survival, g0_msm),  # Replace with actual trait columns
+      .fns = ~ . * relative_fitness_22,  # Multiply each trait by relative fitness
+      .names = "{.col}_weighted22"      # Add a suffix to the adjusted columns
+    )
+  )
+
+# Join the two data frames
+AC_mean_donor_traits_23_G2 <- AC_mean_donor_traits_23_G2 %>%
+  left_join(
+    AC_mean_donor_traits_23_G1 %>% dplyr::select(Donor, relative_fitness_23_1),  # Select only relevant columns
+    by = "Donor"
+  )
+
+# Weight each trait in 23_G2 by relative_fitness from 23
+AC_23_G2_weighted_by_23 <- AC_mean_donor_traits_23_G1 %>%
+  mutate(
+    across(
+      .cols = c(closed_fruits, total_fruits, filled_seeds, mean_seeds_per_fruit, 
+                fl_duration, skel_dryweight_mg, msm_all, corolla_diam_mm_SEG, 
+                SLA_SEG, d13C_SEG, est_fecundity, survival, g0_msm),  # Replace with actual trait columns
+      .fns = ~ . * relative_fitness_23_1,  # Multiply each trait by relative fitness
+      .names = "{.col}_weighted23"      # Add a suffix to the adjusted columns
+    )
+  )
+
+```
+
+
+
+
+
+```{r}
+##Obtain paternal genotypic values - this is what we are interested in
+# Aggregate data by donor
+BB_mean_donor_traits_22 <- BB_fit_22 %>%
+  group_by(Donor) %>%  # Group by donor
+  summarise(
+    closed_fruits = mean(closed_fruits, na.rm = TRUE),
+    total_fruits = mean(total_fruits, na.rm = TRUE),
+    filled_seeds = mean(filled_seeds, na.rm = TRUE),
+    mean_seeds_per_fruit = mean(mean_seeds_per_fruit, na.rm = TRUE),
+    fl_duration = mean(fl_duration, na.rm = TRUE),
+    skel_dryweight_mg = mean(skel_dryweight_mg, na.rm = TRUE),
+    msm_all = mean(msm_all, na.rm = TRUE),
+    corolla_diam_mm_SEG = mean(corolla_diam_mm_SEG, na.rm = TRUE),
+    SLA_SEG = mean(SLA_SEG, na.rm = TRUE),
+    d13C_SEG = mean(d13C_SEG, na.rm = TRUE),
+    est_fecundity = mean(est_fecundity, na.rm = TRUE),
+    survival = mean(survival, na.rm = TRUE),
+    est_fitness = mean(est_fitness, na.rm = TRUE),
+    g0_msm = mean (g0_msm, na.rm = TRUE)
+  ) %>%
+  mutate(relative_fitness_22 = est_fitness / mean(est_fitness, na.rm = TRUE))
+  
+
+
+
+# Aggregate data by donor
+BB_mean_donor_traits_23_G1 <- BB_fit_23_G1 %>%
+  group_by(Donor) %>%  # Group by donor
+  summarise(
+    closed_fruits = mean(closed_fruits, na.rm = TRUE),
+    total_fruits = mean(total_fruits, na.rm = TRUE),
+    filled_seeds = mean(filled_seeds, na.rm = TRUE),
+    mean_seeds_per_fruit = mean(mean_seeds_per_fruit, na.rm = TRUE),
+    fl_duration = mean(fl_duration, na.rm = TRUE),
+    skel_dryweight_mg = mean(skel_dryweight_mg, na.rm = TRUE),
+    msm_all = mean(msm_all, na.rm = TRUE),
+    corolla_diam_mm_SEG = mean(corolla_diam_mm_SEG, na.rm = TRUE),
+    SLA_SEG = mean(SLA_SEG, na.rm = TRUE),
+    d13C_SEG = mean(d13C_SEG, na.rm = TRUE),
+    est_fecundity = mean(est_fecundity, na.rm = TRUE),
+    survival = mean(survival, na.rm = TRUE),
+    est_fitness = mean(est_fitness, na.rm = TRUE),
+    g0_msm = mean (g0_msm, na.rm = TRUE)
+  ) %>%
+  mutate(relative_fitness_23_1 = est_fitness / mean(est_fitness, na.rm = TRUE))
+
+
+
+# Aggregate data by donor
+BB_mean_donor_traits_23_G2 <- BB_fit_23_G2 %>%
+  group_by(Donor) %>%  # Group by donor
+  summarise(
+    closed_fruits = mean(closed_fruits, na.rm = TRUE),
+    total_fruits = mean(total_fruits, na.rm = TRUE),
+    filled_seeds = mean(filled_seeds, na.rm = TRUE),
+    mean_seeds_per_fruit = mean(mean_seeds_per_fruit, na.rm = TRUE),
+    fl_duration = mean(fl_duration, na.rm = TRUE),
+    skel_dryweight_mg = mean(skel_dryweight_mg, na.rm = TRUE),
+    msm_all = mean(msm_all, na.rm = TRUE),
+    corolla_diam_mm_SEG = mean(corolla_diam_mm_SEG, na.rm = TRUE),
+    SLA_SEG = mean(SLA_SEG, na.rm = TRUE),
+    d13C_SEG = mean(d13C_SEG, na.rm = TRUE),
+    est_fecundity = mean(est_fecundity, na.rm = TRUE),
+    survival = mean(survival, na.rm = TRUE),
+    est_fitness = mean(est_fitness, na.rm = TRUE),
+    g0_msm = mean (g0_msm, na.rm = TRUE)
+  ) %>%
+  mutate(relative_fitness_23_2 = est_fitness / mean(est_fitness, na.rm = TRUE))
+  
+
+
+# Join the two data frames
+BB_mean_donor_traits_23_G2 <- BB_mean_donor_traits_23_G2 %>%
+  left_join(
+    BB_mean_donor_traits_22 %>% dplyr::select(Donor, relative_fitness_22),  # Select only relevant columns
+    by = "Donor"
+  )
+
+# Weight each trait in 23_G2 by relative_fitness from 22
+BB_23_G2_weighted_by_22 <- BB_mean_donor_traits_23_G2 %>%
+  mutate(
+    across(
+      .cols = c(closed_fruits, total_fruits, filled_seeds, mean_seeds_per_fruit, 
+                fl_duration, skel_dryweight_mg, msm_all, corolla_diam_mm_SEG, 
+                SLA_SEG, d13C_SEG, est_fecundity, survival, g0_msm),  # Replace with actual trait columns
+      .fns = ~ . * relative_fitness_22,  # Multiply each trait by relative fitness
+      .names = "{.col}_weighted22"      # Add a suffix to the adjusted columns
+    )
+  )
+
+# Join the two data frames
+BB_mean_donor_traits_23_G2 <- BB_mean_donor_traits_23_G2 %>%
+  left_join(
+    BB_mean_donor_traits_23_G1 %>% dplyr::select(Donor, relative_fitness_23_1),  # Select only relevant columns
+    by = "Donor"
+  )
+
+# Weight each trait in 23_G2 by relative_fitness from 23
+BB_23_G2_weighted_by_23 <- BB_mean_donor_traits_23_G2 %>%
+  mutate(
+    across(
+      .cols = c(closed_fruits, total_fruits, filled_seeds, mean_seeds_per_fruit, 
+                fl_duration, skel_dryweight_mg, msm_all, corolla_diam_mm_SEG, 
+                SLA_SEG, d13C_SEG, est_fecundity, survival, g0_msm),  # Replace with actual trait columns
+      .fns = ~ . * relative_fitness_23_1,  # Multiply each trait by relative fitness
+      .names = "{.col}_weighted23"      # Add a suffix to the adjusted columns
+    )
+  )
+
+```
+
+
+```{r}
+##Obtain paternal genotypic values - this is what we are interested in
+# Aggregate data by donor
+BO_mean_donor_traits_22 <- BO_fit_22 %>%
+  group_by(Donor) %>%  # Group by donor
+  summarise(
+    closed_fruits = mean(closed_fruits, na.rm = TRUE),
+    total_fruits = mean(total_fruits, na.rm = TRUE),
+    filled_seeds = mean(filled_seeds, na.rm = TRUE),
+    mean_seeds_per_fruit = mean(mean_seeds_per_fruit, na.rm = TRUE),
+    fl_duration = mean(fl_duration, na.rm = TRUE),
+    skel_dryweight_mg = mean(skel_dryweight_mg, na.rm = TRUE),
+    msm_all = mean(msm_all, na.rm = TRUE),
+    corolla_diam_mm_SEG = mean(corolla_diam_mm_SEG, na.rm = TRUE),
+    SLA_SEG = mean(SLA_SEG, na.rm = TRUE),
+    d13C_SEG = mean(d13C_SEG, na.rm = TRUE),
+    est_fecundity = mean(est_fecundity, na.rm = TRUE),
+    survival = mean(survival, na.rm = TRUE),
+    est_fitness = mean(est_fitness, na.rm = TRUE),
+    g0_msm = mean (g0_msm, na.rm = TRUE)    
+  ) %>%
+  mutate(relative_fitness_22 = est_fitness / mean(est_fitness, na.rm = TRUE))
+  
+
+
+
+# Aggregate data by donor
+BO_mean_donor_traits_23_G1 <- BO_fit_23_G1 %>%
+  group_by(Donor) %>%  # Group by donor
+  summarise(
+    closed_fruits = mean(closed_fruits, na.rm = TRUE),
+    total_fruits = mean(total_fruits, na.rm = TRUE),
+    filled_seeds = mean(filled_seeds, na.rm = TRUE),
+    mean_seeds_per_fruit = mean(mean_seeds_per_fruit, na.rm = TRUE),
+    fl_duration = mean(fl_duration, na.rm = TRUE),
+    skel_dryweight_mg = mean(skel_dryweight_mg, na.rm = TRUE),
+    msm_all = mean(msm_all, na.rm = TRUE),
+    corolla_diam_mm_SEG = mean(corolla_diam_mm_SEG, na.rm = TRUE),
+    SLA_SEG = mean(SLA_SEG, na.rm = TRUE),
+    d13C_SEG = mean(d13C_SEG, na.rm = TRUE),
+    est_fecundity = mean(est_fecundity, na.rm = TRUE),
+    survival = mean(survival, na.rm = TRUE),
+    est_fitness = mean(est_fitness, na.rm = TRUE),
+    g0_msm = mean (g0_msm, na.rm = TRUE)
+  ) %>%
+  mutate(relative_fitness_23_1 = est_fitness / mean(est_fitness, na.rm = TRUE))
+
+
+
+# Aggregate data by donor
+BO_mean_donor_traits_23_G2 <- BO_fit_23_G2 %>%
+  group_by(Donor) %>%  # Group by donor
+  summarise(
+    closed_fruits = mean(closed_fruits, na.rm = TRUE),
+    total_fruits = mean(total_fruits, na.rm = TRUE),
+    filled_seeds = mean(filled_seeds, na.rm = TRUE),
+    mean_seeds_per_fruit = mean(mean_seeds_per_fruit, na.rm = TRUE),
+    fl_duration = mean(fl_duration, na.rm = TRUE),
+    skel_dryweight_mg = mean(skel_dryweight_mg, na.rm = TRUE),
+    msm_all = mean(msm_all, na.rm = TRUE),
+    corolla_diam_mm_SEG = mean(corolla_diam_mm_SEG, na.rm = TRUE),
+    SLA_SEG = mean(SLA_SEG, na.rm = TRUE),
+    d13C_SEG = mean(d13C_SEG, na.rm = TRUE),
+    est_fecundity = mean(est_fecundity, na.rm = TRUE),
+    survival = mean(survival, na.rm = TRUE),
+    est_fitness = mean(est_fitness, na.rm = TRUE),
+   g0_msm = mean (g0_msm, na.rm = TRUE)
+  ) %>%
+  mutate(relative_fitness_23_2 = est_fitness / mean(est_fitness, na.rm = TRUE))
+
+
+# Join the two data frames
+BO_mean_donor_traits_23_G2 <- BO_mean_donor_traits_23_G2 %>%
+  left_join(
+    BO_mean_donor_traits_22 %>% dplyr::select(Donor, relative_fitness_22),  # Select only relevant columns
+    by = "Donor"
+  )
+
+# Weight each trait in 23_G2 by relative_fitness from 22
+BO_23_G2_weighted_by_22 <- BO_mean_donor_traits_23_G2 %>%
+  mutate(
+    across(
+      .cols = c(closed_fruits, total_fruits, filled_seeds, mean_seeds_per_fruit, 
+                fl_duration, skel_dryweight_mg, msm_all, corolla_diam_mm_SEG, 
+                SLA_SEG, d13C_SEG, est_fecundity, survival, g0_msm),  # Replace with actual trait columns
+      .fns = ~ . * relative_fitness_22,  # Multiply each trait by relative fitness
+      .names = "{.col}_weighted22"      # Add a suffix to the adjusted columns
+    )
+  )
+
+BO_mean_donor_traits_23_G2 <- BO_mean_donor_traits_23_G2 %>%
+  left_join(
+    BO_mean_donor_traits_23_G1 %>% dplyr::select(Donor, relative_fitness_23_1),  # Select only relevant columns
+    by = "Donor"
+  )
+
+
+# Weight each trait in 23_G2 by relative_fitness from 23
+BO_23_G2_weighted_by_23 <- BO_mean_donor_traits_23_G1 %>%
+  mutate(
+    across(
+      .cols = c(closed_fruits, total_fruits, filled_seeds, mean_seeds_per_fruit, 
+                fl_duration, skel_dryweight_mg, msm_all, corolla_diam_mm_SEG, 
+                SLA_SEG, d13C_SEG, est_fecundity, survival, g0_msm),  # Replace with actual trait columns
+      .fns = ~ . * relative_fitness_23_1,  # Multiply each trait by relative fitness
+      .names = "{.col}_weighted23"      # Add a suffix to the adjusted columns
+    )
+  )
+
+```
+
+
+```{r}
+##Obtain paternal genotypic values - this is what we are interested in
+# Aggregate data by donor
+HR_mean_donor_traits_22 <- HR_fit_22 %>%
+  group_by(Donor) %>%  # Group by donor
+  summarise(
+    closed_fruits = mean(closed_fruits, na.rm = TRUE),
+    total_fruits = mean(total_fruits, na.rm = TRUE),
+    filled_seeds = mean(filled_seeds, na.rm = TRUE),
+    mean_seeds_per_fruit = mean(mean_seeds_per_fruit, na.rm = TRUE),
+    fl_duration = mean(fl_duration, na.rm = TRUE),
+    skel_dryweight_mg = mean(skel_dryweight_mg, na.rm = TRUE),
+    msm_all = mean(msm_all, na.rm = TRUE),
+    corolla_diam_mm_SEG = mean(corolla_diam_mm_SEG, na.rm = TRUE),
+    SLA_SEG = mean(SLA_SEG, na.rm = TRUE),
+    d13C_SEG = mean(d13C_SEG, na.rm = TRUE),
+    est_fecundity = mean(est_fecundity, na.rm = TRUE),
+    survival = mean(survival, na.rm = TRUE),
+    est_fitness = mean(est_fitness, na.rm = TRUE),
+        g0_msm = mean (g0_msm, na.rm = TRUE)
+  ) %>%
+  mutate(relative_fitness_22 = est_fitness / mean(est_fitness, na.rm = TRUE))
+
+  
+
+
+
+# Aggregate data by donor
+HR_mean_donor_traits_23_G1 <- HR_fit_23_G1 %>%
+  group_by(Donor) %>%  # Group by donor
+  summarise(
+    closed_fruits = mean(closed_fruits, na.rm = TRUE),
+    total_fruits = mean(total_fruits, na.rm = TRUE),
+    filled_seeds = mean(filled_seeds, na.rm = TRUE),
+    mean_seeds_per_fruit = mean(mean_seeds_per_fruit, na.rm = TRUE),
+    fl_duration = mean(fl_duration, na.rm = TRUE),
+    skel_dryweight_mg = mean(skel_dryweight_mg, na.rm = TRUE),
+    msm_all = mean(msm_all, na.rm = TRUE),
+    corolla_diam_mm_SEG = mean(corolla_diam_mm_SEG, na.rm = TRUE),
+    SLA_SEG = mean(SLA_SEG, na.rm = TRUE),
+    d13C_SEG = mean(d13C_SEG, na.rm = TRUE),
+    est_fecundity = mean(est_fecundity, na.rm = TRUE),
+    survival = mean(survival, na.rm = TRUE),
+    est_fitness = mean(est_fitness, na.rm = TRUE),
+        g0_msm = mean (g0_msm, na.rm = TRUE)
+   ) %>%
+  mutate(relative_fitness_23_1 = est_fitness / mean(est_fitness, na.rm = TRUE))
+
+
+
+# Aggregate data by donor
+HR_mean_donor_traits_23_G2 <- HR_fit_23_G2 %>%
+  group_by(Donor) %>%  # Group by donor
+  summarise(
+    closed_fruits = mean(closed_fruits, na.rm = TRUE),
+    total_fruits = mean(total_fruits, na.rm = TRUE),
+    filled_seeds = mean(filled_seeds, na.rm = TRUE),
+    mean_seeds_per_fruit = mean(mean_seeds_per_fruit, na.rm = TRUE),
+    fl_duration = mean(fl_duration, na.rm = TRUE),
+    skel_dryweight_mg = mean(skel_dryweight_mg, na.rm = TRUE),
+    msm_all = mean(msm_all, na.rm = TRUE),
+    corolla_diam_mm_SEG = mean(corolla_diam_mm_SEG, na.rm = TRUE),
+    SLA_SEG = mean(SLA_SEG, na.rm = TRUE),
+    d13C_SEG = mean(d13C_SEG, na.rm = TRUE),
+    est_fecundity = mean(est_fecundity, na.rm = TRUE),
+    survival = mean(survival, na.rm = TRUE),
+    est_fitness = mean(est_fitness, na.rm = TRUE),
+        g0_msm = mean (g0_msm, na.rm = TRUE)
+   ) %>%
+  mutate(relative_fitness_23_2 = est_fitness / mean(est_fitness, na.rm = TRUE))
+  
+
+
+# Join the two data frames
+HR_mean_donor_traits_23_G2 <- HR_mean_donor_traits_23_G2 %>%
+  left_join(
+    HR_mean_donor_traits_22 %>% dplyr::select(Donor, relative_fitness_22),  # Select only relevant columns
+    by = "Donor"
+  )
+
+# Weight each trait in 23_G2 by relative_fitness from 22
+HR_23_G2_weighted_by_22 <- HR_mean_donor_traits_23_G2 %>%
+  mutate(
+    across(
+      .cols = c(closed_fruits, total_fruits, filled_seeds, mean_seeds_per_fruit, 
+                fl_duration, skel_dryweight_mg, msm_all, corolla_diam_mm_SEG, 
+                SLA_SEG, d13C_SEG, est_fecundity, survival, g0_msm),  # Replace with actual trait columns
+      .fns = ~ . * relative_fitness_22,  # Multiply each trait by relative fitness
+      .names = "{.col}_weighted22"      # Add a suffix to the adjusted columns
+    )
+  )
+
+HR_mean_donor_traits_23_G2 <- HR_mean_donor_traits_23_G2 %>%
+  left_join(
+    HR_mean_donor_traits_23_G1 %>% dplyr::select(Donor, relative_fitness_23_1),  # Select only relevant columns
+    by = "Donor"
+  )
+
+# Weight each trait in 23_G2 by relative_fitness from 23
+HR_23_G2_weighted_by_23 <- HR_mean_donor_traits_23_G1 %>%
+  mutate(
+    across(
+      .cols = c(closed_fruits, total_fruits, filled_seeds, mean_seeds_per_fruit, 
+                fl_duration, skel_dryweight_mg, msm_all, corolla_diam_mm_SEG, 
+                SLA_SEG, d13C_SEG, est_fecundity, survival, g0_msm),  # Replace with actual trait columns
+      .fns = ~ . * relative_fitness_23_1,  # Multiply each trait by relative fitness
+      .names = "{.col}_weighted23"      # Add a suffix to the adjusted columns
+    )
+  )
+
+```
+
+
+
+```{r}
+# Join the two data frames
+AC_mean_donor_traits_23_G2 <- AC_mean_donor_traits_23_G2 %>%
+  left_join(
+    HR_mean_donor_traits_22 %>% dplyr::select(Donor, relative_fitness_22),  # Select only relevant columns
+    by = "Donor"
+  )
+
+# Weight each trait in 23_G2 by relative_fitness from 22
+AC_23_G2_weighted_by_22 <- AC_mean_donor_traits_23_G2 %>%
+  mutate(
+    across(
+      .cols = c(closed_fruits, total_fruits, filled_seeds, mean_seeds_per_fruit, 
+                fl_duration, skel_dryweight_mg, msm_all, corolla_diam_mm_SEG, 
+                SLA_SEG, d13C_SEG, est_fecundity, survival),  # Replace with actual trait columns
+      .fns = ~ . * relative_fitness_22,  # Multiply each trait by relative fitness
+      .names = "{.col}_weighted22"      # Add a suffix to the adjusted columns
+    )
+  )
+
+# Join the two data frames
+BB_mean_donor_traits_23_G2 <- BB_mean_donor_traits_23_G2 %>%
+  left_join(
+    HR_mean_donor_traits_22 %>% dplyr::select(Donor, relative_fitness_22),  # Select only relevant columns
+    by = "Donor"
+  )
+
+# Weight each trait in 23_G2 by relative_fitness from 22
+BB_23_G2_weighted_by_22 <- BB_mean_donor_traits_23_G2 %>%
+  mutate(
+    across(
+      .cols = c(closed_fruits, total_fruits, filled_seeds, mean_seeds_per_fruit, 
+                fl_duration, skel_dryweight_mg, msm_all, corolla_diam_mm_SEG, 
+                SLA_SEG, d13C_SEG, est_fecundity, survival),  # Replace with actual trait columns
+      .fns = ~ . * relative_fitness_22,  # Multiply each trait by relative fitness
+      .names = "{.col}_weighted22"      # Add a suffix to the adjusted columns
+    )
+  )
+
+# Join the two data frames
+BO_mean_donor_traits_23_G2 <- BO_mean_donor_traits_23_G2 %>%
+  left_join(
+    HR_mean_donor_traits_22 %>% dplyr::select(Donor, relative_fitness_22),  # Select only relevant columns
+    by = "Donor"
+  )
+
+# Weight each trait in 23_G2 by relative_fitness from 22
+BO_23_G2_weighted_by_22 <- BO_mean_donor_traits_23_G2 %>%
+  mutate(
+    across(
+      .cols = c(closed_fruits, total_fruits, filled_seeds, mean_seeds_per_fruit, 
+                fl_duration, skel_dryweight_mg, msm_all, corolla_diam_mm_SEG, 
+                SLA_SEG, d13C_SEG, est_fecundity, survival),  # Replace with actual trait columns
+      .fns = ~ . * relative_fitness_22,  # Multiply each trait by relative fitness
+      .names = "{.col}_weighted22"      # Add a suffix to the adjusted columns
+    )
+  )
+
+# Join the two data frames
+HR_mean_donor_traits_23_G2 <- HR_mean_donor_traits_23_G2 %>%
+  left_join(
+    HR_mean_donor_traits_22 %>% dplyr::select(Donor, relative_fitness_22),  # Select only relevant columns
+    by = "Donor"
+  )
+
+# Weight each trait in 23_G2 by relative_fitness from 22
+HR_23_G2_weighted_by_22 <- HR_mean_donor_traits_23_G2 %>%
+  mutate(
+    across(
+      .cols = c(closed_fruits, total_fruits, filled_seeds, mean_seeds_per_fruit, 
+                fl_duration, skel_dryweight_mg, msm_all, corolla_diam_mm_SEG, 
+                SLA_SEG, d13C_SEG, est_fecundity, survival),  # Replace with actual trait columns
+      .fns = ~ . * relative_fitness_22,  # Multiply each trait by relative fitness
+      .names = "{.col}_weighted22"      # Add a suffix to the adjusted columns
+    )
+  )
+```
+
+
+Comparing g1 2022 and g1 2023 with paternal trait means
+```{r}
+# Add Year column and combine G1 2022 and G1 2023 data
+HR_mean_donor_traits_22_a <- HR_mean_donor_traits_22 %>%
+  dplyr::select(msm_all, fl_duration, d13C_SEG, corolla_diam_mm_SEG, SLA_SEG, g0_msm) %>%
+  mutate(Group = "HR", Year = "2022")
+
+AC_mean_donor_traits_22_a <- AC_mean_donor_traits_22 %>%
+  dplyr::select(msm_all, fl_duration, d13C_SEG, corolla_diam_mm_SEG, SLA_SEG, g0_msm) %>%
+  mutate(Group = "AC", Year = "2022")
+
+BB_mean_donor_traits_22_a <- BB_mean_donor_traits_22 %>%
+  dplyr::select(msm_all, fl_duration, d13C_SEG, corolla_diam_mm_SEG, SLA_SEG, g0_msm) %>%
+  mutate(Group = "BB", Year = "2022")
+
+BO_mean_donor_traits_22_a <- BO_mean_donor_traits_22 %>%
+  dplyr::select(msm_all, fl_duration, d13C_SEG, corolla_diam_mm_SEG, SLA_SEG, g0_msm) %>%
+  mutate(Group = "BO", Year = "2022")
+
+HR_mean_donor_traits_23_G1_a <- HR_mean_donor_traits_23_G1 %>%
+  dplyr::select(msm_all, fl_duration, d13C_SEG, corolla_diam_mm_SEG, SLA_SEG, g0_msm) %>%
+  mutate(Group = "HR", Year = "2023")
+
+AC_mean_donor_traits_23_G1_a <- AC_mean_donor_traits_23_G1 %>%
+  dplyr::select(msm_all, fl_duration, d13C_SEG, corolla_diam_mm_SEG, SLA_SEG, g0_msm) %>%
+  mutate(Group = "AC", Year = "2023")
+
+BB_mean_donor_traits_23_G1_a <- BB_mean_donor_traits_23_G1 %>%
+  dplyr::select(msm_all, fl_duration, d13C_SEG, corolla_diam_mm_SEG, SLA_SEG, g0_msm) %>%
+  mutate(Group = "BB", Year = "2023")
+
+BO_mean_donor_traits_23_G1_a <- BO_mean_donor_traits_23_G1 %>%
+  dplyr::select(msm_all, fl_duration, d13C_SEG, corolla_diam_mm_SEG, SLA_SEG, g0_msm) %>%
+  mutate(Group = "BO", Year = "2023")
+
+
+# Combine all datasets
+combined_traits <- bind_rows(
+  HR_mean_donor_traits_22_a, AC_mean_donor_traits_22_a,
+  BB_mean_donor_traits_22_a, BO_mean_donor_traits_22_a,
+  HR_mean_donor_traits_23_G1_a, AC_mean_donor_traits_23_G1_a,
+  BB_mean_donor_traits_23_G1_a, BO_mean_donor_traits_23_G1_a
+)
+
+# Convert data to long format
+data_long <- combined_traits %>%
+  pivot_longer(cols = c(msm_all, fl_duration, d13C_SEG, corolla_diam_mm_SEG, SLA_SEG, g0_msm),
+               names_to = "Trait",
+               values_to = "Value")
+
+# Convert Value to numeric
+data_long <- data_long %>% mutate(Value = as.numeric(Value))
+
+# Rename Trait values for readability
+data_long <- data_long %>%
+  mutate(
+    Trait = recode(
+      Trait,
+      "msm_all" = "Mean Seed Mass",
+      "fl_duration" = "Flowering Duration",
+      "d13C_SEG" = "δ13C",
+      "corolla_diam_mm_SEG" = "Corolla Diameter",
+      "SLA_SEG" = "Specific Leaf Area",
+      "g0_msm" = "Sewn Seed Mass"
+    )
+  )
+
+# # Create the density plot
+# frequency_dist_traits <- ggplot(data_long, aes(x = Value, fill = Year)) +
+#   geom_density(alpha = 0.6) +
+#   facet_grid(Group ~ Trait, scales = "free_y") +
+#   labs(
+#     title = "Frequency Distribution of Traits for G1 (2022 vs 2023)",
+#     x = "Trait Value",
+#     y = "Density"
+#   ) +
+#   theme_minimal() +
+#   theme(
+#     legend.position = "top",
+#     panel.grid.major = element_blank(),
+#     panel.grid.minor = element_blank(),
+#     strip.text.y = element_text(angle = 0),
+#     strip.text.x = element_text(face = "bold")
+#   ) +
+#   scale_fill_manual(values = c("2022" = "#ff6f61", "2023" = "#17becf")) +
+#   scale_y_continuous(expand = c(0, 0))
+# 
+# # Print and save the plot
+# print(frequency_dist_traits)
+# ggsave("combined_frequency_dist_G1_2022_vs_2023.png", plot = frequency_dist_traits, width = 12, height = 10, dpi = 300)
+
+
+
+# Define axis limits for each trait
+x_limits <- list(
+  "Mean Seed Mass" = c(0, 20),
+  "Flowering Duration" = c(0, 90),
+  "δ13C" = c(-35, -25),
+  "Corolla Diameter" = c(0, 40),
+  "Specific Leaf Area" = c(0, 40),
+  "Sewn Seed Mass" = c(0, 10)
+)
+
+
+
+# Create individual density plots for each trait
+plots <- lapply(unique(data_long$Trait), function(trait) {
+  ggplot(filter(data_long, Trait == trait), aes(x = Value, fill = Year)) +
+    geom_density(alpha = 0.6) +
+    facet_grid(Group ~ Trait, scales = "free_y") +
+    labs(
+      title = paste("Distribution of", trait, "for 2022 and 2023"),
+      x = "Trait Value",
+      y = "Density"
+    ) +
+    theme_minimal() +
+    theme(
+      legend.position = "top",
+      panel.grid.major = element_blank(),
+      panel.grid.minor = element_blank(),
+      strip.text.y = element_text(angle = 0),
+      strip.text.x = element_text(face = "bold")
+    ) +
+    scale_fill_manual(values = c("2022" = "#ff6f61", "2023" = "#17becf")) +
+    scale_y_continuous(expand = c(0, 0)) +
+    scale_x_continuous(limits = x_limits[[trait]])
+})
+
+
+
+# Combine and display all plots
+combined_plot <- wrap_plots(plots)
+print(combined_plot)
+
+# Save the combined plot
+ggsave("frequency_dist_2022_vs_2023_weighted_fixed_axes.png", plot = combined_plot, width = 12, height = 10, dpi = 300)
+
+```
+
+
+
+
+Comparing g1 2022 and g2 2023 (weighted with g1 2022) with scaled paternal trait means
+```{r}
+
+# Add Generation column and combine G1 2022 and G2 weighted by 2022
+HR_mean_donor_traits_22_a <- HR_mean_donor_traits_22 %>%
+  dplyr::select(msm_all, fl_duration, d13C_SEG, corolla_diam_mm_SEG, SLA_SEG, g0_msm) %>%
+  mutate(Group = "HR", Generation = "G1", Year = "2022")
+
+AC_mean_donor_traits_22_a <- AC_mean_donor_traits_22 %>%
+  dplyr::select(msm_all, fl_duration, d13C_SEG, corolla_diam_mm_SEG, SLA_SEG, g0_msm) %>%
+  mutate(Group = "AC", Generation = "G1", Year = "2022")
+
+BB_mean_donor_traits_22_a <- BB_mean_donor_traits_22 %>%
+  dplyr::select(msm_all, fl_duration, d13C_SEG, corolla_diam_mm_SEG, SLA_SEG, g0_msm) %>%
+  mutate(Group = "BB", Generation = "G1", Year = "2022")
+
+BO_mean_donor_traits_22_a <- BO_mean_donor_traits_22 %>%
+  dplyr::select(msm_all, fl_duration, d13C_SEG, corolla_diam_mm_SEG, SLA_SEG, g0_msm) %>%
+  mutate(Group = "BO", Generation = "G1", Year = "2022")
+
+HR_23_G2_weighted_by_22_a <- HR_23_G2_weighted_by_22 %>%
+  dplyr::select(msm_all_weighted22, fl_duration_weighted22, d13C_SEG_weighted22, corolla_diam_mm_SEG_weighted22, SLA_SEG_weighted22, g0_msm_weighted22) %>%
+  rename_with(~ gsub("_weighted22", "", .x)) %>%
+  mutate(Group = "HR", Generation = "G2", Year = "2023")
+
+AC_23_G2_weighted_by_22_a <- AC_23_G2_weighted_by_22 %>%
+  dplyr::select(msm_all_weighted22, fl_duration_weighted22, d13C_SEG_weighted22, corolla_diam_mm_SEG_weighted22, SLA_SEG_weighted22, g0_msm_weighted22) %>%
+  rename_with(~ gsub("_weighted22", "", .x)) %>%
+  mutate(Group = "AC", Generation = "G2", Year = "2023")
+
+BB_23_G2_weighted_by_22_a <- BB_23_G2_weighted_by_22 %>%
+  dplyr::select(msm_all_weighted22, fl_duration_weighted22, d13C_SEG_weighted22, corolla_diam_mm_SEG_weighted22, SLA_SEG_weighted22, g0_msm_weighted22) %>%
+  rename_with(~ gsub("_weighted22", "", .x)) %>%
+  mutate(Group = "BB", Generation = "G2", Year = "2023")
+
+BO_23_G2_weighted_by_22_a <- BO_23_G2_weighted_by_22 %>%
+  dplyr::select(msm_all_weighted22, fl_duration_weighted22, d13C_SEG_weighted22, corolla_diam_mm_SEG_weighted22, SLA_SEG_weighted22, g0_msm_weighted22) %>%
+  rename_with(~ gsub("_weighted22", "", .x)) %>%
+  mutate(Group = "BO", Generation = "G2", Year = "2023")
+
+# Combine all data
+combined_traits <- bind_rows(
+  HR_mean_donor_traits_22_a, AC_mean_donor_traits_22_a,
+  BB_mean_donor_traits_22_a, BO_mean_donor_traits_22_a,
+  HR_23_G2_weighted_by_22_a, AC_23_G2_weighted_by_22_a,
+  BB_23_G2_weighted_by_22_a, BO_23_G2_weighted_by_22_a
+)
+# Convert data to long format
+data_long <- combined_traits %>%
+  pivot_longer(cols = c(msm_all, fl_duration, d13C_SEG, corolla_diam_mm_SEG, SLA_SEG),
+               names_to = "Trait",
+               values_to = "Value")
+
+# Convert Value to numeric
+data_long <- data_long %>% mutate(Value = as.numeric(Value))
+
+# Rename Trait values for readability
+data_long <- data_long %>%
+  mutate(
+    Trait = recode(
+      Trait,
+      "msm_all" = "Mean Seed Mass",
+      "fl_duration" = "Flowering Duration",
+      "d13C_SEG" = "δ13C",
+      "corolla_diam_mm_SEG" = "Corolla Diameter",
+      "SLA_SEG" = "Specific Leaf Area"
+    )
+  )
+
+# # Create the density plot
+# frequency_dist_traits <- ggplot(data_long, aes(x = Value, fill = Generation)) +
+#   geom_density(alpha = 0.6) +
+#   facet_grid(Group ~ Trait, scales = "free_y") +
+#   labs(
+#     title = "Frequency Distribution of Traits for G1 2022 vs G2 2023 (weighted by G1)",
+#     x = "Trait Value",
+#     y = "Density"
+#   ) +
+#   theme_minimal() +
+#   theme(
+#     legend.position = "top",
+#     panel.grid.major = element_blank(),
+#     panel.grid.minor = element_blank(),
+#     strip.text.y = element_text(angle = 0),
+#     strip.text.x = element_text(face = "bold")
+#   ) +
+#   scale_fill_manual(values = c("G1" = "#ff6f61", "G2" = "#17becf")) +
+#   scale_y_continuous(expand = c(0, 0))
+# 
+# # Print and save the plot
+# print(frequency_dist_traits)
+# ggsave("combined_frequency_dist_G1_2022_vs_G2_2023(weightG122).png", plot = frequency_dist_traits, width = 12, height = 10, dpi = 300)
+
+# Define axis limits for each trait
+x_limits <- list(
+  "Mean Seed Mass" = c(0, 20),
+  "Flowering Duration" = c(0, 70),
+  "δ13C" = c(-35, -25),
+  "Corolla Diameter" = c(0, 40),
+  "Specific Leaf Area" = c(0, 40)
+)
+
+# Create individual density plots for each trait
+plots <- lapply(unique(data_long$Trait), function(trait) {
+  ggplot(filter(data_long, Trait == trait), aes(x = Value, fill = Generation)) +
+    geom_density(alpha = 0.6) +
+    facet_grid(Group ~ Trait, scales = "free_y") +
+    labs(
+      title = paste("Distribution of", trait, "for G1 and G2"),
+      x = "Trait Value",
+      y = "Density"
+    ) +
+    theme_minimal() +
+    theme(
+      legend.position = "top",
+      panel.grid.major = element_blank(),
+      panel.grid.minor = element_blank(),
+      strip.text.y = element_text(angle = 0),
+      strip.text.x = element_text(face = "bold")
+    ) +
+    scale_fill_manual(values = c("G1" = "#ff6f61", "G2" = "#17becf")) +
+    scale_y_continuous(expand = c(0, 0)) +
+    scale_x_continuous(limits = x_limits[[trait]])
+})
+
+# Combine and display all plots
+combined_plot <- wrap_plots(plots)
+print(combined_plot)
+
+# Save the combined plot
+ggsave("frequency_dist_G1_vs_G2_weighted(22)_fixed_axes.png", plot = combined_plot, width = 12, height = 10, dpi = 300)
+
+```
+
+
+
+Comparing g1 2022 and g2 2023 (weighted with g1 2023) with scaled paternal trait means
+```{r}
+# Add Generation column and combine G1 2022 and G2 weighted by 2022
+HR_mean_donor_traits_22_a <- HR_mean_donor_traits_22 %>%
+  dplyr::select(msm_all, fl_duration, d13C_SEG, corolla_diam_mm_SEG, SLA_SEG) %>%
+  mutate(Group = "HR", Generation = "G1", Year = "2022")
+
+AC_mean_donor_traits_22_a <- AC_mean_donor_traits_22 %>%
+  dplyr::select(msm_all, fl_duration, d13C_SEG, corolla_diam_mm_SEG, SLA_SEG) %>%
+  mutate(Group = "AC", Generation = "G1", Year = "2022")
+
+BB_mean_donor_traits_22_a <- BB_mean_donor_traits_22 %>%
+  dplyr::select(msm_all, fl_duration, d13C_SEG, corolla_diam_mm_SEG, SLA_SEG) %>%
+  mutate(Group = "BB", Generation = "G1", Year = "2022")
+
+BO_mean_donor_traits_22_a <- BO_mean_donor_traits_22 %>%
+  dplyr::select(msm_all, fl_duration, d13C_SEG, corolla_diam_mm_SEG, SLA_SEG) %>%
+  mutate(Group = "BO", Generation = "G1", Year = "2022")
+
+HR_23_G2_weighted_by_23_a <- HR_23_G2_weighted_by_23 %>%
+  dplyr::select(msm_all_weighted23, fl_duration_weighted23, d13C_SEG_weighted23, corolla_diam_mm_SEG_weighted23, SLA_SEG_weighted23) %>%
+  rename_with(~ gsub("_weighted23", "", .x)) %>%
+  mutate(Group = "HR", Generation = "G2", Year = "2023")
+
+AC_23_G2_weighted_by_23_a <- AC_23_G2_weighted_by_23 %>%
+  dplyr::select(msm_all_weighted23, fl_duration_weighted23, d13C_SEG_weighted23, corolla_diam_mm_SEG_weighted23, SLA_SEG_weighted23) %>%
+  rename_with(~ gsub("_weighted23", "", .x)) %>%
+  mutate(Group = "AC", Generation = "G2", Year = "2023")
+
+BB_23_G2_weighted_by_23_a <- BB_23_G2_weighted_by_23 %>%
+  dplyr::select(msm_all_weighted23, fl_duration_weighted23, d13C_SEG_weighted23, corolla_diam_mm_SEG_weighted23, SLA_SEG_weighted23) %>%
+  rename_with(~ gsub("_weighted23", "", .x)) %>%
+  mutate(Group = "BB", Generation = "G2", Year = "2023")
+
+BO_23_G2_weighted_by_23_a <- BO_23_G2_weighted_by_23 %>%
+  dplyr::select(msm_all_weighted23, fl_duration_weighted23, d13C_SEG_weighted23, corolla_diam_mm_SEG_weighted23, SLA_SEG_weighted23) %>%
+  rename_with(~ gsub("_weighted23", "", .x)) %>%
+  mutate(Group = "BO", Generation = "G2", Year = "2023")
+
+# Combine all data
+combined_traits <- bind_rows(
+  HR_mean_donor_traits_22_a, AC_mean_donor_traits_22_a,
+  BB_mean_donor_traits_22_a, BO_mean_donor_traits_22_a,
+  HR_23_G2_weighted_by_23_a, AC_23_G2_weighted_by_23_a,
+  BB_23_G2_weighted_by_23_a, BO_23_G2_weighted_by_23_a
+)
+
+# Convert data to long format
+data_long <- combined_traits %>%
+  pivot_longer(cols = c(msm_all, fl_duration, d13C_SEG, corolla_diam_mm_SEG, SLA_SEG),
+               names_to = "Trait",
+               values_to = "Value")
+
+# Convert Value to numeric
+data_long <- data_long %>% mutate(Value = as.numeric(Value))
+
+# Rename Trait values for readability
+data_long <- data_long %>%
+  mutate(
+    Trait = recode(
+      Trait,
+      "msm_all" = "Mean Seed Mass",
+      "fl_duration" = "Flowering Duration",
+      "d13C_SEG" = "δ13C",
+      "corolla_diam_mm_SEG" = "Corolla Diameter",
+      "SLA_SEG" = "Specific Leaf Area"
+    )
+  )
+
+# # Create the density plot
+# frequency_dist_traits <- ggplot(data_long, aes(x = Value, fill = Generation)) +
+#   geom_density(alpha = 0.6) +
+#   facet_grid(Group ~ Trait, scales = "free_y") +
+#   labs(
+#     title = "Frequency Distribution of Traits for G1 2022 vs G2 2023 (weighted by G1 23)",
+#     x = "Trait Value",
+#     y = "Density"
+#   ) +
+#   theme_minimal() +
+#   theme(
+#     legend.position = "top",
+#     panel.grid.major = element_blank(),
+#     panel.grid.minor = element_blank(),
+#     strip.text.y = element_text(angle = 0),
+#     strip.text.x = element_text(face = "bold")
+#   ) +
+#   scale_fill_manual(values = c("G1" = "#ff6f61", "G2" = "#17becf")) +
+#   scale_y_continuous(expand = c(0, 0))
+# 
+# # Print and save the plot
+# print(frequency_dist_traits)
+# ggsave("combined_frequency_dist_G1_2022_vs_G2_2023(weightG123).png", plot = frequency_dist_traits, width = 12, height = 10, dpi = 300)
+
+# Define axis limits for each trait
+x_limits <- list(
+  "Mean Seed Mass" = c(0, 20),
+  "Flowering Duration" = c(0, 70),
+  "δ13C" = c(-35, -25),
+  "Corolla Diameter" = c(0, 40),
+  "Specific Leaf Area" = c(0, 40)
+)
+
+# Create individual density plots for each trait
+plots <- lapply(unique(data_long$Trait), function(trait) {
+  ggplot(filter(data_long, Trait == trait), aes(x = Value, fill = Generation)) +
+    geom_density(alpha = 0.6) +
+    facet_grid(Group ~ Trait, scales = "free_y") +
+    labs(
+      title = paste("Distribution of", trait, "for G1 and G2"),
+      x = "Trait Value",
+      y = "Density"
+    ) +
+    theme_minimal() +
+    theme(
+      legend.position = "top",
+      panel.grid.major = element_blank(),
+      panel.grid.minor = element_blank(),
+      strip.text.y = element_text(angle = 0),
+      strip.text.x = element_text(face = "bold")
+    ) +
+    scale_fill_manual(values = c("G1" = "#ff6f61", "G2" = "#17becf")) +
+    scale_y_continuous(expand = c(0, 0)) +
+    scale_x_continuous(limits = x_limits[[trait]])
+})
+
+# Combine and display all plots
+combined_plot <- wrap_plots(plots)
+print(combined_plot)
+
+# Save the combined plot
+ggsave("frequency_dist_G1_vs_G2_weighted(23)_fixed_axes.png", plot = combined_plot, width = 12, height = 10, dpi = 300)
+
+
+```
+
+
+
+Comparing g1 2022 and g2 2023 (UNWEIGHTED) with scaled paternal trait means
+```{r}
+# Add Generation column and combine G1 2022 and G2 weighted by 2022
+HR_mean_donor_traits_22_a <- HR_mean_donor_traits_22 %>%
+  dplyr::select(msm_all, fl_duration, d13C_SEG, corolla_diam_mm_SEG, SLA_SEG) %>%
+  mutate(Group = "HR", Generation = "G1", Year = "2022")
+
+AC_mean_donor_traits_22_a <- AC_mean_donor_traits_22 %>%
+  dplyr::select(msm_all, fl_duration, d13C_SEG, corolla_diam_mm_SEG, SLA_SEG) %>%
+  mutate(Group = "AC", Generation = "G1", Year = "2022")
+
+BB_mean_donor_traits_22_a <- BB_mean_donor_traits_22 %>%
+  dplyr::select(msm_all, fl_duration, d13C_SEG, corolla_diam_mm_SEG, SLA_SEG) %>%
+  mutate(Group = "BB", Generation = "G1", Year = "2022")
+
+BO_mean_donor_traits_22_a <- BO_mean_donor_traits_22 %>%
+  dplyr::select(msm_all, fl_duration, d13C_SEG, corolla_diam_mm_SEG, SLA_SEG) %>%
+  mutate(Group = "BO", Generation = "G1", Year = "2022")
+
+HR_mean_donor_traits_23_G2_a <- HR_mean_donor_traits_23_G2 %>%
+  dplyr::select(msm_all, fl_duration, d13C_SEG, corolla_diam_mm_SEG, SLA_SEG) %>%
+  rename_with(~ gsub("_weighted22", "", .x)) %>%
+  mutate(Group = "HR", Generation = "G2", Year = "2023")
+
+AC_mean_donor_traits_23_G2_a <- AC_mean_donor_traits_23_G2 %>%
+  dplyr::select(msm_all, fl_duration, d13C_SEG, corolla_diam_mm_SEG, SLA_SEG) %>%
+  rename_with(~ gsub("_weighted22", "", .x)) %>%
+  mutate(Group = "AC", Generation = "G2", Year = "2023")
+
+BB_mean_donor_traits_23_G2_a <- BB_mean_donor_traits_23_G2 %>%
+  dplyr::select(msm_all, fl_duration, d13C_SEG, corolla_diam_mm_SEG, SLA_SEG) %>%
+  rename_with(~ gsub("_weighted22", "", .x)) %>%
+  mutate(Group = "BB", Generation = "G2", Year = "2023")
+
+BO_mean_donor_traits_23_G2_a <- BO_mean_donor_traits_23_G2 %>%
+  dplyr::select(msm_all, fl_duration, d13C_SEG, corolla_diam_mm_SEG, SLA_SEG) %>%
+  rename_with(~ gsub("_weighted22", "", .x)) %>%
+  mutate(Group = "BO", Generation = "G2", Year = "2023")
+
+# Combine all data
+combined_traits <- bind_rows(
+  HR_mean_donor_traits_22_a, AC_mean_donor_traits_22_a,
+  BB_mean_donor_traits_22_a, BO_mean_donor_traits_22_a,
+  HR_mean_donor_traits_23_G2_a, AC_mean_donor_traits_23_G2_a,
+  BB_mean_donor_traits_23_G2_a, BO_mean_donor_traits_23_G2_a
+)
+# Convert data to long format
+data_long <- combined_traits %>%
+  pivot_longer(cols = c(msm_all, fl_duration, d13C_SEG, corolla_diam_mm_SEG, SLA_SEG),
+               names_to = "Trait",
+               values_to = "Value")
+
+# Convert Value to numeric
+data_long <- data_long %>% mutate(Value = as.numeric(Value))
+
+# Rename Trait values for readability
+data_long <- data_long %>%
+  mutate(
+    Trait = recode(
+      Trait,
+      "msm_all" = "Mean Seed Mass",
+      "fl_duration" = "Flowering Duration",
+      "d13C_SEG" = "δ13C",
+      "corolla_diam_mm_SEG" = "Corolla Diameter",
+      "SLA_SEG" = "Specific Leaf Area"
+    )
+  )
+
+# Define axis limits for each trait
+x_limits <- list(
+  "Mean Seed Mass" = c(0, 20),
+  "Flowering Duration" = c(0, 80),
+  "δ13C" = c(-35, -25),
+  "Corolla Diameter" = c(0, 40),
+  "Specific Leaf Area" = c(0, 40)
+)
+
+# Create individual density plots for each trait
+plots <- lapply(unique(data_long$Trait), function(trait) {
+  ggplot(filter(data_long, Trait == trait), aes(x = Value, fill = Generation)) +
+    geom_density(alpha = 0.6) +
+    facet_grid(Group ~ Trait, scales = "free_y") +
+    labs(
+      title = paste("Distribution of", trait, "for G1 and G2"),
+      x = "Trait Value",
+      y = "Density"
+    ) +
+    theme_minimal() +
+    theme(
+      legend.position = "top",
+      panel.grid.major = element_blank(),
+      panel.grid.minor = element_blank(),
+      strip.text.y = element_text(angle = 0),
+      strip.text.x = element_text(face = "bold")
+    ) +
+    scale_fill_manual(values = c("G1" = "#ff6f61", "G2" = "#17becf")) +
+    scale_y_continuous(expand = c(0, 0)) +
+    scale_x_continuous(limits = x_limits[[trait]])
+})
+
+# Combine and display all plots
+combined_plot <- wrap_plots(plots)
+print(combined_plot)
+
+# Save the combined plot
+ggsave("frequency_dist_G1_vs_G2_raw_fixed_axes.png", plot = combined_plot, width = 12, height = 10, dpi = 300)
+
+```
+
+
+
+Comparing g1 2023 and g2 2023 paternal trait means
+```{r}
+# Add Generation column and combine G1 2022 and G2 weighted by 2022
+HR_mean_donor_traits_23_G1_a <- HR_mean_donor_traits_23_G1 %>%
+  dplyr::select(msm_all, fl_duration, d13C_SEG, corolla_diam_mm_SEG, SLA_SEG) %>%
+  mutate(Group = "HR", Generation = "G1", Year = "2023")
+
+AC_mean_donor_traits_23_G1_a <- AC_mean_donor_traits_23_G1 %>%
+  dplyr::select(msm_all, fl_duration, d13C_SEG, corolla_diam_mm_SEG, SLA_SEG) %>%
+  mutate(Group = "AC", Generation = "G1", Year = "2023")
+
+BB_mean_donor_traits_23_G1_a <- BB_mean_donor_traits_23_G1%>%
+  dplyr::select(msm_all, fl_duration, d13C_SEG, corolla_diam_mm_SEG, SLA_SEG) %>%
+  mutate(Group = "BB", Generation = "G1", Year = "2023")
+
+BO_mean_donor_traits_23_G1_a <- BO_mean_donor_traits_23_G1 %>%
+  dplyr::select(msm_all, fl_duration, d13C_SEG, corolla_diam_mm_SEG, SLA_SEG) %>%
+  mutate(Group = "BO", Generation = "G1", Year = "2023")
+
+HR_mean_donor_traits_23_G2_a <- HR_mean_donor_traits_23_G2 %>%
+  dplyr::select(msm_all, fl_duration, d13C_SEG, corolla_diam_mm_SEG, SLA_SEG) %>%
+  rename_with(~ gsub("_weighted22", "", .x)) %>%
+  mutate(Group = "HR", Generation = "G2", Year = "2023")
+
+AC_mean_donor_traits_23_G2_a <- AC_mean_donor_traits_23_G2 %>%
+  dplyr::select(msm_all, fl_duration, d13C_SEG, corolla_diam_mm_SEG, SLA_SEG) %>%
+  rename_with(~ gsub("_weighted22", "", .x)) %>%
+  mutate(Group = "AC", Generation = "G2", Year = "2023")
+
+BB_mean_donor_traits_23_G2_a <- BB_mean_donor_traits_23_G2 %>%
+  dplyr::select(msm_all, fl_duration, d13C_SEG, corolla_diam_mm_SEG, SLA_SEG) %>%
+  rename_with(~ gsub("_weighted22", "", .x)) %>%
+  mutate(Group = "BB", Generation = "G2", Year = "2023")
+
+BO_mean_donor_traits_23_G2_a <- BO_mean_donor_traits_23_G2 %>%
+  dplyr::select(msm_all, fl_duration, d13C_SEG, corolla_diam_mm_SEG, SLA_SEG) %>%
+  rename_with(~ gsub("_weighted22", "", .x)) %>%
+  mutate(Group = "BO", Generation = "G2", Year = "2023")
+
+# Combine all data
+combined_traits <- bind_rows(
+  HR_mean_donor_traits_23_G1_a, AC_mean_donor_traits_23_G1_a,
+  BB_mean_donor_traits_23_G1_a, BO_mean_donor_traits_23_G1_a,
+  HR_mean_donor_traits_23_G2_a, AC_mean_donor_traits_23_G2_a,
+  BB_mean_donor_traits_23_G2_a, BO_mean_donor_traits_23_G2_a
+)
+# Convert data to long format
+data_long <- combined_traits %>%
+  pivot_longer(cols = c(msm_all, fl_duration, d13C_SEG, corolla_diam_mm_SEG, SLA_SEG),
+               names_to = "Trait",
+               values_to = "Value")
+
+# Convert Value to numeric
+data_long <- data_long %>% mutate(Value = as.numeric(Value))
+
+# Rename Trait values for readability
+data_long <- data_long %>%
+  mutate(
+    Trait = recode(
+      Trait,
+      "msm_all" = "Mean Seed Mass",
+      "fl_duration" = "Flowering Duration",
+      "d13C_SEG" = "δ13C",
+      "corolla_diam_mm_SEG" = "Corolla Diameter",
+      "SLA_SEG" = "Specific Leaf Area"
+    )
+  )
+
+# Define axis limits for each trait
+x_limits <- list(
+  "Mean Seed Mass" = c(0, 20),
+  "Flowering Duration" = c(0, 80),
+  "δ13C" = c(-35, -25),
+  "Corolla Diameter" = c(0, 40),
+  "Specific Leaf Area" = c(0, 40)
+)
+
+# Create individual density plots for each trait
+plots <- lapply(unique(data_long$Trait), function(trait) {
+  ggplot(filter(data_long, Trait == trait), aes(x = Value, fill = Generation)) +
+    geom_density(alpha = 0.6) +
+    facet_grid(Group ~ Trait, scales = "free_y") +
+    labs(
+      title = paste("Distribution of", trait, "for G1 2023 and G2 2023"),
+      x = "Trait Value",
+      y = "Density"
+    ) +
+    theme_minimal() +
+    theme(
+      legend.position = "top",
+      panel.grid.major = element_blank(),
+      panel.grid.minor = element_blank(),
+      strip.text.y = element_text(angle = 0),
+      strip.text.x = element_text(face = "bold")
+    ) +
+    scale_fill_manual(values = c("G1" = "#ff6f61", "G2" = "#17becf")) +
+    scale_y_continuous(expand = c(0, 0)) +
+    scale_x_continuous(limits = x_limits[[trait]])
+})
+
+# Combine and display all plots
+combined_plot <- wrap_plots(plots)
+print(combined_plot)
+
+# Save the combined plot
+ggsave("frequency_dist_G1_2023_vs_G2_2023_fixed_axes.png", plot = combined_plot, width = 12, height = 10, dpi = 300)
+
+```
+
+Comparing G1 with G2 (weighted by G1)
+```{r}
+# Add Generation column and combine G1 2022 and G2 weighted by 2022
+HR_mean_donor_traits_23_G1_a <- HR_mean_donor_traits_23_G1 %>%
+  dplyr::select(msm_all, fl_duration, d13C_SEG, corolla_diam_mm_SEG, SLA_SEG) %>%
+  mutate(Group = "HR", Generation = "G1", Year = "2023")
+
+AC_mean_donor_traits_23_G1_a <- AC_mean_donor_traits_23_G1 %>%
+  dplyr::select(msm_all, fl_duration, d13C_SEG, corolla_diam_mm_SEG, SLA_SEG) %>%
+  mutate(Group = "AC", Generation = "G1", Year = "2023")
+
+BB_mean_donor_traits_23_G1_a <- BB_mean_donor_traits_23_G1%>%
+  dplyr::select(msm_all, fl_duration, d13C_SEG, corolla_diam_mm_SEG, SLA_SEG) %>%
+  mutate(Group = "BB", Generation = "G1", Year = "2023")
+
+BO_mean_donor_traits_23_G1_a <- BO_mean_donor_traits_23_G1 %>%
+  dplyr::select(msm_all, fl_duration, d13C_SEG, corolla_diam_mm_SEG, SLA_SEG) %>%
+  mutate(Group = "BO", Generation = "G1", Year = "2023")
+
+HR_23_G2_weighted_by_23_a <- HR_23_G2_weighted_by_23 %>%
+  dplyr::select(msm_all_weighted23, fl_duration_weighted23, d13C_SEG_weighted23, corolla_diam_mm_SEG_weighted23, SLA_SEG_weighted23) %>%
+  rename_with(~ gsub("_weighted23", "", .x)) %>%
+  mutate(Group = "HR", Generation = "G2", Year = "2023")
+
+AC_23_G2_weighted_by_23_a <- AC_23_G2_weighted_by_23 %>%
+  dplyr::select(msm_all_weighted23, fl_duration_weighted23, d13C_SEG_weighted23, corolla_diam_mm_SEG_weighted23, SLA_SEG_weighted23) %>%
+  rename_with(~ gsub("_weighted23", "", .x)) %>%
+  mutate(Group = "AC", Generation = "G2", Year = "2023")
+
+BB_23_G2_weighted_by_23_a <- BB_23_G2_weighted_by_23 %>%
+  dplyr::select(msm_all_weighted23, fl_duration_weighted23, d13C_SEG_weighted23, corolla_diam_mm_SEG_weighted23, SLA_SEG_weighted23) %>%
+  rename_with(~ gsub("_weighted23", "", .x)) %>%
+  mutate(Group = "BB", Generation = "G2", Year = "2023")
+
+BO_23_G2_weighted_by_23_a <- BO_23_G2_weighted_by_23 %>%
+  dplyr::select(msm_all_weighted23, fl_duration_weighted23, d13C_SEG_weighted23, corolla_diam_mm_SEG_weighted23, SLA_SEG_weighted23) %>%
+  rename_with(~ gsub("_weighted23", "", .x)) %>%
+  mutate(Group = "BO", Generation = "G2", Year = "2023")
+
+# Combine all data
+combined_traits <- bind_rows(
+  HR_mean_donor_traits_23_G1_a, AC_mean_donor_traits_23_G1_a,
+  BB_mean_donor_traits_23_G1_a, BO_mean_donor_traits_23_G1_a,
+  HR_23_G2_weighted_by_23_a, AC_23_G2_weighted_by_23_a,
+  BB_23_G2_weighted_by_23_a, BO_23_G2_weighted_by_23_a
+)
+
+# Convert data to long format
+data_long <- combined_traits %>%
+  pivot_longer(cols = c(msm_all, fl_duration, d13C_SEG, corolla_diam_mm_SEG, SLA_SEG),
+               names_to = "Trait",
+               values_to = "Value")
+
+# Convert Value to numeric
+data_long <- data_long %>% mutate(Value = as.numeric(Value))
+
+# Rename Trait values for readability
+data_long <- data_long %>%
+  mutate(
+    Trait = recode(
+      Trait,
+      "msm_all" = "Mean Seed Mass",
+      "fl_duration" = "Flowering Duration",
+      "d13C_SEG" = "δ13C",
+      "corolla_diam_mm_SEG" = "Corolla Diameter",
+      "SLA_SEG" = "Specific Leaf Area"
+    )
+  )
+
+# Define axis limits for each trait
+x_limits <- list(
+  "Mean Seed Mass" = c(0, 20),
+  "Flowering Duration" = c(0, 80),
+  "δ13C" = c(-35, -25),
+  "Corolla Diameter" = c(0, 40),
+  "Specific Leaf Area" = c(0, 40)
+)
+
+# Create individual density plots for each trait
+plots <- lapply(unique(data_long$Trait), function(trait) {
+  ggplot(filter(data_long, Trait == trait), aes(x = Value, fill = Generation)) +
+    geom_density(alpha = 0.6) +
+    facet_grid(Group ~ Trait, scales = "free_y") +
+    labs(
+      title = paste("Distribution of", trait, "for G1 and G2"),
+      x = "Trait Value",
+      y = "Density"
+    ) +
+    theme_minimal() +
+    theme(
+      legend.position = "top",
+      panel.grid.major = element_blank(),
+      panel.grid.minor = element_blank(),
+      strip.text.y = element_text(angle = 0),
+      strip.text.x = element_text(face = "bold")
+    ) +
+    scale_fill_manual(values = c("G1" = "#ff6f61", "G2" = "#17becf")) +
+    scale_y_continuous(expand = c(0, 0)) +
+    scale_x_continuous(limits = x_limits[[trait]])
+})
+
+# Combine and display all plots
+combined_plot <- wrap_plots(plots)
+print(combined_plot)
+
+# Save the combined plot
+ggsave("frequency_dist_G1_23_vs_G2_23_(weighted22)_fixed_axes.png", plot = combined_plot, width = 12, height = 10, dpi = 300)
+
+```
+
+
+```{r}
+# Function to calculate Cohen's d
+compute_cohens_d <- function(x1, x2) {
+  mean_diff <- mean(x1, na.rm = TRUE) - mean(x2, na.rm = TRUE)
+  pooled_sd <- sqrt((sd(x1, na.rm = TRUE)^2 + sd(x2, na.rm = TRUE)^2) / 2)
+  cohen_d <- mean_diff / pooled_sd
+  return(cohen_d)
+}
+```
+
+
+```{r}
+cohens_d_msm_all <- compute_cohens_d(AC_mean_donor_traits_22_a$msm_all, AC_mean_donor_traits_23_G1_a$msm_all)
+print(cohens_d_msm_all)
+
+
+cohens_d_fl_duration <- compute_cohens_d(AC_mean_donor_traits_22_a$fl_duration, AC_mean_donor_traits_23_G1_a$fl_duration)
+print(cohens_d_fl_duration)
+
+
+cohens_d_d13C_SEG<- compute_cohens_d(AC_mean_donor_traits_22_a$d13C_SEG, AC_mean_donor_traits_23_G1_a$d13C_SEG)
+print(cohens_d_d13C_SEG)
+
+cohens_d_corolla_diam_mm_SEG<- compute_cohens_d(AC_mean_donor_traits_22_a$corolla_diam_mm_SEG, AC_mean_donor_traits_23_G1_a$corolla_diam_mm_SEG)
+print(cohens_d_corolla_diam_mm_SEG)
+
+
+cohens_d_SLA_SEG<- compute_cohens_d(AC_mean_donor_traits_22_a$SLA_SEG, AC_mean_donor_traits_23_G1_a$SLA_SEG)
+print(cohens_d_SLA_SEG)
+```
+
+ANGELO COAST
+```{r}
+cohens_d_msm_all <- compute_cohens_d(AC_mean_donor_traits_22_a$msm_all, AC_23_G2_weighted_by_22_a$msm_all)
+print(cohens_d_msm_all)
+
+
+cohens_d_fl_duration <- compute_cohens_d(AC_mean_donor_traits_22_a$fl_duration, AC_23_G2_weighted_by_22_a$fl_duration)
+print(cohens_d_fl_duration)
+
+
+cohens_d_d13C_SEG<- compute_cohens_d(AC_mean_donor_traits_22_a$d13C_SEG, AC_23_G2_weighted_by_22_a$d13C_SEG)
+print(cohens_d_d13C_SEG)
+
+cohens_d_corolla_diam_mm_SEG<- compute_cohens_d(AC_mean_donor_traits_22_a$corolla_diam_mm_SEG, AC_23_G2_weighted_by_22_a$corolla_diam_mm_SEG)
+print(cohens_d_corolla_diam_mm_SEG)
+
+
+cohens_d_SLA_SEG<- compute_cohens_d(AC_mean_donor_traits_22_a$SLA_SEG, AC_23_G2_weighted_by_22_a$SLA_SEG)
+print(cohens_d_SLA_SEG)
+```
+
+BODEGA BAY
+```{r}
+cohens_d_msm_all <- compute_cohens_d(BB_mean_donor_traits_22_a$msm_all, BB_mean_donor_traits_23_G1_a$msm_all)
+print(cohens_d_msm_all)
+
+
+cohens_d_fl_duration <- compute_cohens_d(BB_mean_donor_traits_22_a$fl_duration, BB_mean_donor_traits_23_G1_a$fl_duration)
+print(cohens_d_fl_duration)
+
+
+cohens_d_d13C_SEG<- compute_cohens_d(BB_mean_donor_traits_22_a$d13C_SEG, BB_mean_donor_traits_23_G1_a$d13C_SEG)
+print(cohens_d_d13C_SEG)
+
+cohens_d_corolla_diam_mm_SEG<- compute_cohens_d(BB_mean_donor_traits_22_a$corolla_diam_mm_SEG, BB_mean_donor_traits_23_G1_a$corolla_diam_mm_SEG)
+print(cohens_d_corolla_diam_mm_SEG)
+
+
+cohens_d_SLA_SEG<- compute_cohens_d(BB_mean_donor_traits_22_a$SLA_SEG, BB_mean_donor_traits_23_G1_a$SLA_SEG)
+print(cohens_d_SLA_SEG)
+```
+
+```{r}
+cohens_d_msm_all <- compute_cohens_d(BB_mean_donor_traits_22_a$msm_all, BB_23_G2_weighted_by_22_a$msm_all)
+print(cohens_d_msm_all)
+
+
+cohens_d_fl_duration <- compute_cohens_d(BB_mean_donor_traits_22_a$fl_duration, BB_23_G2_weighted_by_22_a$fl_duration)
+print(cohens_d_fl_duration)
+
+
+cohens_d_d13C_SEG<- compute_cohens_d(BB_mean_donor_traits_22_a$d13C_SEG, BB_23_G2_weighted_by_22_a$d13C_SEG)
+print(cohens_d_d13C_SEG)
+
+cohens_d_corolla_diam_mm_SEG<- compute_cohens_d(BB_mean_donor_traits_22_a$corolla_diam_mm_SEG, BB_23_G2_weighted_by_22_a$corolla_diam_mm_SEG)
+print(cohens_d_corolla_diam_mm_SEG)
+
+
+cohens_d_SLA_SEG<- compute_cohens_d(BB_mean_donor_traits_22_a$SLA_SEG, BB_23_G2_weighted_by_22_a$SLA_SEG)
+print(cohens_d_SLA_SEG)
+```
+
+
+BLUE OAK
+```{r}
+# For comparisons between 22 and 23 G1
+cohens_d_msm_all <- compute_cohens_d(BO_mean_donor_traits_22_a$msm_all, BO_mean_donor_traits_23_G1_a$msm_all)
+print(cohens_d_msm_all)
+
+cohens_d_fl_duration <- compute_cohens_d(BO_mean_donor_traits_22_a$fl_duration, BO_mean_donor_traits_23_G1_a$fl_duration)
+print(cohens_d_fl_duration)
+
+cohens_d_d13C_SEG <- compute_cohens_d(BO_mean_donor_traits_22_a$d13C_SEG, BO_mean_donor_traits_23_G1_a$d13C_SEG)
+print(cohens_d_d13C_SEG)
+
+cohens_d_corolla_diam_mm_SEG <- compute_cohens_d(BO_mean_donor_traits_22_a$corolla_diam_mm_SEG, BO_mean_donor_traits_23_G1_a$corolla_diam_mm_SEG)
+print(cohens_d_corolla_diam_mm_SEG)
+
+cohens_d_SLA_SEG <- compute_cohens_d(BO_mean_donor_traits_22_a$SLA_SEG, BO_mean_donor_traits_23_G1_a$SLA_SEG)
+print(cohens_d_SLA_SEG)
+```
+
+
+```{r}
+# For comparisons between 22 and 23 G2
+cohens_d_msm_all <- compute_cohens_d(BO_mean_donor_traits_22_a$msm_all, BO_23_G2_weighted_by_22_a$msm_all)
+print(cohens_d_msm_all)
+
+cohens_d_fl_duration <- compute_cohens_d(BO_mean_donor_traits_22_a$fl_duration, BO_23_G2_weighted_by_22_a$fl_duration)
+print(cohens_d_fl_duration)
+
+
+cohens_d_d13C_SEG <- compute_cohens_d(BO_mean_donor_traits_22_a$d13C_SEG, BO_23_G2_weighted_by_22_a$d13C_SEG)
+print(cohens_d_d13C_SEG)
+
+
+cohens_d_corolla_diam_mm_SEG <- compute_cohens_d(BO_mean_donor_traits_22_a$corolla_diam_mm_SEG, BO_23_G2_weighted_by_22_a$corolla_diam_mm_SEG)
+print(cohens_d_corolla_diam_mm_SEG)
+
+cohens_d_SLA_SEG <- compute_cohens_d(BO_mean_donor_traits_22_a$SLA_SEG, BO_23_G2_weighted_by_22_a$SLA_SEG)
+print(cohens_d_SLA_SEG)
+```
+
+HASTINGS RANCH
+```{r}
+# For comparisons between 22 and 23 G1
+cohens_d_msm_all <- compute_cohens_d(HR_mean_donor_traits_22_a$msm_all, HR_mean_donor_traits_23_G1_a$msm_all)
+print(cohens_d_msm_all)
+
+cohens_d_fl_duration <- compute_cohens_d(HR_mean_donor_traits_22_a$fl_duration, HR_mean_donor_traits_23_G1_a$fl_duration)
+print(cohens_d_fl_duration)
+
+cohens_d_d13C_SEG <- compute_cohens_d(HR_mean_donor_traits_22_a$d13C_SEG, HR_mean_donor_traits_23_G1_a$d13C_SEG)
+print(cohens_d_d13C_SEG)
+
+cohens_d_corolla_diam_mm_SEG <- compute_cohens_d(HR_mean_donor_traits_22_a$corolla_diam_mm_SEG, HR_mean_donor_traits_23_G1_a$corolla_diam_mm_SEG)
+print(cohens_d_corolla_diam_mm_SEG)
+
+cohens_d_SLA_SEG <- compute_cohens_d(HR_mean_donor_traits_22_a$SLA_SEG, HR_mean_donor_traits_23_G1_a$SLA_SEG)
+print(cohens_d_SLA_SEG)
+
+```
+
+```{r}
+# For comparisons between 22 and 23 G2
+cohens_d_msm_all <- compute_cohens_d(HR_mean_donor_traits_22_a$msm_all, HR_23_G2_weighted_by_22_a$msm_all)
+print(cohens_d_msm_all)
+
+cohens_d_fl_duration <- compute_cohens_d(HR_mean_donor_traits_22_a$fl_duration, HR_23_G2_weighted_by_22_a$fl_duration)
+print(cohens_d_fl_duration)
+
+cohens_d_d13C_SEG <- compute_cohens_d(HR_mean_donor_traits_22_a$d13C_SEG, HR_23_G2_weighted_by_22_a$d13C_SEG)
+print(cohens_d_d13C_SEG)
+
+cohens_d_corolla_diam_mm_SEG <- compute_cohens_d(HR_mean_donor_traits_22_a$corolla_diam_mm_SEG, HR_23_G2_weighted_by_22_a$corolla_diam_mm_SEG)
+print(cohens_d_corolla_diam_mm_SEG)
+
+cohens_d_SLA_SEG <- compute_cohens_d(HR_mean_donor_traits_22_a$SLA_SEG, HR_23_G2_weighted_by_22_a$SLA_SEG)
+print(cohens_d_SLA_SEG)
+
+```
+
+
+COMPARING WEIGHTED TRAIT MEANS
+*G1 vs G2*
+
+Check if paternal corolla means are significantly different:
+```{r}
+
+# Combine the dataframes
+AC_donor_combined <- bind_rows(AC_mean_donor_traits_22_a, AC_23_G2_weighted_by_22_a)
+
+# Create the histogram
+ggplot(AC_donor_combined, aes(x = corolla_diam_mm_SEG, fill = Generation)) +
+  geom_histogram(position = "identity", alpha = 0.6, binwidth = 0.2) +
+  labs(title = "Comparison of Recipient Mean Corolla Diameter",
+       x = "Mean Corolla Diameter (mm)",
+       y = "Frequency") +
+  scale_fill_manual(values = c("1" = "blue", "2" = "red")) +
+  theme_minimal()
+
+shapiro_test_2022 <- shapiro.test(AC_mean_donor_traits_22_a$corolla_diam_mm_SEG)
+shapiro_test_2023_G2 <- shapiro.test(AC_23_G2_weighted_by_22_a$corolla_diam_mm_SEG)
+
+print(shapiro_test_2022)
+print(shapiro_test_2023_G2) #not normally distributed
+
+# Q-Q plots
+qqnorm(AC_mean_donor_traits_22_a$corolla_diam_mm_SEG, main = "Q-Q Plot for 2022 Corolla Diameter")
+
+qqnorm(AC_23_G2_weighted_by_22_a$corolla_diam_mm_SEG, main = "Q-Q Plot for 2023 Corolla Diameter")
+
+library(car)
+
+# Perform Levene's test for homogeneity of variances
+levene_test <- leveneTest(corolla_diam_mm_SEG ~ Generation, data = AC_donor_combined)
+
+# Print Levene's test result
+print(levene_test) #Did not pass
+
+# Perform t-test
+#pat_t_test_result_gen <- t.test(corolla_diam_mm_SEG ~ Generation, data = AC_donor_combined)
+
+# Print result
+#print(pat_t_test_result_gen)
+
+
+# Perform Mann-Whitney U test (Wilcoxon rank-sum test) instead of t-test
+mann_whitney_test <- wilcox.test(corolla_diam_mm_SEG ~ Generation, data = AC_donor_combined)
+
+# Print t-test result
+print(mann_whitney_test)
+#p-value = 0.02875
+```
+
+```{r}
+
+# Create the histogram
+ggplot(AC_donor_combined, aes(x = msm_all, fill = factor(Generation))) +
+  geom_histogram(position = "identity", alpha = 0.6, binwidth = 0.2) +
+  labs(title = "Comparison of Recipient Mean Seed Mass",
+       x = "Mean Seed Mass",
+       y = "Frequency") +
+  scale_fill_manual(values = c("1" = "blue", "2" = "red"), name = "Generation") +
+  theme_minimal()
+
+# Shapiro-Wilk test for normality
+shapiro_test_2022 <- shapiro.test(AC_mean_donor_traits_22_a$msm_all)
+shapiro_test_2023_G2 <- shapiro.test(AC_23_G2_weighted_by_22_a$msm_all)
+
+print(shapiro_test_2022)
+print(shapiro_test_2023_G2) # Not normally distributed
+
+# Q-Q plots
+qqnorm(AC_mean_donor_traits_22_a$msm_all, main = "Q-Q Plot for 2022 Mean Seed Mass")
+
+qqnorm(AC_23_G2_weighted_by_22_a$msm_all, main = "Q-Q Plot for 2023 Mean Seed Mass")
+
+# Perform Levene's test for homogeneity of variances
+levene_test <- leveneTest(msm_all ~ factor(Generation), data = AC_donor_combined)
+print(levene_test) # Did not pass
+
+# Perform Mann-Whitney U test (Wilcoxon rank-sum test)
+mann_whitney_test <- wilcox.test(msm_all ~ Generation, data = AC_donor_combined)
+print(mann_whitney_test)
+
+```
+
+
+

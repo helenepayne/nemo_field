@@ -1,0 +1,1275 @@
+"cgHdId","cgPlaId","hdmeasureYr","expNm","caulineLfCt","longestCaulineLfByRosette","hdInsects","ant1","ant2to10","antGT10","aphid1","aphid2to10","aphid11to80","aphidGT80","antNest","hdInsectDamageTxt","nibbles","holes","wrinkles","rolledLf","totalMinorInsDam","totalHalfGoneInsDam","totalGoneInsDam"
+2004000843,2945,2004,"Inbreeding",11,26,"2-10 aphids",0,0,0,0,1,0,0,0,"",NA,NA,NA,NA,0,0,0
+2004000846,2953,2004,"Inbreeding",11,23,"2-10 aphids;2-10 ants",0,1,0,0,1,0,0,0,"",NA,NA,NA,NA,0,0,0
+2004000856,2955,2004,"Inbreeding",12,22,"11-80 aphids;1 ant",1,0,0,0,0,1,0,0,"",NA,NA,NA,NA,0,0,0
+2004000861,2975,2004,"Inbreeding",13,28,"11-80 aphids;2-10 ants",0,1,0,0,0,1,0,0,"",NA,NA,NA,NA,0,0,0
+2004000865,2977,2004,"Inbreeding",12,21,">80 aphids;1 ant",1,0,0,0,0,0,1,0,"",NA,NA,NA,NA,0,0,0
+2004000870,2978,2004,"Inbreeding",10,26,"11-80 aphids;2-10 ants;1 larva",0,1,0,0,0,1,0,0,"",NA,NA,NA,NA,0,0,0
+2004000873,2979,2004,"Inbreeding",9,23,"2-10 aphids",0,0,0,0,1,0,0,0,"",NA,NA,NA,NA,0,0,0
+2004000878,3011,2004,"Inbreeding",9,19,"11-80 aphids;1 ant",1,0,0,0,0,1,0,0,"",NA,NA,NA,NA,0,0,0
+2004000924,3080,2004,"Inbreeding",10,20,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2004000928,3082,2004,"Inbreeding",15,20,"11-80 aphids;1 2mm brown/blk beetle",0,0,0,0,0,1,0,0,"",NA,NA,NA,NA,0,0,0
+2004000937,3083,2004,"Inbreeding",22,23,"11-80 aphids",0,0,0,0,0,1,0,0,"",NA,NA,NA,NA,0,0,0
+2004000942,3086,2004,"Inbreeding",16,20,"11-80 aphids",0,0,0,0,0,1,0,0,"",NA,NA,NA,NA,0,0,0
+2004000946,3089,2004,"Inbreeding",8,23,"11-80 aphids;2-10 ants",0,1,0,0,0,1,0,0,"",NA,NA,NA,NA,0,0,0
+2004000950,3102,2004,"Inbreeding",9,18,"11-80 aphids;2-10 ants",0,1,0,0,0,1,0,0,"",NA,NA,NA,NA,0,0,0
+2004000953,3179,2004,"Inbreeding",9,23,">80 aphids;2-10 ants",0,1,0,0,0,0,1,0,"",NA,NA,NA,NA,0,0,0
+2004000958,3298,2004,"Inbreeding",8,18,"11-80 aphids;2-10 ants",0,1,0,0,0,1,0,0,"",NA,NA,NA,NA,0,0,0
+2004000965,3266,2004,"Inbreeding",13,22,"11-80 aphids;2-10 ants;other (Note)",0,1,0,0,0,1,0,0,"",NA,NA,NA,NA,0,0,0
+2004000968,3264,2004,"Inbreeding",17,26,">80 aphids;2-10 ants;other (Note)",0,1,0,0,0,0,1,0,"",NA,NA,NA,NA,0,0,0
+2004000974,3241,2004,"Inbreeding",9,23,"2-10 aphids;white gunk",0,0,0,0,1,0,0,0,"",NA,NA,NA,NA,0,0,0
+2004000977,3222,2004,"Inbreeding",11,20,"2-10 aphids;1 ant",1,0,0,0,1,0,0,0,"",NA,NA,NA,NA,0,0,0
+2004000979,3197,2004,"Inbreeding",6,20,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2004000982,3342,2004,"Inbreeding",9,20,"11-80 aphids;2-10 ants;white gunk",0,1,0,0,0,1,0,0,"",NA,NA,NA,NA,0,0,0
+2004000986,3372,2004,"Inbreeding",18,29,"2-10 aphids",0,0,0,0,1,0,0,0,"",NA,NA,NA,NA,0,0,0
+2005000213,2946,2005,"Inbreeding",9,41,"",0,0,0,0,0,0,0,0,"Nibbles;Holes;4 lvs minor",1,1,0,0,4,0,0
+2005000214,2956,2005,"Inbreeding",13,25,"1 ant",1,0,0,0,0,0,0,0,"Nibbles;Holes;1 lf minor;4 lvs minor",1,1,0,0,5,0,0
+2005000215,2957,2005,"Inbreeding",14,31,"other (Note)",0,0,0,0,0,0,0,0,"Nibbles;1 lf minor;4 lvs minor",1,0,0,0,5,0,0
+2005000216,2959,2005,"Inbreeding",8,18,"",0,0,0,0,0,0,0,0,"Nibbles;2 lvs minor",1,0,0,0,2,0,0
+2005000217,2959,2005,"Inbreeding",11,12,"",0,0,0,0,0,0,0,0,"Nibbles;2 lvs minor",1,0,0,0,2,0,0
+2005000218,2995,2005,"Inbreeding",11,20,"2-10 aphids;2-10 ants",0,1,0,0,1,0,0,0,"Nibbles;2 lvs minor",1,0,0,0,2,0,0
+2005000219,3002,2005,"Inbreeding",12,27,"1 ant",1,0,0,0,0,0,0,0,"Nibbles;Holes;4 lvs minor",1,1,0,0,4,0,0
+2005000220,3014,2005,"Inbreeding",9,26,"",0,0,0,0,0,0,0,0,"Nibbles;Holes;1 lf minor;2 lvs minor",1,1,0,0,3,0,0
+2005000221,3140,2005,"Inbreeding",13,23,"2-10 ants",0,1,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2005000222,3138,2005,"Inbreeding",11,19,"white gunk",0,0,0,0,0,0,0,0,"Nibbles;1 lf minor",1,0,0,0,1,0,0
+2005000223,3089,2005,"Inbreeding",9,21,"",0,0,0,0,0,0,0,0,"Nibbles;Holes;1 lf minor;2 lvs minor",1,1,0,0,3,0,0
+2005000224,3089,2005,"Inbreeding",8,24,"white gunk",0,0,0,0,0,0,0,0,"Nibbles;Holes;1 lf minor;2 lvs minor",1,1,0,0,3,0,0
+2005000225,3086,2005,"Inbreeding",8,35,"other (Note)",0,0,0,0,0,0,0,0,"Nibbles;4 lvs minor",1,0,0,0,4,0,0
+2005000226,3219,2005,"Inbreeding",20,26,"white gunk",0,0,0,0,0,0,0,0,"Nibbles;Holes;1 lf minor;4 lvs minor",1,1,0,0,5,0,0
+2005000227,3222,2005,"Inbreeding",10,22,"",0,0,0,0,0,0,0,0,"Nibbles;1 lf minor;2 lvs minor",1,0,0,0,3,0,0
+2005000228,3351,2005,"Inbreeding",12,26,"",0,0,0,0,0,0,0,0,"Nibbles;Holes;1 lf minor",1,1,0,0,1,0,0
+2005000229,3219,2005,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2005000230,3336,2005,"Inbreeding",7,32,"",0,0,0,0,0,0,0,0,"Nibbles;1 lf minor",1,0,0,0,1,0,0
+2005000231,3372,2005,"Inbreeding",17,37,"2-10 ants;ant nest",0,1,0,0,0,0,0,1,"Nibbles;Holes;2 lvs minor;2 lvs half-gone;4 lvs minor",1,1,0,0,6,2,0
+2005000232,3372,2005,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2005000233,3261,2005,"Inbreeding",16,30,"white gunk",0,0,0,0,0,0,0,0,"Nibbles;Holes;8 lvs minor;2 lvs minor",1,1,0,0,10,0,0
+2006001243,3374,2006,"Inbreeding",6,33,"",0,0,0,0,0,0,0,0,"Nibbles;Holes;1 lf minor;2 lvs minor",1,1,0,0,3,0,0
+2006001244,3378,2006,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2006001245,3378,2006,"Inbreeding",4,15,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2006001246,3378,2006,"Inbreeding",12,22,"",0,0,0,0,0,0,0,0,"Nibbles;1 lf minor",1,0,0,0,1,0,0
+2006001247,3379,2006,"Inbreeding",12,22,"",0,0,0,0,0,0,0,0,"Nibbles;1 lf minor",1,0,0,0,1,0,0
+2006001248,3380,2006,"Inbreeding",9,27,"",0,0,0,0,0,0,0,0,"Nibbles;1 lf minor",1,0,0,0,1,0,0
+2006001249,3244,2006,"Inbreeding",10,22,"",0,0,0,0,0,0,0,0,"Holes;1 lf minor",0,1,0,0,1,0,0
+2006001250,3245,2006,"Inbreeding",15,25,"larva",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2006001251,3246,2006,"Inbreeding",11,22,"",0,0,0,0,0,0,0,0,"Holes;2 lvs minor",0,1,0,0,2,0,0
+2006001252,3394,2006,"Inbreeding",11,16,"11-80 aphids",0,0,0,0,0,1,0,0,"Nibbles;1 lf minor;2 lvs half-gone",1,0,0,0,1,2,0
+2006001253,3396,2006,"Inbreeding",10,30,"2-10 aphids",0,0,0,0,1,0,0,0,"Nibbles;1 lf half-gone;2 lvs minor",1,0,0,0,2,1,0
+2006001254,3257,2006,"Inbreeding",12,26,"",0,0,0,0,0,0,0,0,"Nibbles;Holes;1 lf minor;2 lvs minor",1,1,0,0,3,0,0
+2006001255,3398,2006,"Inbreeding",13,26,"11-80 aphids;1 ant",1,0,0,0,0,1,0,0,"Nibbles;Holes;1 lf minor;2 lvs minor",1,1,0,0,3,0,0
+2006001256,3258,2006,"Inbreeding",8,12,"11-80 aphids;1 ant",1,0,0,0,0,1,0,0,"Nibbles;1 lf minor;2 lvs minor",1,0,0,0,3,0,0
+2006001257,3400,2006,"Inbreeding",12,21,"",0,0,0,0,0,0,0,0,"Nibbles;Holes;1 lf minor;1 lf half-gone;4 lvs minor",1,1,0,0,5,1,0
+2006001258,3400,2006,"Inbreeding",9,21,"2-10 aphids",0,0,0,0,1,0,0,0,"Holes;1 lf minor",0,1,0,0,1,0,0
+2006001259,3264,2006,"Inbreeding",10,24,"",0,0,0,0,0,0,0,0,"Nibbles;Holes;1 lf minor;2 lvs minor",1,1,0,0,3,0,0
+2006001260,3264,2006,"Inbreeding",26,23,"",0,0,0,0,0,0,0,0,"Nibbles;Holes;4 lvs minor",1,1,0,0,4,0,0
+2006001261,3266,2006,"Inbreeding",15,18,"",0,0,0,0,0,0,0,0,"Nibbles;Holes;1 lf minor;4 lvs minor",1,1,0,0,5,0,0
+2006001262,3417,2006,"Inbreeding",11,17,"11-80 aphids",0,0,0,0,0,1,0,0,"Nibbles;Holes;2 lvs minor",1,1,0,0,2,0,0
+2006001263,3418,2006,"Inbreeding",11,14,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2006001264,3287,2006,"Inbreeding",10,22,"",0,0,0,0,0,0,0,0,"Holes;1 lf minor",0,1,0,0,1,0,0
+2006001265,3443,2006,"Inbreeding",11,15,"11-80 aphids;2-10 ants;wht fuzzy",0,1,0,0,0,1,0,0,"Nibbles;2 lvs minor",1,0,0,0,2,0,0
+2006001266,3314,2006,"Inbreeding",11,21,"11-80 aphids",0,0,0,0,0,1,0,0,"Holes;2 lvs minor",0,1,0,0,2,0,0
+2006001267,2949,2006,"Inbreeding",5,22,"",0,0,0,0,0,0,0,0,"Nibbles;1 lf minor",1,0,0,0,1,0,0
+2006001268,2950,2006,"Inbreeding",11,21,"",0,0,0,0,0,0,0,0,"Holes;2 lvs minor",0,1,0,0,2,0,0
+2006001269,2953,2006,"Inbreeding",12,21,"",0,0,0,0,0,0,0,0,"Holes;1 lf minor",0,1,0,0,1,0,0
+2006001270,2953,2006,"Inbreeding",13,21,"",0,0,0,0,0,0,0,0,"Nibbles;2 lvs minor",1,0,0,0,2,0,0
+2006001271,2953,2006,"Inbreeding",11,27,"",0,0,0,0,0,0,0,0,"Nibbles;2 lvs minor",1,0,0,0,2,0,0
+2006001272,2953,2006,"Inbreeding",8,28,"",0,0,0,0,0,0,0,0,"Nibbles;1 lf minor;1 lf half-gone",1,0,0,0,1,1,0
+2006001273,2954,2006,"Inbreeding",15,27,"",0,0,0,0,0,0,0,0,"Nibbles;Holes;8 lvs minor",1,1,0,0,8,0,0
+2006001274,2955,2006,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2006001275,2955,2006,"Inbreeding",13,18,"",0,0,0,0,0,0,0,0,"Nibbles;1 lf minor;2 lvs minor",1,0,0,0,3,0,0
+2006001276,2955,2006,"Inbreeding",13,17,"",0,0,0,0,0,0,0,0,"Nibbles;Holes;1 lf minor;2 lvs minor;4 lvs minor",1,1,0,0,7,0,0
+2006001277,2955,2006,"Inbreeding",5,18,"",0,0,0,0,0,0,0,0,"Holes;1 lf minor",0,1,0,0,1,0,0
+2006001278,2955,2006,"Inbreeding",18,20,"",0,0,0,0,0,0,0,0,"Holes;8 lvs minor;2 lvs minor",0,1,0,0,10,0,0
+2006001279,2956,2006,"Inbreeding",11,26,"",0,0,0,0,0,0,0,0,"Nibbles;Wrinkles;1 lf minor;1 lf half-gone;4 lvs minor",1,0,1,0,5,1,0
+2006001280,2956,2006,"Inbreeding",12,23,"",0,0,0,0,0,0,0,0,"Nibbles;Holes;4 lvs minor",1,1,0,0,4,0,0
+2006001281,3006,2006,"Inbreeding",17,17,"",0,0,0,0,0,0,0,0,"Holes;Wrinkles;4 lvs minor",0,1,1,0,4,0,0
+2006001282,3012,2006,"Inbreeding",9,23,"",0,0,0,0,0,0,0,0,"Nibbles;Holes;2 lvs half-gone",1,1,0,0,0,2,0
+2006001283,3014,2006,"Inbreeding",14,20,"",0,0,0,0,0,0,0,0,"Nibbles;1 lf minor;2 lvs minor",1,0,0,0,3,0,0
+2006001284,3021,2006,"Inbreeding",10,22,"",0,0,0,0,0,0,0,0,"Nibbles;1 lf minor",1,0,0,0,1,0,0
+2006001285,3104,2006,"Inbreeding",8,25,"",0,0,0,0,0,0,0,0,"Nibbles;2 lvs minor",1,0,0,0,2,0,0
+2006001286,3111,2006,"Inbreeding",6,29,"",0,0,0,0,0,0,0,0,"Nibbles;Holes;4 lvs minor",1,1,0,0,4,0,0
+2006001287,3121,2006,"Inbreeding",12,22,"",0,0,0,0,0,0,0,0,"Nibbles;Wrinkles;2 lvs minor;4 lvs minor",1,0,1,0,6,0,0
+2006001288,3122,2006,"Inbreeding",22,22,"",0,0,0,0,0,0,0,0,"Nibbles;Holes;1 lf minor;2 lvs minor;4 lvs minor",1,1,0,0,7,0,0
+2006001289,3124,2006,"Inbreeding",8,21,"",0,0,0,0,0,0,0,0,"Nibbles;Holes;1 lf minor;2 lvs minor",1,1,0,0,3,0,0
+2006001290,3124,2006,"Inbreeding",4,20,"",0,0,0,0,0,0,0,0,"Nibbles;1 lf minor",1,0,0,0,1,0,0
+2006001291,3124,2006,"Inbreeding",6,22,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2006001292,3124,2006,"Inbreeding",13,22,"11-80 aphids",0,0,0,0,0,1,0,0,"Nibbles;2 lvs minor",1,0,0,0,2,0,0
+2006001293,3126,2006,"Inbreeding",11,22,"2-10 aphids",0,0,0,0,1,0,0,0,"Nibbles;Holes;1 lf minor;4 lvs minor",1,1,0,0,5,0,0
+2006001294,3126,2006,"Inbreeding",10,22,"2-10 aphids",0,0,0,0,1,0,0,0,"Nibbles;Holes;Wrinkles;1 lf minor;4 lvs minor",1,1,1,0,5,0,0
+2006001295,3138,2006,"Inbreeding",10,22,"11-80 aphids",0,0,0,0,0,1,0,0,"Nibbles;1 lf minor",1,0,0,0,1,0,0
+2006001305,2926,2006,"Inbreeding",11,26,"2-10 aphids;other (Note)",0,0,0,0,1,0,0,0,"Nibbles;1 lf minor;2 lvs minor",1,0,0,0,3,0,0
+2006001306,2927,2006,"Inbreeding",7,20,"beetle",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2006001308,2932,2006,"Inbreeding",11,29,"11-80 aphids",0,0,0,0,0,1,0,0,"Nibbles;1 lf minor;2 lvs minor",1,0,0,0,3,0,0
+2006001309,2935,2006,"Inbreeding",12,28,"2-10 aphids",0,0,0,0,1,0,0,0,"Wrinkles;1 lf minor",0,0,1,0,1,0,0
+2006001310,2936,2006,"Inbreeding",14,22,"11-80 aphids;2-10 ants",0,1,0,0,0,1,0,0,"Nibbles;Holes;4 lvs minor",1,1,0,0,4,0,0
+2006001311,2937,2006,"Inbreeding",14,22,"11-80 aphids",0,0,0,0,0,1,0,0,"Nibbles;Wrinkles;1 lf minor;4 lvs minor",1,0,1,0,5,0,0
+2006001312,2938,2006,"Inbreeding",18,19,"",0,0,0,0,0,0,0,0,"Nibbles;Holes;1 lf minor;4 lvs minor",1,1,0,0,5,0,0
+2006001313,2938,2006,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2006001314,2940,2006,"Inbreeding",13,21,"",0,0,0,0,0,0,0,0,"Nibbles;1 lf minor",1,0,0,0,1,0,0
+2006001315,2941,2006,"Inbreeding",10,21,"",0,0,0,0,0,0,0,0,"Nibbles;1 lf minor;2 lvs minor",1,0,0,0,3,0,0
+2006001316,2941,2006,"Inbreeding",11,21,"",0,0,0,0,0,0,0,0,"Nibbles;2 lvs minor",1,0,0,0,2,0,0
+2006001317,2941,2006,"Inbreeding",11,25,"",0,0,0,0,0,0,0,0,"Nibbles;1 lf minor;2 lvs minor",1,0,0,0,3,0,0
+2006001318,2943,2006,"Inbreeding",14,25,"other (Note)",0,0,0,0,0,0,0,0,"Nibbles;Holes;2 lvs minor;4 lvs minor",1,1,0,0,6,0,0
+2006001338,2944,2006,"Inbreeding",8,20,"1 aphid",0,0,0,1,0,0,0,0,"Nibbles;Holes;2 lvs minor",1,1,0,0,2,0,0
+2006001339,2945,2006,"Inbreeding",7,34,"",0,0,0,0,0,0,0,0,"Nibbles;Holes;1 lf minor;4 lvs minor",1,1,0,0,5,0,0
+2006001340,2945,2006,"Inbreeding",5,37,"",0,0,0,0,0,0,0,0,"Nibbles;Holes;1 lf minor",1,1,0,0,1,0,0
+2006001341,2946,2006,"Inbreeding",10,19,"11-80 aphids;2-10 ants",0,1,0,0,0,1,0,0,"Nibbles;Holes;1 lf minor;4 lvs minor",1,1,0,0,5,0,0
+2006001342,2946,2006,"Inbreeding",10,26,"larva;other (Note)",0,0,0,0,0,0,0,0,"Nibbles;1 lf minor",1,0,0,0,1,0,0
+2006001343,2947,2006,"Inbreeding",10,32,"",0,0,0,0,0,0,0,0,"Nibbles;Holes;1 lf minor;2 lvs half-gone;4 lvs minor",1,1,0,0,5,2,0
+2006001346,3191,2006,"Inbreeding",9,23,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2006001347,3194,2006,"Inbreeding",9,21,"2-10 ants",0,1,0,0,0,0,0,0,"Nibbles;1 lf minor",1,0,0,0,1,0,0
+2006001348,3194,2006,"Inbreeding",10,22,"1 ant",1,0,0,0,0,0,0,0,"Nibbles;Holes;1 lf minor",1,1,0,0,1,0,0
+2006001349,3194,2006,"Inbreeding",13,22,">80 aphids;>10 ants",0,0,1,0,0,0,1,0,"Nibbles;2 lvs minor",1,0,0,0,2,0,0
+2006001350,3196,2006,"Inbreeding",12,22,"",0,0,0,0,0,0,0,0,"Nibbles;1 lf minor",1,0,0,0,1,0,0
+2006001351,3197,2006,"Inbreeding",7,19,"",0,0,0,0,0,0,0,0,"Nibbles;Wrinkles;1 lf minor",1,0,1,0,1,0,0
+2006001352,3202,2006,"Inbreeding",10,18,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2006001353,3210,2006,"Inbreeding",17,25,"beetle;thorn hopper",0,0,0,0,0,0,0,0,"Nibbles;4 lvs minor",1,0,0,0,4,0,0
+2006001373,3332,2006,"Inbreeding",10,34,"",0,0,0,0,0,0,0,0,"Nibbles;Holes;1 lf minor;2 lvs minor",1,1,0,0,3,0,0
+2006001374,3339,2006,"Inbreeding",13,25,"11-80 aphids;2-10 ants",0,1,0,0,0,1,0,0,"",NA,NA,NA,NA,0,0,0
+2006001375,3341,2006,"Inbreeding",10,22,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2006001376,3351,2006,"Inbreeding",10,22,"11-80 aphids;2-10 ants",0,1,0,0,0,1,0,0,"",NA,NA,NA,NA,0,0,0
+2006001377,3351,2006,"Inbreeding",8,20,"2-10 aphids;2-10 ants",0,1,0,0,1,0,0,0,"",NA,NA,NA,NA,0,0,0
+2006001378,3351,2006,"Inbreeding",11,22,"",0,0,0,0,0,0,0,0,"Nibbles;2 lvs minor",1,0,0,0,2,0,0
+2006001379,3353,2006,"Inbreeding",9,19,"",0,0,0,0,0,0,0,0,"Nibbles;Holes;1 lf minor;2 lvs minor",1,1,0,0,3,0,0
+2006001380,3353,2006,"Inbreeding",9,17,"larva;thorn hopper;other (Note)",0,0,0,0,0,0,0,0,"Nibbles;Holes;2 lvs minor",1,1,0,0,2,0,0
+2006001381,3353,2006,"Inbreeding",10,17,"larva",0,0,0,0,0,0,0,0,"Nibbles;1 lf minor",1,0,0,0,1,0,0
+2006001382,3353,2006,"Inbreeding",9,16,"",0,0,0,0,0,0,0,0,"Nibbles;Holes;2 lvs minor;2 lvs half-gone",1,1,0,0,2,2,0
+2006001394,3075,2006,"Inbreeding",10,19,"",0,0,0,0,0,0,0,0,"Nibbles;1 lf minor",1,0,0,0,1,0,0
+2006001395,3076,2006,"Inbreeding",9,22,"2-10 ants",0,1,0,0,0,0,0,0,"Holes;2 lvs minor",0,1,0,0,2,0,0
+2006001396,3080,2006,"Inbreeding",7,17,"",0,0,0,0,0,0,0,0,"Nibbles;Holes;1 lf minor",1,1,0,0,1,0,0
+2006001397,3080,2006,"Inbreeding",9,16,"",0,0,0,0,0,0,0,0,"Nibbles;Holes;4 lvs minor",1,1,0,0,4,0,0
+2006001398,3080,2006,"Inbreeding",11,19,"",0,0,0,0,0,0,0,0,"Nibbles;Holes;1 lf minor;2 lvs minor",1,1,0,0,3,0,0
+2006001399,3080,2006,"Inbreeding",7,21,"",0,0,0,0,0,0,0,0,"Holes;1 lf minor;2 lvs minor",0,1,0,0,3,0,0
+2006001400,3081,2006,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2006001401,3081,2006,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2006001402,3081,2006,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2006001403,3081,2006,"Inbreeding",24,21,"",0,0,0,0,0,0,0,0,"Holes;2 lvs minor;4 lvs minor",0,1,0,0,6,0,0
+2006001404,3082,2006,"Inbreeding",16,20,"other (Note)",0,0,0,0,0,0,0,0,"Nibbles;Holes;2 lvs minor;4 lvs minor",1,1,0,0,6,0,0
+2006001405,3082,2006,"Inbreeding",9,18,"other (Note)",0,0,0,0,0,0,0,0,"Nibbles;2 lvs minor",1,0,0,0,2,0,0
+2006001406,3082,2006,"Inbreeding",13,19,"",0,0,0,0,0,0,0,0,"Holes;4 lvs minor",0,1,0,0,4,0,0
+2006001407,3083,2006,"Inbreeding",13,22,"",0,0,0,0,0,0,0,0,"Holes;4 lvs minor",0,1,0,0,4,0,0
+2006001408,3083,2006,"Inbreeding",15,24,"",0,0,0,0,0,0,0,0,"Nibbles;Holes;8 lvs minor;1 lf minor",1,1,0,0,9,0,0
+2006001409,3083,2006,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2006001410,3083,2006,"Inbreeding",16,24,"",0,0,0,0,0,0,0,0,"Nibbles;Holes;2 lvs minor;4 lvs minor",1,1,0,0,6,0,0
+2006001411,3083,2006,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2006001412,3083,2006,"Inbreeding",20,23,"",0,0,0,0,0,0,0,0,"Nibbles;Holes;1 lf minor;2 lvs minor;4 lvs minor",1,1,0,0,7,0,0
+2006001413,3359,2006,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2006001414,3359,2006,"Inbreeding",17,22,"",0,0,0,0,0,0,0,0,"Nibbles;2 lvs minor;4 lvs minor",1,0,0,0,6,0,0
+2006001415,3359,2006,"Inbreeding",0,NA,"other (Note)",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2006001416,3219,2006,"Inbreeding",14,21,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2006001417,3219,2006,"Inbreeding",14,21,"",0,0,0,0,0,0,0,0,"Holes;2 lvs minor;4 lvs minor",0,1,0,0,6,0,0
+2006001418,3219,2006,"Inbreeding",13,24,"",0,0,0,0,0,0,0,0,"Holes;2 lvs minor;4 lvs minor",0,1,0,0,6,0,0
+2006001419,3219,2006,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2006001420,3220,2006,"Inbreeding",16,20,"",0,0,0,0,0,0,0,0,"Nibbles;Holes;1 lf minor;2 lvs minor;4 lvs minor",1,1,0,0,7,0,0
+2006001421,3221,2006,"Inbreeding",15,28,"larva",0,0,0,0,0,0,0,0,"Nibbles;Holes;2 lvs minor;4 lvs minor",1,1,0,0,6,0,0
+2006001422,3222,2006,"Inbreeding",9,20,"larva",0,0,0,0,0,0,0,0,"Nibbles;Holes;1 lf minor;4 lvs minor",1,1,0,0,5,0,0
+2006001423,3222,2006,"Inbreeding",9,17,"beetle",0,0,0,0,0,0,0,0,"Nibbles;Holes;1 lf minor;4 lvs minor",1,1,0,0,5,0,0
+2006001424,3222,2006,"Inbreeding",11,21,"",0,0,0,0,0,0,0,0,"Nibbles;Holes;1 lf minor;2 lvs minor;4 lvs minor",1,1,0,0,7,0,0
+2006001425,3222,2006,"Inbreeding",9,21,"",0,0,0,0,0,0,0,0,"Nibbles;Holes;1 lf minor;2 lvs minor;4 lvs minor",1,1,0,0,7,0,0
+2006001426,3222,2006,"Inbreeding",14,22,"",0,0,0,0,0,0,0,0,"Nibbles;Holes;8 lvs minor",1,1,0,0,8,0,0
+2006001427,3222,2006,"Inbreeding",9,13,"",0,0,0,0,0,0,0,0,"Nibbles;Holes;2 lvs minor;4 lvs minor",1,1,0,0,6,0,0
+2006001428,3222,2006,"Inbreeding",15,20,"beetle",0,0,0,0,0,0,0,0,"Nibbles;Holes;2 lvs minor;4 lvs minor",1,1,0,0,6,0,0
+2006001429,3223,2006,"Inbreeding",9,28,"",0,0,0,0,0,0,0,0,"Nibbles;Holes;1 lf minor;2 lvs minor",1,1,0,0,3,0,0
+2006001430,3372,2006,"Inbreeding",10,32,"2-10 aphids;2-10 ants;thorn hopper",0,1,0,0,1,0,0,0,"Nibbles;2 lvs minor",1,0,0,0,2,0,0
+2006001431,3372,2006,"Inbreeding",10,33,"",0,0,0,0,0,0,0,0,"Nibbles;Holes;2 lvs minor",1,1,0,0,2,0,0
+2006001432,2957,2006,"Inbreeding",11,22,"11-80 aphids",0,0,0,0,0,1,0,0,"Nibbles;1 lf minor",1,0,0,0,1,0,0
+2006001433,2957,2006,"Inbreeding",10,22,"11-80 aphids",0,0,0,0,0,1,0,0,"Nibbles;4 lvs minor",1,0,0,0,4,0,0
+2006001434,2957,2006,"Inbreeding",15,25,"2-10 aphids",0,0,0,0,1,0,0,0,"Nibbles;Holes;1 lf minor;1 lf half-gone;2 lvs minor;4 lvs minor",1,1,0,0,7,1,0
+2006001435,2958,2006,"Inbreeding",14,27,"",0,0,0,0,0,0,0,0,"Nibbles;Holes;2 lvs minor",1,1,0,0,2,0,0
+2006001436,2962,2006,"Inbreeding",13,24,"",0,0,0,0,0,0,0,0,"Nibbles;1 lf minor",1,0,0,0,1,0,0
+2006001437,2968,2006,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2006001438,2968,2006,"Inbreeding",21,21,"2-10 aphids",0,0,0,0,1,0,0,0,"Nibbles;Wrinkles;1 lf minor;4 lvs minor",1,0,1,0,5,0,0
+2006001439,2977,2006,"Inbreeding",15,19,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2006001440,2977,2006,"Inbreeding",19,20,"1 ant",1,0,0,0,0,0,0,0,"Nibbles;2 lvs minor",1,0,0,0,2,0,0
+2006001441,2986,2006,"Inbreeding",6,29,"",0,0,0,0,0,0,0,0,"Nibbles;1 lf minor;2 lvs minor;2 lvs half-gone",1,0,0,0,3,2,0
+2006001442,2986,2006,"Inbreeding",10,30,"",0,0,0,0,0,0,0,0,"Nibbles;4 lvs minor",1,0,0,0,4,0,0
+2006001443,2989,2006,"Inbreeding",14,27,"other (Note)",0,0,0,0,0,0,0,0,"Nibbles;1 lf minor;4 lvs minor",1,0,0,0,5,0,0
+2006001444,2991,2006,"Inbreeding",12,23,"",0,0,0,0,0,0,0,0,"Nibbles;1 lf minor",1,0,0,0,1,0,0
+2006001445,2996,2006,"Inbreeding",13,29,"11-80 aphids;2-10 ants",0,1,0,0,0,1,0,0,"Nibbles;2 lvs minor",1,0,0,0,2,0,0
+2006001446,2998,2006,"Inbreeding",9,22,"",0,0,0,0,0,0,0,0,"Nibbles;Holes;1 lf minor;1 lf half-gone",1,1,0,0,1,1,0
+2006001447,2999,2006,"Inbreeding",12,21,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2006001448,3002,2006,"Inbreeding",9,18,"",0,0,0,0,0,0,0,0,"Holes;1 lf minor",0,1,0,0,1,0,0
+2006001449,3002,2006,"Inbreeding",9,19,"1 aphid",0,0,0,1,0,0,0,0,"Nibbles;1 lf minor",1,0,0,0,1,0,0
+2006001450,3002,2006,"Inbreeding",9,16,"",0,0,0,0,0,0,0,0,"Nibbles;2 lvs minor",1,0,0,0,2,0,0
+2006001451,3002,2006,"Inbreeding",10,14,"",0,0,0,0,0,0,0,0,"Nibbles;1 lf minor",1,0,0,0,1,0,0
+2006001452,3003,2006,"Inbreeding",19,13,"1 ant",1,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2006001458,3052,2006,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2006001459,3052,2006,"Inbreeding",13,21,"11-80 aphids;2-10 ants",0,1,0,0,0,1,0,0,"Holes;2 lvs minor",0,1,0,0,2,0,0
+2006001460,3058,2006,"Inbreeding",7,23,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2006001461,3059,2006,"Inbreeding",9,15,"",0,0,0,0,0,0,0,0,"Nibbles;4 lvs minor",1,0,0,0,4,0,0
+2006001462,3059,2006,"Inbreeding",9,21,"",0,0,0,0,0,0,0,0,"Nibbles;1 lf minor;1 lf half-gone",1,0,0,0,1,1,0
+2006001463,3061,2006,"Inbreeding",15,20,"11-80 aphids;>10 ants",0,0,1,0,0,1,0,0,"Nibbles;Holes;2 lvs half-gone;8 lvs minor",1,1,0,0,8,2,0
+2006001464,3064,2006,"Inbreeding",12,19,"2-10 ants",0,1,0,0,0,0,0,0,"Holes;1 lf minor",0,1,0,0,1,0,0
+2006001465,3064,2006,"Inbreeding",10,19,"",0,0,0,0,0,0,0,0,"Nibbles;1 lf minor",1,0,0,0,1,0,0
+2006001466,3065,2006,"Inbreeding",11,19,"",0,0,0,0,0,0,0,0,"Holes;4 lvs minor",0,1,0,0,4,0,0
+2006001467,3070,2006,"Inbreeding",13,21,"",0,0,0,0,0,0,0,0,"Nibbles;Holes;1 lf minor;4 lvs minor",1,1,0,0,5,0,0
+2006001468,3073,2006,"Inbreeding",12,25,"",0,0,0,0,0,0,0,0,"Nibbles;1 lf minor;2 lvs minor",1,0,0,0,3,0,0
+2006001469,3073,2006,"Inbreeding",12,27,"larva",0,0,0,0,0,0,0,0,"Holes;2 lvs minor",0,1,0,0,2,0,0
+2006001470,3073,2006,"Inbreeding",8,25,"",0,0,0,0,0,0,0,0,"Nibbles;4 lvs minor",1,0,0,0,4,0,0
+2006001471,3073,2006,"Inbreeding",9,25,"other (Note)",0,0,0,0,0,0,0,0,"Nibbles;2 lvs minor",1,0,0,0,2,0,0
+2006001472,3074,2006,"Inbreeding",15,24,"",0,0,0,0,0,0,0,0,"Holes;1 lf minor;2 lvs minor",0,1,0,0,3,0,0
+2006001473,3083,2006,"Inbreeding",7,24,"",0,0,0,0,0,0,0,0,"Nibbles;Holes;4 lvs minor",1,1,0,0,4,0,0
+2006001474,3083,2006,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2006001475,3085,2006,"Inbreeding",15,20,"",0,0,0,0,0,0,0,0,"Nibbles;Holes;1 lf minor;2 lvs minor;4 lvs minor",1,1,0,0,7,0,0
+2006001476,3086,2006,"Inbreeding",9,21,"",0,0,0,0,0,0,0,0,"Nibbles;Holes;1 lf minor;2 lvs minor",1,1,0,0,3,0,0
+2006001477,3086,2006,"Inbreeding",8,22,"",0,0,0,0,0,0,0,0,"Nibbles;Holes;2 lvs minor",1,1,0,0,2,0,0
+2006001478,3086,2006,"Inbreeding",3,25,"",0,0,0,0,0,0,0,0,"Nibbles;Holes;2 lvs minor",1,1,0,0,2,0,0
+2006001479,3086,2006,"Inbreeding",9,27,"",0,0,0,0,0,0,0,0,"Nibbles;1 lf minor",1,0,0,0,1,0,0
+2006001480,3087,2006,"Inbreeding",6,40,"",0,0,0,0,0,0,0,0,"Nibbles;2 lvs minor;4 lvs half-gone",1,0,0,0,2,4,0
+2006001481,3087,2006,"Inbreeding",10,36,"",0,0,0,0,0,0,0,0,"Nibbles;2 lvs half-gone;4 lvs minor",1,0,0,0,4,2,0
+2006001482,3088,2006,"Inbreeding",6,23,"",0,0,0,0,0,0,0,0,"Nibbles;2 lvs minor",1,0,0,0,2,0,0
+2006001483,3088,2006,"Inbreeding",9,22,"",0,0,0,0,0,0,0,0,"Nibbles;Holes;8 lvs minor",1,1,0,0,8,0,0
+2006001484,3088,2006,"Inbreeding",10,28,"",0,0,0,0,0,0,0,0,"Nibbles;Holes;8 lvs minor;2 lvs minor",1,1,0,0,10,0,0
+2006001485,3089,2006,"Inbreeding",6,23,"",0,0,0,0,0,0,0,0,"Nibbles;1 lf minor;2 lvs minor",1,0,0,0,3,0,0
+2006001486,3092,2006,"Inbreeding",10,20,"",0,0,0,0,0,0,0,0,"Holes;1 lf minor",0,1,0,0,1,0,0
+2006001487,3097,2006,"Inbreeding",12,22,"",0,0,0,0,0,0,0,0,"Holes;2 lvs minor;4 lvs minor",0,1,0,0,6,0,0
+2006001488,3101,2006,"Inbreeding",8,23,"",0,0,0,0,0,0,0,0,"Nibbles;1 lf minor",1,0,0,0,1,0,0
+2006001489,3357,2006,"Inbreeding",9,24,"",0,0,0,0,0,0,0,0,"Nibbles;Holes;2 lvs minor",1,1,0,0,2,0,0
+2006001490,3359,2006,"Inbreeding",14,18,"",0,0,0,0,0,0,0,0,"Nibbles;1 lf minor;2 lvs minor",1,0,0,0,3,0,0
+2006001510,2947,2006,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2007000599,2922,2007,"Inbreeding",11,21,"",0,0,0,0,0,0,0,0,"Wrinkles;2 lvs half-gone",0,0,1,0,0,2,0
+2007000600,2925,2007,"Inbreeding",14,31,"white gunk",0,0,0,0,0,0,0,0,"Nibbles;Holes;2 lvs minor;4 lvs minor",1,1,0,0,6,0,0
+2007000601,2932,2007,"Inbreeding",9,23,"white gunk",0,0,0,0,0,0,0,0,"Nibbles;Holes;1 lf minor;4 lvs minor",1,1,0,0,5,0,0
+2007000602,2937,2007,"Inbreeding",11,21,"",0,0,0,0,0,0,0,0,"Nibbles;1 lf minor;2 lvs minor",1,0,0,0,3,0,0
+2007000603,2937,2007,"Inbreeding",11,NA,"white gunk",0,0,0,0,0,0,0,0,"Nibbles;Holes;4 lvs minor",1,1,0,0,4,0,0
+2007000604,2938,2007,"Inbreeding",12,23,"2-10 ants;white gunk",0,1,0,0,0,0,0,0,"Nibbles;1 lf minor;4 lvs minor",1,0,0,0,5,0,0
+2007000605,2939,2007,"Inbreeding",12,NA,"1 ant",1,0,0,0,0,0,0,0,"Nibbles;1 lf half-gone;1 lf gone;4 lvs minor",1,0,0,0,4,1,1
+2007000606,2941,2007,"Inbreeding",8,27,"2-10 aphids;white gunk",0,0,0,0,1,0,0,0,"Nibbles;1 lf minor;4 lvs minor",1,0,0,0,5,0,0
+2007000607,2941,2007,"Inbreeding",9,28,"",0,0,0,0,0,0,0,0,"Nibbles;Holes;4 lvs minor",1,1,0,0,4,0,0
+2007000608,2943,2007,"Inbreeding",12,27,"1 ant",1,0,0,0,0,0,0,0,"Nibbles;2 lvs minor;4 lvs minor",1,0,0,0,6,0,0
+2007000609,2946,2007,"Inbreeding",7,29,"",0,0,0,0,0,0,0,0,"Nibbles;1 lf minor;4 lvs minor",1,0,0,0,5,0,0
+2007000610,2946,2007,"Inbreeding",8,31,"",0,0,0,0,0,0,0,0,"Nibbles;Holes;1 lf half-gone;4 lvs minor",1,1,0,0,4,1,0
+2007000611,2948,2007,"Inbreeding",9,36,"11-80 aphids",0,0,0,0,0,1,0,0,"Nibbles;1 lf minor;1 lf gone;2 lvs minor;4 lvs minor",1,0,0,0,7,0,1
+2007000612,2949,2007,"Inbreeding",8,26,"",0,0,0,0,0,0,0,0,"Nibbles;Holes;4 lvs minor",1,1,0,0,4,0,0
+2007000613,2952,2007,"Inbreeding",10,21,"white gunk",0,0,0,0,0,0,0,0,"Nibbles;4 lvs minor",1,0,0,0,4,0,0
+2007000614,2952,2007,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2007000624,3190,2007,"Inbreeding",13,22,"2-10 aphids;2-10 ants",0,1,0,0,1,0,0,0,"Nibbles;1 lf minor;4 lvs minor",1,0,0,0,5,0,0
+2007000639,3209,2007,"Inbreeding",9,35,"",0,0,0,0,0,0,0,0,"Nibbles;1 lf minor;2 lvs minor",1,0,0,0,3,0,0
+2007000642,3210,2007,"Inbreeding",15,17,"white gunk",0,0,0,0,0,0,0,0,"Nibbles;1 lf minor;2 lvs minor;4 lvs minor",1,0,0,0,7,0,0
+2007000644,3210,2007,"Inbreeding",13,30,"white gunk",0,0,0,0,0,0,0,0,"Nibbles;2 lvs minor;4 lvs minor",1,0,0,0,6,0,0
+2007000648,3212,2007,"Inbreeding",14,32,"",0,0,0,0,0,0,0,0,"Nibbles;8 lvs minor",1,0,0,0,8,0,0
+2007000652,3219,2007,"Inbreeding",10,15,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2007000653,3219,2007,"Inbreeding",15,27,"white gunk;wht fuzzy",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2007000654,3219,2007,"Inbreeding",15,27,"white gunk",0,0,0,0,0,0,0,0,"Nibbles;2 lvs minor",1,0,0,0,2,0,0
+2007000656,3219,2007,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2007000661,3222,2007,"Inbreeding",12,22,"",0,0,0,0,0,0,0,0,"Nibbles;1 lf minor;2 lvs minor;4 lvs minor",1,0,0,0,7,0,0
+2007000663,3222,2007,"Inbreeding",23,NA,"",0,0,0,0,0,0,0,0,"Nibbles;Holes;1 lf minor;2 lvs minor",1,1,0,0,3,0,0
+2007000665,3222,2007,"Inbreeding",11,12,"",0,0,0,0,0,0,0,0,"Nibbles;Holes;1 lf minor;1 lf gone;2 lvs gone;4 lvs minor",1,1,0,0,5,0,3
+2007000666,3222,2007,"Inbreeding",11,21,"",0,0,0,0,0,0,0,0,"Nibbles;1 lf minor;2 lvs minor",1,0,0,0,3,0,0
+2007000668,3222,2007,"Inbreeding",10,16,"white gunk",0,0,0,0,0,0,0,0,"Nibbles;Holes;4 lvs minor",1,1,0,0,4,0,0
+2007000669,3058,2007,"Inbreeding",6,33,"",0,0,0,0,0,0,0,0,"Nibbles;Holes;1 lf gone;2 lvs minor",1,1,0,0,2,0,1
+2007000672,3222,2007,"Inbreeding",10,13,"",0,0,0,0,0,0,0,0,"Nibbles;Holes;1 lf gone;2 lvs minor;2 lvs gone",1,1,0,0,2,0,3
+2007000674,3224,2007,"Inbreeding",12,26,"",0,0,0,0,0,0,0,0,"Nibbles;Holes;8 lvs minor;2 lvs minor",1,1,0,0,10,0,0
+2007000676,3059,2007,"Inbreeding",10,36,"",0,0,0,0,0,0,0,0,"Nibbles;Holes;1 lf minor;1 lf gone;2 lvs minor",1,1,0,0,3,0,1
+2007000682,3233,2007,"Inbreeding",15,30,"white gunk;wht fuzzy",0,0,0,0,0,0,0,0,"Nibbles;1 lf minor;2 lvs minor;4 lvs minor",1,0,0,0,7,0,0
+2007000686,3070,2007,"Inbreeding",17,23,"",0,0,0,0,0,0,0,0,"Nibbles;Holes;2 lvs minor;4 lvs minor",1,1,0,0,6,0,0
+2007000687,3235,2007,"Inbreeding",16,29,"11-80 aphids;white gunk",0,0,0,0,0,1,0,0,"Nibbles;Holes;4 lvs minor",1,1,0,0,4,0,0
+2007000689,3236,2007,"Inbreeding",12,17,"white gunk",0,0,0,0,0,0,0,0,"Nibbles;Holes;1 lf minor;2 lvs minor",1,1,0,0,3,0,0
+2007000692,3237,2007,"Inbreeding",12,30,"white gunk;wht fuzzy",0,0,0,0,0,0,0,0,"Nibbles;Holes;1 lf half-gone;1 lf gone;4 lvs minor",1,1,0,0,4,1,1
+2007000694,3073,2007,"Inbreeding",8,37,"",0,0,0,0,0,0,0,0,"Nibbles;1 lf minor;4 lvs minor",1,0,0,0,5,0,0
+2007000695,3242,2007,"Inbreeding",21,23,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2007000698,3243,2007,"Inbreeding",12,27,"white gunk",0,0,0,0,0,0,0,0,"Nibbles;Holes;1 lf gone;4 lvs minor",1,1,0,0,4,0,1
+2007000699,3074,2007,"Inbreeding",15,33,"white gunk",0,0,0,0,0,0,0,0,"Nibbles;Holes;1 lf minor;4 lvs minor",1,1,0,0,5,0,0
+2007000704,3075,2007,"Inbreeding",9,22,"",0,0,0,0,0,0,0,0,"Nibbles;1 lf minor",1,0,0,0,1,0,0
+2007000707,3076,2007,"Inbreeding",12,24,"white gunk",0,0,0,0,0,0,0,0,"Nibbles;Holes;1 lf minor;8 lvs minor",1,1,0,0,9,0,0
+2007000710,3080,2007,"Inbreeding",13,31,"",0,0,0,0,0,0,0,0,"Nibbles;Holes;8 lvs minor;1 lf minor",1,1,0,0,9,0,0
+2007000716,3081,2007,"Inbreeding",19,29,"",0,0,0,0,0,0,0,0,"Nibbles;Holes;8 lvs minor;4 lvs minor",1,1,0,0,12,0,0
+2007000720,3082,2007,"Inbreeding",13,21,"",0,0,0,0,0,0,0,0,"Nibbles;1 lf minor;2 lvs minor",1,0,0,0,3,0,0
+2007000722,3265,2007,"Inbreeding",10,22,"1 ant;wht fuzzy",1,0,0,0,0,0,0,0,"Nibbles;1 lf minor;2 lvs minor",1,0,0,0,3,0,0
+2007000723,3083,2007,"Inbreeding",13,20,"2-10 aphids;white gunk",0,0,0,0,1,0,0,0,"Nibbles;Holes;1 lf minor;2 lvs minor;4 lvs minor",1,1,0,0,7,0,0
+2007000725,3083,2007,"Inbreeding",29,25,"",0,0,0,0,0,0,0,0,"Nibbles;Holes;8 lvs minor;4 lvs minor;2 lvs minor;1 lf minor",1,1,0,0,15,0,0
+2007000728,3083,2007,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2007000730,3083,2007,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2007000731,3083,2007,"Inbreeding",15,25,"",0,0,0,0,0,0,0,0,"Nibbles;Holes;1 lf minor;4 lvs minor",1,1,0,0,5,0,0
+2007000732,3083,2007,"Inbreeding",18,29,"",0,0,0,0,0,0,0,0,"Nibbles;Holes;1 lf minor;2 lvs minor;4 lvs minor",1,1,0,0,7,0,0
+2007000733,3083,2007,"Inbreeding",16,28,"",0,0,0,0,0,0,0,0,"Nibbles;Holes;1 lf minor;4 lvs minor",1,1,0,0,5,0,0
+2007000736,3086,2007,"Inbreeding",6,28,"",0,0,0,0,0,0,0,0,"Nibbles;Holes;1 lf minor;1 lf gone",1,1,0,0,1,0,1
+2007000738,3086,2007,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2007000739,3086,2007,"Inbreeding",15,27,"white gunk",0,0,0,0,0,0,0,0,"Nibbles;Holes;1 lf gone;2 lvs minor;4 lvs minor",1,1,0,0,6,0,1
+2007000740,3276,2007,"Inbreeding",10,22,"",0,0,0,0,0,0,0,0,"Nibbles;1 lf minor",1,0,0,0,1,0,0
+2007000742,3086,2007,"Inbreeding",0,NA,"white gunk",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2007000743,3086,2007,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2007000745,3086,2007,"Inbreeding",14,26,"",0,0,0,0,0,0,0,0,"Nibbles;2 lvs gone;4 lvs minor",1,0,0,0,4,0,2
+2007000748,3087,2007,"Inbreeding",16,20,"white gunk",0,0,0,0,0,0,0,0,"Nibbles;Holes;1 lf minor;1 lf half-gone;2 lvs minor;4 lvs minor",1,1,0,0,7,1,0
+2007000750,3087,2007,"Inbreeding",17,28,"white gunk",0,0,0,0,0,0,0,0,"Nibbles;Holes;1 lf gone;8 lvs minor",1,1,0,0,8,0,1
+2007000751,3088,2007,"Inbreeding",10,25,"",0,0,0,0,0,0,0,0,"Nibbles;1 lf minor;1 lf gone;2 lvs gone",1,0,0,0,1,0,3
+2007000752,3088,2007,"Inbreeding",9,24,"1 ant",1,0,0,0,0,0,0,0,"Nibbles;Holes;1 lf minor;1 lf gone;4 lvs minor",1,1,0,0,5,0,1
+2007000754,3088,2007,"Inbreeding",10,23,"",0,0,0,0,0,0,0,0,"Nibbles;4 lvs minor",1,0,0,0,4,0,0
+2007000755,3288,2007,"Inbreeding",9,NA,"11-80 aphids;2-10 ants",0,1,0,0,0,1,0,0,"",NA,NA,NA,NA,0,0,0
+2007000756,3088,2007,"Inbreeding",10,27,"",0,0,0,0,0,0,0,0,"Nibbles;Holes;1 lf gone;2 lvs half-gone;4 lvs minor",1,1,0,0,4,2,1
+2007000757,3288,2007,"Inbreeding",10,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2007000758,3088,2007,"Inbreeding",10,20,"",0,0,0,0,0,0,0,0,"Nibbles;1 lf half-gone;1 lf gone;4 lvs minor",1,0,0,0,4,1,1
+2007000759,3088,2007,"Inbreeding",13,25,"white gunk",0,0,0,0,0,0,0,0,"Nibbles;1 lf minor;1 lf gone;4 lvs minor",1,0,0,0,5,0,1
+2007000760,3088,2007,"Inbreeding",9,26,"",0,0,0,0,0,0,0,0,"Nibbles;1 lf half-gone;1 lf gone;2 lvs minor",1,0,0,0,2,1,1
+2007000761,3089,2007,"Inbreeding",9,23,"",0,0,0,0,0,0,0,0,"Nibbles;1 lf minor;1 lf half-gone;1 lf gone",1,0,0,0,1,1,1
+2007000762,3089,2007,"Inbreeding",12,25,"",0,0,0,0,0,0,0,0,"Nibbles;1 lf minor;2 lvs minor",1,0,0,0,3,0,0
+2007000763,3334,2007,"Inbreeding",5,27,"",0,0,0,0,0,0,0,0,"Nibbles;Holes;4 lvs minor",1,1,0,0,4,0,0
+2007000765,3096,2007,"Inbreeding",11,27,"",0,0,0,0,0,0,0,0,"Nibbles;1 lf half-gone;2 lvs minor",1,0,0,0,2,1,0
+2007000767,3339,2007,"Inbreeding",11,30,"11-80 aphids",0,0,0,0,0,1,0,0,"Nibbles;1 lf minor;4 lvs minor",1,0,0,0,5,0,0
+2007000768,3122,2007,"Inbreeding",10,27,"white gunk;cat frass",0,0,0,0,0,0,0,0,"Nibbles;1 lf minor;2 lvs minor",1,0,0,0,3,0,0
+2007000769,3122,2007,"Inbreeding",11,28,"white gunk",0,0,0,0,0,0,0,0,"Nibbles;2 lvs minor",1,0,0,0,2,0,0
+2007000770,3341,2007,"Inbreeding",7,27,"",0,0,0,0,0,0,0,0,"Nibbles;1 lf minor",1,0,0,0,1,0,0
+2007000771,3097,2007,"Inbreeding",8,23,"",0,0,0,0,0,0,0,0,"Nibbles;Holes;1 lf minor;2 lvs minor;2 lvs half-gone;2 lvs gone",1,1,0,0,3,2,2
+2007000773,3124,2007,"Inbreeding",12,19,"white gunk",0,0,0,0,0,0,0,0,"Nibbles;Holes;Other type (Note);8 lvs minor",1,1,0,0,8,0,0
+2007000777,3126,2007,"Inbreeding",10,18,"1 ant",1,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2007000779,3112,2007,"Inbreeding",13,34,"11-80 aphids;1 ant",1,0,0,0,0,1,0,0,"Nibbles;Holes;1 lf minor;4 lvs minor",1,1,0,0,5,0,0
+2007000781,3130,2007,"Inbreeding",9,23,"white gunk",0,0,0,0,0,0,0,0,"Nibbles;Holes;2 lvs minor",1,1,0,0,2,0,0
+2007000783,3351,2007,"Inbreeding",10,30,"11-80 aphids;2-10 ants",0,1,0,0,0,1,0,0,"Nibbles;Holes;2 lvs minor;4 lvs minor",1,1,0,0,6,0,0
+2007000789,3352,2007,"Inbreeding",12,24,"",0,0,0,0,0,0,0,0,"Nibbles;2 lvs minor",1,0,0,0,2,0,0
+2007000792,3136,2007,"Inbreeding",12,19,"2-10 aphids;white gunk",0,0,0,0,1,0,0,0,"Nibbles;2 lvs minor",1,0,0,0,2,0,0
+2007000795,3353,2007,"Inbreeding",11,25,"white gunk",0,0,0,0,0,0,0,0,"Nibbles;2 lvs minor;4 lvs minor",1,0,0,0,6,0,0
+2007000797,2989,2007,"Inbreeding",10,32,"white gunk",0,0,0,0,0,0,0,0,"Nibbles;1 lf minor",1,0,0,0,1,0,0
+2007000798,3353,2007,"Inbreeding",9,19,"11-80 aphids;1 ant;wht fuzzy",1,0,0,0,0,1,0,0,"Nibbles;1 lf minor;2 lvs minor",1,0,0,0,3,0,0
+2007000799,3412,2007,"Inbreeding",8,21,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2007000801,2991,2007,"Inbreeding",11,18,"",0,0,0,0,0,0,0,0,"Nibbles;1 lf minor",1,0,0,0,1,0,0
+2007000803,3353,2007,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2007000804,3138,2007,"Inbreeding",11,18,"",0,0,0,0,0,0,0,0,"Nibbles;1 lf minor",1,0,0,0,1,0,0
+2007000805,2993,2007,"Inbreeding",11,21,"",0,0,0,0,0,0,0,0,"Nibbles;2 lvs minor",1,0,0,0,2,0,0
+2007000807,2993,2007,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2007000808,3138,2007,"Inbreeding",11,19,"white gunk",0,0,0,0,0,0,0,0,"Holes;1 lf minor",0,1,0,0,1,0,0
+2007000811,2999,2007,"Inbreeding",13,24,"white gunk",0,0,0,0,0,0,0,0,"Nibbles;1 lf minor",1,0,0,0,1,0,0
+2007000813,3358,2007,"Inbreeding",11,25,"white gunk",0,0,0,0,0,0,0,0,"Nibbles;2 lvs minor",1,0,0,0,2,0,0
+2007000814,3001,2007,"Inbreeding",10,20,"",0,0,0,0,0,0,0,0,"Holes;2 lvs minor",0,1,0,0,2,0,0
+2007000815,3358,2007,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2007000817,3002,2007,"Inbreeding",10,22,"",0,0,0,0,0,0,0,0,"Nibbles;1 lf minor",1,0,0,0,1,0,0
+2007000818,3359,2007,"Inbreeding",13,29,"wht fuzzy",0,0,0,0,0,0,0,0,"Nibbles;2 lvs minor;4 lvs minor",1,0,0,0,6,0,0
+2007000820,3359,2007,"Inbreeding",12,15,"",0,0,0,0,0,0,0,0,"Nibbles;4 lvs minor",1,0,0,0,4,0,0
+2007000821,3014,2007,"Inbreeding",10,23,"2-10 aphids;11-80 aphids",0,0,0,0,1,1,0,0,"Holes;1 lf minor",0,1,0,0,1,0,0
+2007000822,3014,2007,"Inbreeding",11,26,"11-80 aphids",0,0,0,0,0,1,0,0,"Nibbles;2 lvs minor",1,0,0,0,2,0,0
+2007000823,3359,2007,"Inbreeding",19,22,"11-80 aphids;wht fuzzy",0,0,0,0,0,1,0,0,"Nibbles;1 lf half-gone;8 lvs minor",1,0,0,0,8,1,0
+2007000824,3014,2007,"Inbreeding",9,24,"11-80 aphids;2-10 ants",0,1,0,0,0,1,0,0,"Nibbles;1 lf minor",1,0,0,0,1,0,0
+2007000825,3359,2007,"Inbreeding",0,NA,"11-80 aphids;wht fuzzy",0,0,0,0,0,1,0,0,"",NA,NA,NA,NA,0,0,0
+2007000826,3359,2007,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2007000827,3361,2007,"Inbreeding",14,18,"",0,0,0,0,0,0,0,0,"Nibbles;Wrinkles;1 lf minor;1 lf half-gone;2 lvs minor",1,0,1,0,3,1,0
+2007000833,3371,2007,"Inbreeding",13,23,"",0,0,0,0,0,0,0,0,"Nibbles;1 lf minor;2 lvs minor;4 lvs minor",1,0,0,0,7,0,0
+2007000835,3372,2007,"Inbreeding",9,28,"",0,0,0,0,0,0,0,0,"Nibbles;1 lf minor;4 lvs minor",1,0,0,0,5,0,0
+2007000840,3372,2007,"Inbreeding",13,22,"white gunk;other (Note)",0,0,0,0,0,0,0,0,"Nibbles;8 lvs minor;2 lvs minor",1,0,0,0,10,0,0
+2007000843,3372,2007,"Inbreeding",13,20,"white gunk",0,0,0,0,0,0,0,0,"Nibbles;1 lf minor;2 lvs minor;4 lvs minor",1,0,0,0,7,0,0
+2007000847,3372,2007,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2007000848,3372,2007,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2007000849,3372,2007,"Inbreeding",10,27,"1 ant;white gunk",1,0,0,0,0,0,0,0,"Nibbles;8 lvs minor;1 lf minor;2 lvs minor",1,0,0,0,11,0,0
+2007000850,3372,2007,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2007000851,3374,2007,"Inbreeding",11,29,"2-10 aphids;white gunk",0,0,0,0,1,0,0,0,"Nibbles;Holes;2 lvs minor",1,1,0,0,2,0,0
+2007000852,2953,2007,"Inbreeding",9,29,"2-10 aphids",0,0,0,0,1,0,0,0,"Nibbles;2 lvs minor",1,0,0,0,2,0,0
+2007000853,2953,2007,"Inbreeding",12,30,"white gunk",0,0,0,0,0,0,0,0,"Nibbles;1 lf minor;2 lvs minor",1,0,0,0,3,0,0
+2007000854,2953,2007,"Inbreeding",15,25,"white gunk",0,0,0,0,0,0,0,0,"Nibbles;Holes;2 lvs minor;4 lvs minor",1,1,0,0,6,0,0
+2007000855,2953,2007,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2007000856,3380,2007,"Inbreeding",9,20,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2007000858,2955,2007,"Inbreeding",9,15,"11-80 aphids",0,0,0,0,0,1,0,0,"Nibbles;Holes;2 lvs minor;2 lvs half-gone",1,1,0,0,2,2,0
+2007000859,3382,2007,"Inbreeding",12,27,"2-10 aphids;wht fuzzy",0,0,0,0,1,0,0,0,"Nibbles;2 lvs minor;4 lvs minor",1,0,0,0,6,0,0
+2007000861,2956,2007,"Inbreeding",9,24,"white gunk",0,0,0,0,0,0,0,0,"Nibbles;1 lf minor;4 lvs minor",1,0,0,0,5,0,0
+2007000863,2956,2007,"Inbreeding",11,27,"white gunk",0,0,0,0,0,0,0,0,"Nibbles;Holes;2 lvs minor;4 lvs minor",1,1,0,0,6,0,0
+2007000865,3382,2007,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2007000869,2958,2007,"Inbreeding",12,NA,"white gunk",0,0,0,0,0,0,0,0,"Nibbles;4 lvs minor",1,0,0,0,4,0,0
+2007000870,2958,2007,"Inbreeding",5,32,"",0,0,0,0,0,0,0,0,"Nibbles;1 lf minor",1,0,0,0,1,0,0
+2007000874,2959,2007,"Inbreeding",9,19,"",0,0,0,0,0,0,0,0,"Nibbles;1 lf minor;2 lvs minor",1,0,0,0,3,0,0
+2007000875,2959,2007,"Inbreeding",9,21,"",0,0,0,0,0,0,0,0,"Nibbles;2 lvs minor",1,0,0,0,2,0,0
+2007000876,2959,2007,"Inbreeding",12,18,"white gunk",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2007000877,3394,2007,"Inbreeding",11,22,"",0,0,0,0,0,0,0,0,"Nibbles;1 lf minor;2 lvs minor",1,0,0,0,3,0,0
+2007000879,2959,2007,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2007000880,2959,2007,"Inbreeding",9,17,"white gunk",0,0,0,0,0,0,0,0,"Nibbles;Holes;1 lf minor;1 lf half-gone",1,1,0,0,1,1,0
+2007000882,2959,2007,"Inbreeding",4,20,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2007000885,3397,2007,"Inbreeding",10,35,"11-80 aphids;1 ant",1,0,0,0,0,1,0,0,"Nibbles;Holes;4 lvs minor",1,1,0,0,4,0,0
+2007000891,2985,2007,"Inbreeding",14,30,"other (Note)",0,0,0,0,0,0,0,0,"Nibbles;2 lvs minor;4 lvs minor",1,0,0,0,6,0,0
+2007000892,2986,2007,"Inbreeding",10,29,"11-80 aphids;white gunk",0,0,0,0,0,1,0,0,"Nibbles;1 lf minor;2 lvs minor;4 lvs minor",1,0,0,0,7,0,0
+2008000255,2918,2008,"Inbreeding",10,19,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2008000256,2926,2008,"Inbreeding",12,26,"",0,0,0,0,0,0,0,0,"Nibbles;Holes;2 lvs minor",1,1,0,0,2,0,0
+2008000257,2927,2008,"Inbreeding",4,24,"",0,0,0,0,0,0,0,0,"Nibbles;Holes;Wrinkles;4 lvs minor",1,1,1,0,4,0,0
+2008000258,2932,2008,"Inbreeding",8,30,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2008000259,2932,2008,"Inbreeding",8,20,"11-80 aphids",0,0,0,0,0,1,0,0,"",NA,NA,NA,NA,0,0,0
+2008000260,2932,2008,"Inbreeding",3,12,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2008000261,2934,2008,"Inbreeding",7,18,"2-10 aphids;11-80 aphids",0,0,0,0,1,1,0,0,"Nibbles;1 lf minor",1,0,0,0,1,0,0
+2008000262,2935,2008,"Inbreeding",6,18,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2008000263,2935,2008,"Inbreeding",4,9,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2008000264,2935,2008,"Inbreeding",7,24,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2008000265,2935,2008,"Inbreeding",10,24,"",0,0,0,0,0,0,0,0,"Holes;1 lf minor",0,1,0,0,1,0,0
+2008000266,2936,2008,"Inbreeding",7,20,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2008000267,2936,2008,"Inbreeding",10,26,"beetle",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2008000268,2936,2008,"Inbreeding",11,22,"other (Note)",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2008000269,2937,2008,"Inbreeding",3,9,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2008000270,2937,2008,"Inbreeding",10,26,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2008000271,2937,2008,"Inbreeding",8,22,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2008000272,2937,2008,"Inbreeding",10,23,"",0,0,0,0,0,0,0,0,"Wrinkles;1 lf minor",0,0,1,0,1,0,0
+2008000273,2938,2008,"Inbreeding",7,13,"",0,0,0,0,0,0,0,0,"Nibbles;1 lf minor",1,0,0,0,1,0,0
+2008000274,2938,2008,"Inbreeding",11,22,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2008000275,2938,2008,"Inbreeding",9,16,"2-10 aphids",0,0,0,0,1,0,0,0,"Nibbles;Holes;1 lf minor;4 lvs minor",1,1,0,0,5,0,0
+2008000276,2939,2008,"Inbreeding",14,21,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2008000277,2939,2008,"Inbreeding",4,6,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2008000278,2940,2008,"Inbreeding",4,5,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2008000279,2940,2008,"Inbreeding",7,10,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2008000280,2940,2008,"Inbreeding",16,20,"",0,0,0,0,0,0,0,0,"Nibbles;1 lf minor",1,0,0,0,1,0,0
+2008000281,2948,2008,"Inbreeding",16,17,"2-10 aphids",0,0,0,0,1,0,0,0,"Nibbles;1 lf half-gone",1,0,0,0,0,1,0
+2008000282,2948,2008,"Inbreeding",10,24,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2008000283,2955,2008,"Inbreeding",1,5,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2008000284,2955,2008,"Inbreeding",9,23,"11-80 aphids;2-10 ants",0,1,0,0,0,1,0,0,"",NA,NA,NA,NA,0,0,0
+2008000285,2955,2008,"Inbreeding",1,6,"2-10 aphids",0,0,0,0,1,0,0,0,"",NA,NA,NA,NA,0,0,0
+2008000286,2956,2008,"Inbreeding",8,21,"11-80 aphids;2-10 ants",0,1,0,0,0,1,0,0,"Nibbles;Holes;2 lvs minor",1,1,0,0,2,0,0
+2008000287,2956,2008,"Inbreeding",8,21,"11-80 aphids;2-10 ants",0,1,0,0,0,1,0,0,"",NA,NA,NA,NA,0,0,0
+2008000288,2956,2008,"Inbreeding",5,14,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2008000289,2956,2008,"Inbreeding",4,11,"2-10 aphids;1 ant",1,0,0,0,1,0,0,0,"",NA,NA,NA,NA,0,0,0
+2008000290,2957,2008,"Inbreeding",12,25,"11-80 aphids;2-10 ants;larva;beetle",0,1,0,0,0,1,0,0,"",NA,NA,NA,NA,0,0,0
+2008000291,2957,2008,"Inbreeding",11,23,"2-10 aphids;1 ant",1,0,0,0,1,0,0,0,"Nibbles;Holes;1 lf minor;2 lvs minor",1,1,0,0,3,0,0
+2008000292,2957,2008,"Inbreeding",1,5,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2008000293,2957,2008,"Inbreeding",13,24,"11-80 aphids;2-10 ants",0,1,0,0,0,1,0,0,"Nibbles;1 lf minor",1,0,0,0,1,0,0
+2008000294,2957,2008,"Inbreeding",9,25,"11-80 aphids;2-10 ants",0,1,0,0,0,1,0,0,"Nibbles;1 lf minor;2 lvs gone",1,0,0,0,1,0,2
+2008000295,2957,2008,"Inbreeding",9,26,"11-80 aphids;1 ant",1,0,0,0,0,1,0,0,"Nibbles;1 lf minor",1,0,0,0,1,0,0
+2008000296,2957,2008,"Inbreeding",11,26,"",0,0,0,0,0,0,0,0,"Nibbles;1 lf minor",1,0,0,0,1,0,0
+2008000297,2977,2008,"Inbreeding",12,12,"2-10 aphids;2-10 ants",0,1,0,0,1,0,0,0,"Nibbles;2 lvs minor",1,0,0,0,2,0,0
+2008000298,2977,2008,"Inbreeding",12,15,"11-80 aphids;2-10 ants",0,1,0,0,0,1,0,0,"Nibbles;Holes;2 lvs minor",1,1,0,0,2,0,0
+2008000299,2984,2008,"Inbreeding",7,19,"2-10 aphids;2-10 ants;beetle",0,1,0,0,1,0,0,0,"",NA,NA,NA,NA,0,0,0
+2008000300,2985,2008,"Inbreeding",12,23,"11-80 aphids;>10 ants;beetle",0,0,1,0,0,1,0,0,"",NA,NA,NA,NA,0,0,0
+2008000301,2986,2008,"Inbreeding",9,28,"2-10 aphids;2-10 ants",0,1,0,0,1,0,0,0,"Nibbles;Holes;2 lvs minor",1,1,0,0,2,0,0
+2008000302,2986,2008,"Inbreeding",9,30,"2-10 aphids;2-10 ants",0,1,0,0,1,0,0,0,"Nibbles;1 lf minor;2 lvs minor",1,0,0,0,3,0,0
+2008000303,2986,2008,"Inbreeding",9,32,"11-80 aphids;2-10 ants",0,1,0,0,0,1,0,0,"Nibbles;1 lf minor",1,0,0,0,1,0,0
+2008000304,2986,2008,"Inbreeding",9,31,"2-10 aphids;2-10 ants;beetle",0,1,0,0,1,0,0,0,"Nibbles;Holes;2 lvs minor",1,1,0,0,2,0,0
+2008000305,2986,2008,"Inbreeding",7,30,"2-10 aphids;wht fuzzy",0,0,0,0,1,0,0,0,"Nibbles;Holes;1 lf minor;2 lvs minor",1,1,0,0,3,0,0
+2008000306,2989,2008,"Inbreeding",2,4,"2-10 aphids;1 ant",1,0,0,0,1,0,0,0,"",NA,NA,NA,NA,0,0,0
+2008000307,2989,2008,"Inbreeding",1,2,"2-10 aphids;2-10 ants",0,1,0,0,1,0,0,0,"",NA,NA,NA,NA,0,0,0
+2008000308,2989,2008,"Inbreeding",11,23,">80 aphids;>10 ants",0,0,1,0,0,0,1,0,"Nibbles;2 lvs minor",1,0,0,0,2,0,0
+2008000309,2989,2008,"Inbreeding",11,23,"11-80 aphids;>10 ants",0,0,1,0,0,1,0,0,"Nibbles;2 lvs minor",1,0,0,0,2,0,0
+2008000310,2989,2008,"Inbreeding",0,0,"2-10 aphids;1 ant",1,0,0,0,1,0,0,0,"",NA,NA,NA,NA,0,0,0
+2008000311,2989,2008,"Inbreeding",11,22,"2-10 aphids;2-10 ants",0,1,0,0,1,0,0,0,"Nibbles;Holes;2 lvs minor",1,1,0,0,2,0,0
+2008000312,2991,2008,"Inbreeding",11,26,"11-80 aphids;2-10 ants",0,1,0,0,0,1,0,0,"",NA,NA,NA,NA,0,0,0
+2008000313,2992,2008,"Inbreeding",8,24,"11-80 aphids;2-10 ants",0,1,0,0,0,1,0,0,"",NA,NA,NA,NA,0,0,0
+2008000314,2995,2008,"Inbreeding",7,18,"11-80 aphids;2-10 ants",0,1,0,0,0,1,0,0,"Nibbles;2 lvs minor",1,0,0,0,2,0,0
+2008000315,2995,2008,"Inbreeding",6,15,"11-80 aphids;2-10 ants",0,1,0,0,0,1,0,0,"Nibbles;1 lf minor;2 lvs half-gone",1,0,0,0,1,2,0
+2008000316,2995,2008,"Inbreeding",9,24,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2008000317,2996,2008,"Inbreeding",10,30,"11-80 aphids;2-10 ants",0,1,0,0,0,1,0,0,"",NA,NA,NA,NA,0,0,0
+2008000318,2997,2008,"Inbreeding",6,16,"",0,0,0,0,0,0,0,0,"Nibbles;1 lf half-gone",1,0,0,0,0,1,0
+2008000319,2997,2008,"Inbreeding",6,16,"11-80 aphids;2-10 ants",0,1,0,0,0,1,0,0,"",NA,NA,NA,NA,0,0,0
+2008000320,2998,2008,"Inbreeding",9,23,"2-10 aphids",0,0,0,0,1,0,0,0,"",NA,NA,NA,NA,0,0,0
+2008000321,2999,2008,"Inbreeding",8,24,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2008000322,2999,2008,"Inbreeding",7,11,"",0,0,0,0,0,0,0,0,"Holes;1 lf minor",0,1,0,0,1,0,0
+2008000323,2999,2008,"Inbreeding",13,22,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2008000324,3014,2008,"Inbreeding",10,14,"2-10 aphids;2-10 ants",0,1,0,0,1,0,0,0,"Nibbles;Holes;1 lf half-gone",1,1,0,0,0,1,0
+2008000325,3014,2008,"Inbreeding",2,6,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2008000326,3014,2008,"Inbreeding",6,11,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2008000327,3014,2008,"Inbreeding",13,27,"",0,0,0,0,0,0,0,0,"Nibbles;1 lf minor",1,0,0,0,1,0,0
+2008000328,3046,2008,"Inbreeding",10,23,"",0,0,0,0,0,0,0,0,"Nibbles;2 lvs minor",1,0,0,0,2,0,0
+2008000329,3046,2008,"Inbreeding",1,3,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2008000347,3057,2008,"Inbreeding",9,19,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2008000348,3057,2008,"Inbreeding",9,22,"1 ant",1,0,0,0,0,0,0,0,"Holes;2 lvs minor",0,1,0,0,2,0,0
+2008000349,3058,2008,"Inbreeding",9,16,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2008000350,3058,2008,"Inbreeding",7,19,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2008000351,3059,2008,"Inbreeding",7,24,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2008000352,3061,2008,"Inbreeding",10,24,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2008000353,3064,2008,"Inbreeding",9,19,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2008000354,3065,2008,"Inbreeding",7,22,"2-10 aphids;>10 ants",0,0,1,0,1,0,0,0,"Nibbles;Holes;1 lf minor;2 lvs minor",1,1,0,0,3,0,0
+2008000355,3065,2008,"Inbreeding",11,23,"2-10 aphids;2-10 ants",0,1,0,0,1,0,0,0,"Nibbles;Holes;2 lvs minor",1,1,0,0,2,0,0
+2008000356,3068,2008,"Inbreeding",13,24,"11-80 aphids;2-10 ants",0,1,0,0,0,1,0,0,"Nibbles;1 lf minor;2 lvs minor",1,0,0,0,3,0,0
+2008000357,3070,2008,"Inbreeding",6,9,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2008000358,3070,2008,"Inbreeding",7,8,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2008000359,3070,2008,"Inbreeding",6,11,"2-10 aphids",0,0,0,0,1,0,0,0,"",NA,NA,NA,NA,0,0,0
+2008000360,3071,2008,"Inbreeding",7,9,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2008000361,3071,2008,"Inbreeding",4,10,"",0,0,0,0,0,0,0,0,"Nibbles;1 lf minor",1,0,0,0,1,0,0
+2008000362,3071,2008,"Inbreeding",9,13,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2008000363,3071,2008,"Inbreeding",8,15,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2008000364,3072,2008,"Inbreeding",6,14,"thorn hopper",0,0,0,0,0,0,0,0,"Nibbles",1,0,0,0,0,0,0
+2008000365,3072,2008,"Inbreeding",7,18,"",0,0,0,0,0,0,0,0,"Nibbles;Holes;2 lvs minor",1,1,0,0,2,0,0
+2008000366,3073,2008,"Inbreeding",6,13,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2008000367,3073,2008,"Inbreeding",8,30,"",0,0,0,0,0,0,0,0,"Holes;1 lf minor",0,1,0,0,1,0,0
+2008000368,3073,2008,"Inbreeding",6,26,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2008000369,3080,2008,"Inbreeding",6,17,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2008000370,3080,2008,"Inbreeding",9,18,"11-80 aphids;2-10 ants",0,1,0,0,0,1,0,0,"Holes;1 lf minor",0,1,0,0,1,0,0
+2008000371,3080,2008,"Inbreeding",6,15,"11-80 aphids;2-10 ants",0,1,0,0,0,1,0,0,"Holes;1 lf minor",0,1,0,0,1,0,0
+2008000372,3080,2008,"Inbreeding",9,21,"2-10 ants",0,1,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2008000373,3080,2008,"Inbreeding",5,11,"2-10 aphids;2-10 ants",0,1,0,0,1,0,0,0,"",NA,NA,NA,NA,0,0,0
+2008000374,3080,2008,"Inbreeding",7,13,"2-10 aphids",0,0,0,0,1,0,0,0,"",NA,NA,NA,NA,0,0,0
+2008000375,3082,2008,"Inbreeding",9,14,"11-80 aphids;1 ant",1,0,0,0,0,1,0,0,"Nibbles;2 lvs minor",1,0,0,0,2,0,0
+2008000376,3082,2008,"Inbreeding",14,21,"11-80 aphids;2-10 ants",0,1,0,0,0,1,0,0,"",NA,NA,NA,NA,0,0,0
+2008000377,3082,2008,"Inbreeding",10,13,">80 aphids;2-10 ants",0,1,0,0,0,0,1,0,"Nibbles;1 lf minor",1,0,0,0,1,0,0
+2008000378,3085,2008,"Inbreeding",8,20,"2-10 ants",0,1,0,0,0,0,0,0,"Wrinkles;2 lvs minor",0,0,1,0,2,0,0
+2008000379,3087,2008,"Inbreeding",10,25,"11-80 aphids;>10 ants",0,0,1,0,0,1,0,0,"Nibbles;2 lvs half-gone",1,0,0,0,0,2,0
+2008000380,3087,2008,"Inbreeding",4,6,"1 ant",1,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2008000381,3087,2008,"Inbreeding",7,27,"1 aphid;1 ant",1,0,0,1,0,0,0,0,"Nibbles;2 lvs minor",1,0,0,0,2,0,0
+2008000382,3087,2008,"Inbreeding",12,26,"2-10 aphids;2-10 ants",0,1,0,0,1,0,0,0,"Nibbles;2 lvs minor",1,0,0,0,2,0,0
+2008000383,3104,2008,"Inbreeding",8,14,"1 ant",1,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2008000384,3108,2008,"Inbreeding",15,20,"",0,0,0,0,0,0,0,0,"Nibbles;1 lf minor;2 lvs minor",1,0,0,0,3,0,0
+2008000385,3111,2008,"Inbreeding",8,12,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2008000386,3111,2008,"Inbreeding",7,18,"11-80 aphids;2-10 ants",0,1,0,0,0,1,0,0,"",NA,NA,NA,NA,0,0,0
+2008000387,3124,2008,"Inbreeding",9,18,"11-80 aphids;2-10 ants",0,1,0,0,0,1,0,0,"Nibbles;1 lf minor",1,0,0,0,1,0,0
+2008000388,3126,2008,"Inbreeding",9,21,"1 aphid",0,0,0,1,0,0,0,0,"Nibbles;2 lvs minor",1,0,0,0,2,0,0
+2008000389,3127,2008,"Inbreeding",3,10,"11-80 aphids;2-10 ants",0,1,0,0,0,1,0,0,"",NA,NA,NA,NA,0,0,0
+2008000390,3129,2008,"Inbreeding",10,16,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2008000391,3129,2008,"Inbreeding",10,16,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2008000392,3134,2008,"Inbreeding",10,25,"11-80 aphids",0,0,0,0,0,1,0,0,"",NA,NA,NA,NA,0,0,0
+2008000393,3134,2008,"Inbreeding",8,16,"11-80 aphids;2-10 ants",0,1,0,0,0,1,0,0,"",NA,NA,NA,NA,0,0,0
+2008000394,3135,2008,"Inbreeding",11,22,"11-80 aphids",0,0,0,0,0,1,0,0,"",NA,NA,NA,NA,0,0,0
+2008000395,3136,2008,"Inbreeding",5,15,"",0,0,0,0,0,0,0,0,"Nibbles;Holes;Wrinkles;1 lf half-gone;1 lf gone;2 lvs minor",1,1,1,0,2,1,1
+2008000396,3175,2008,"Inbreeding",11,19,"2-10 aphids;2-10 ants",0,1,0,0,1,0,0,0,"Nibbles;1 lf minor",1,0,0,0,1,0,0
+2008000397,3184,2008,"Inbreeding",10,16,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2008000408,3191,2008,"Inbreeding",9,30,"1 ant",1,0,0,0,0,0,0,0,"Holes;1 lf minor",0,1,0,0,1,0,0
+2008000409,3196,2008,"Inbreeding",8,17,"",0,0,0,0,0,0,0,0,"Nibbles;1 lf half-gone",1,0,0,0,0,1,0
+2008000410,3196,2008,"Inbreeding",8,18,"1 aphid",0,0,0,1,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2008000411,3197,2008,"Inbreeding",8,20,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2008000412,3197,2008,"Inbreeding",4,12,"",0,0,0,0,0,0,0,0,"Nibbles;1 lf minor;2 lvs minor",1,0,0,0,3,0,0
+2008000413,3197,2008,"Inbreeding",9,16,"",0,0,0,0,0,0,0,0,"Nibbles;Holes;2 lvs minor",1,1,0,0,2,0,0
+2008000414,3208,2008,"Inbreeding",12,21,"",0,0,0,0,0,0,0,0,"Holes;1 lf minor",0,1,0,0,1,0,0
+2008000415,3209,2008,"Inbreeding",9,22,"",0,0,0,0,0,0,0,0,"Holes;1 lf minor",0,1,0,0,1,0,0
+2008000416,3209,2008,"Inbreeding",8,19,"",0,0,0,0,0,0,0,0,"Holes;1 lf minor",0,1,0,0,1,0,0
+2008000417,3210,2008,"Inbreeding",7,18,"",0,0,0,0,0,0,0,0,"Nibbles;Holes;4 lvs minor",1,1,0,0,4,0,0
+2008000418,3210,2008,"Inbreeding",8,18,"2-10 aphids;2-10 ants",0,1,0,0,1,0,0,0,"Nibbles;1 lf minor",1,0,0,0,1,0,0
+2008000419,3210,2008,"Inbreeding",7,23,"2-10 aphids;2-10 ants",0,1,0,0,1,0,0,0,"Nibbles;2 lvs minor",1,0,0,0,2,0,0
+2008000420,3210,2008,"Inbreeding",2,5,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2008000421,3210,2008,"Inbreeding",5,11,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2008000422,3210,2008,"Inbreeding",10,21,"1 ant",1,0,0,0,0,0,0,0,"Nibbles;2 lvs minor",1,0,0,0,2,0,0
+2008000423,3211,2008,"Inbreeding",10,18,"",0,0,0,0,0,0,0,0,"Holes;1 lf minor",0,1,0,0,1,0,0
+2008000424,3211,2008,"Inbreeding",8,11,"",0,0,0,0,0,0,0,0,"Nibbles;1 lf minor",1,0,0,0,1,0,0
+2008000425,3217,2008,"Inbreeding",3,9,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2008000426,3217,2008,"Inbreeding",10,23,"",0,0,0,0,0,0,0,0,"Holes;1 lf minor",0,1,0,0,1,0,0
+2008000428,3238,2008,"Inbreeding",8,24,"",0,0,0,0,0,0,0,0,"Nibbles;Holes;1 lf minor;1 lf half-gone;4 lvs minor",1,1,0,0,5,1,0
+2008000429,3244,2008,"Inbreeding",12,26,"2-10 ants",0,1,0,0,0,0,0,0,"Nibbles;Wrinkles;1 lf minor",1,0,1,0,1,0,0
+2008000430,3257,2008,"Inbreeding",8,16,"2-10 ants",0,1,0,0,0,0,0,0,"Nibbles;1 lf minor",1,0,0,0,1,0,0
+2008000431,3257,2008,"Inbreeding",7,20,"2-10 aphids;2-10 ants",0,1,0,0,1,0,0,0,"Nibbles;Holes;Wrinkles;1 lf minor;2 lvs minor",1,1,1,0,3,0,0
+2008000432,3257,2008,"Inbreeding",7,19,"2-10 ants",0,1,0,0,0,0,0,0,"Nibbles;Holes;1 lf minor;1 lf half-gone;2 lvs minor",1,1,0,0,3,1,0
+2008000433,3266,2008,"Inbreeding",12,20,">80 aphids;2-10 ants",0,1,0,0,0,0,1,0,"",NA,NA,NA,NA,0,0,0
+2008000434,3296,2008,"Inbreeding",9,19,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2008000446,3331,2008,"Inbreeding",10,24,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2008000447,3332,2008,"Inbreeding",11,34,"",0,0,0,0,0,0,0,0,"Holes;2 lvs minor",0,1,0,0,2,0,0
+2008000448,3332,2008,"Inbreeding",10,30,"1 ant",1,0,0,0,0,0,0,0,"Nibbles;1 lf minor;2 lvs minor",1,0,0,0,3,0,0
+2008000449,3336,2008,"Inbreeding",12,26,"2-10 aphids;2-10 ants",0,1,0,0,1,0,0,0,"",NA,NA,NA,NA,0,0,0
+2008000450,3343,2008,"Inbreeding",16,26,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2008000451,3343,2008,"Inbreeding",18,31,"",0,0,0,0,0,0,0,0,"Nibbles;2 lvs minor",1,0,0,0,2,0,0
+2008000452,3349,2008,"Inbreeding",10,20,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2008000453,3351,2008,"Inbreeding",4,7,"2-10 aphids;2-10 ants",0,1,0,0,1,0,0,0,"",NA,NA,NA,NA,0,0,0
+2008000454,3351,2008,"Inbreeding",9,22,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2008000455,3351,2008,"Inbreeding",4,7,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2008000456,3351,2008,"Inbreeding",5,5,"",0,0,0,0,0,0,0,0,"Holes;1 lf minor",0,1,0,0,1,0,0
+2008000457,3351,2008,"Inbreeding",8,26,"2-10 aphids;2-10 ants",0,1,0,0,1,0,0,0,"",NA,NA,NA,NA,0,0,0
+2008000458,3351,2008,"Inbreeding",9,24,"11-80 aphids;2-10 ants",0,1,0,0,0,1,0,0,"Nibbles;1 lf minor",1,0,0,0,1,0,0
+2008000459,3352,2008,"Inbreeding",10,20,"",0,0,0,0,0,0,0,0,"Nibbles;1 lf minor",1,0,0,0,1,0,0
+2008000460,3352,2008,"Inbreeding",9,22,"",0,0,0,0,0,0,0,0,"Nibbles;1 lf minor",1,0,0,0,1,0,0
+2008000461,3353,2008,"Inbreeding",13,20,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2008000462,3353,2008,"Inbreeding",10,21,"",0,0,0,0,0,0,0,0,"Holes;1 lf minor",0,1,0,0,1,0,0
+2008000463,3353,2008,"Inbreeding",10,22,"",0,0,0,0,0,0,0,0,"Holes;1 lf minor",0,1,0,0,1,0,0
+2008000464,3353,2008,"Inbreeding",9,25,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2008000465,3354,2008,"Inbreeding",8,21,"",0,0,0,0,0,0,0,0,"Nibbles;1 lf minor",1,0,0,0,1,0,0
+2008000466,3357,2008,"Inbreeding",6,10,"",0,0,0,0,0,0,0,0,"Nibbles;2 lvs minor",1,0,0,0,2,0,0
+2008000467,3357,2008,"Inbreeding",11,20,"11-80 aphids;2-10 ants",0,1,0,0,0,1,0,0,"Nibbles;Holes;2 lvs minor",1,1,0,0,2,0,0
+2008000468,3357,2008,"Inbreeding",8,20,"11-80 aphids;2-10 ants",0,1,0,0,0,1,0,0,"",NA,NA,NA,NA,0,0,0
+2008000469,3357,2008,"Inbreeding",6,9,"11-80 aphids;2-10 ants",0,1,0,0,0,1,0,0,"",NA,NA,NA,NA,0,0,0
+2008000470,3357,2008,"Inbreeding",8,19,"beetle",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2008000471,3360,2008,"Inbreeding",11,23,"11-80 aphids;2-10 ants",0,1,0,0,0,1,0,0,"",NA,NA,NA,NA,0,0,0
+2008000472,3379,2008,"Inbreeding",7,18,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2008000473,3379,2008,"Inbreeding",9,18,"11-80 aphids;2-10 ants",0,1,0,0,0,1,0,0,"",NA,NA,NA,NA,0,0,0
+2008000474,3379,2008,"Inbreeding",13,19,"",0,0,0,0,0,0,0,0,"Nibbles;Holes;1 lf minor;2 lvs minor",1,1,0,0,3,0,0
+2008000475,3379,2008,"Inbreeding",10,22,"",0,0,0,0,0,0,0,0,"Nibbles;Holes;1 lf minor",1,1,0,0,1,0,0
+2008000476,3379,2008,"Inbreeding",0,0,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2008000477,3379,2008,"Inbreeding",13,19,"",0,0,0,0,0,0,0,0,"Holes;2 lvs minor",0,1,0,0,2,0,0
+2008000478,3380,2008,"Inbreeding",8,22,"2-10 ants",0,1,0,0,0,0,0,0,"Nibbles;Holes;2 lvs minor",1,1,0,0,2,0,0
+2008000479,3380,2008,"Inbreeding",3,8,"2-10 aphids;1 ant",1,0,0,0,1,0,0,0,"",NA,NA,NA,NA,0,0,0
+2008000480,3397,2008,"Inbreeding",10,25,"2-10 aphids;2-10 ants",0,1,0,0,1,0,0,0,"Holes;1 lf minor",0,1,0,0,1,0,0
+2008000481,3397,2008,"Inbreeding",6,27,"2-10 aphids;2-10 ants",0,1,0,0,1,0,0,0,"Nibbles;1 lf minor",1,0,0,0,1,0,0
+2008000482,3397,2008,"Inbreeding",10,26,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2008000483,3397,2008,"Inbreeding",8,26,"2-10 aphids;2-10 ants",0,1,0,0,1,0,0,0,"",NA,NA,NA,NA,0,0,0
+2008000484,3397,2008,"Inbreeding",9,26,"2-10 aphids;2-10 ants",0,1,0,0,1,0,0,0,"",NA,NA,NA,NA,0,0,0
+2008000485,3398,2008,"Inbreeding",10,26,"2-10 aphids;1 ant",1,0,0,0,1,0,0,0,"Nibbles;1 lf minor",1,0,0,0,1,0,0
+2008000486,3398,2008,"Inbreeding",9,27,"1 ant",1,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2008000487,3398,2008,"Inbreeding",9,27,"1 ant",1,0,0,0,0,0,0,0,"Nibbles;1 lf minor",1,0,0,0,1,0,0
+2008000488,3398,2008,"Inbreeding",9,24,"",0,0,0,0,0,0,0,0,"Nibbles;1 lf minor",1,0,0,0,1,0,0
+2008000489,3402,2008,"Inbreeding",10,23,"2-10 aphids;2-10 ants",0,1,0,0,1,0,0,0,"",NA,NA,NA,NA,0,0,0
+2008000490,3411,2008,"Inbreeding",12,20,"2-10 aphids",0,0,0,0,1,0,0,0,"Nibbles;Holes;1 lf minor",1,1,0,0,1,0,0
+2008000491,3413,2008,"Inbreeding",12,21,"11-80 aphids;1 ant",1,0,0,0,0,1,0,0,"Nibbles;Holes;2 lvs minor",1,1,0,0,2,0,0
+2008001960,2927,2008,"Inbreeding",6,18,"",0,0,0,0,0,0,0,0,"Nibbles;Holes;Wrinkles;1 lf minor;2 lvs half-gone;4 lvs minor;4 lvs gone",1,1,1,0,5,2,4
+2008001961,3059,2008,"Inbreeding",10,19,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2008001962,3085,2008,"Inbreeding",3,11,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2009000214,2918,2009,"Inbreeding",12,24,"",0,0,0,0,0,0,0,0,"Nibbles;Holes;Wrinkles;2 lvs minor;2 lvs half-gone;4 lvs half-gone",1,1,1,0,2,6,0
+2009000215,2922,2009,"Inbreeding",9,31,"",0,0,0,0,0,0,0,0,"Nibbles;Wrinkles;1 lf minor;2 lvs minor;4 lvs minor",1,0,1,0,7,0,0
+2009000216,2924,2009,"Inbreeding",10,32,"2-10 ants;2-10 aphids",0,1,0,0,1,0,0,0,"Nibbles;Holes;4 lvs minor",1,1,0,0,4,0,0
+2009000217,2929,2009,"Inbreeding",8,33,"2-10 ants;2-10 aphids",0,1,0,0,1,0,0,0,"Nibbles;1 lf minor;2 lvs minor",1,0,0,0,3,0,0
+2009000218,2929,2009,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2009000219,2932,2009,"Inbreeding",10,23,"",0,0,0,0,0,0,0,0,"Nibbles;1 lf minor;2 lvs minor",1,0,0,0,3,0,0
+2009000220,2932,2009,"Inbreeding",9,23,"1 ant;2-10 aphids",1,0,0,0,1,0,0,0,"Nibbles;2 lvs minor;4 lvs minor",1,0,0,0,6,0,0
+2009000221,2933,2009,"Inbreeding",10,26,"1 ant",1,0,0,0,0,0,0,0,"Nibbles;1 lf minor;4 lvs minor",1,0,0,0,5,0,0
+2009000222,2933,2009,"Inbreeding",11,22,"2-10 ants;2-10 aphids",0,1,0,0,1,0,0,0,"Nibbles;2 lvs minor;4 lvs minor",1,0,0,0,6,0,0
+2009000223,2935,2009,"Inbreeding",12,30,"2-10 ants;11-80 aphids",0,1,0,0,0,1,0,0,"Nibbles;1 lf minor;2 lvs minor",1,0,0,0,3,0,0
+2009000224,2935,2009,"Inbreeding",11,30,"2-10 ants;11-80 aphids",0,1,0,0,0,1,0,0,"Nibbles;Wrinkles;1 lf gone;2 lvs minor;4 lvs minor",1,0,1,0,6,0,1
+2009000225,2935,2009,"Inbreeding",0,NA,"2-10 aphids",0,0,0,0,1,0,0,0,"",NA,NA,NA,NA,0,0,0
+2009000226,2935,2009,"Inbreeding",9,27,"1 ant;11-80 aphids",1,0,0,0,0,1,0,0,"Nibbles;1 lf minor;2 lvs minor",1,0,0,0,3,0,0
+2009000227,2936,2009,"Inbreeding",11,25,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2009000228,2936,2009,"Inbreeding",11,25,"2-10 ants;1 aphid",0,1,0,1,0,0,0,0,"Nibbles;2 lvs minor",1,0,0,0,2,0,0
+2009000229,2936,2009,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2009000230,2937,2009,"Inbreeding",0,NA,"2-10 ants;11-80 aphids",0,1,0,0,0,1,0,0,"",NA,NA,NA,NA,0,0,0
+2009000231,2937,2009,"Inbreeding",11,31,"1 ant;2-10 aphids",1,0,0,0,1,0,0,0,"Nibbles;4 lvs minor",1,0,0,0,4,0,0
+2009000232,2937,2009,"Inbreeding",10,28,"1 ant;2-10 aphids",1,0,0,0,1,0,0,0,"",NA,NA,NA,NA,0,0,0
+2009000233,2938,2009,"Inbreeding",11,28,"1 ant;2-10 aphids",1,0,0,0,1,0,0,0,"Nibbles;4 lvs minor",1,0,0,0,4,0,0
+2009000234,2938,2009,"Inbreeding",9,23,"",0,0,0,0,0,0,0,0,"Nibbles;1 lf minor;2 lvs minor",1,0,0,0,3,0,0
+2009000235,2938,2009,"Inbreeding",10,21,"1 ant;2-10 aphids",1,0,0,0,1,0,0,0,"Nibbles;1 lf minor;2 lvs minor",1,0,0,0,3,0,0
+2009000236,2939,2009,"Inbreeding",12,27,"1 ant",1,0,0,0,0,0,0,0,"Nibbles;1 lf minor;4 lvs minor",1,0,0,0,5,0,0
+2009000237,2955,2009,"Inbreeding",8,23,">10 ants;11-80 aphids",0,0,1,0,0,1,0,0,"Nibbles;1 lf minor",1,0,0,0,1,0,0
+2009000238,2955,2009,"Inbreeding",8,22,"2-10 ants;2-10 aphids",0,1,0,0,1,0,0,0,"Nibbles;1 lf minor",1,0,0,0,1,0,0
+2009000239,2955,2009,"Inbreeding",9,24,">10 ants;11-80 aphids",0,0,1,0,0,1,0,0,"Nibbles;1 lf minor",1,0,0,0,1,0,0
+2009000240,2955,2009,"Inbreeding",0,NA,"2-10 aphids",0,0,0,0,1,0,0,0,"",NA,NA,NA,NA,0,0,0
+2009000241,2955,2009,"Inbreeding",8,26,"2-10 ants;11-80 aphids",0,1,0,0,0,1,0,0,"",NA,NA,NA,NA,0,0,0
+2009000242,2955,2009,"Inbreeding",10,18,"2-10 ants;11-80 aphids",0,1,0,0,0,1,0,0,"Nibbles;1 lf minor",1,0,0,0,1,0,0
+2009000243,2955,2009,"Inbreeding",11,22,">10 ants;>80 aphids",0,0,1,0,0,0,1,0,"Nibbles;1 lf minor;2 lvs minor",1,0,0,0,3,0,0
+2009000244,2956,2009,"Inbreeding",13,22,"2-10 ants;2-10 aphids",0,1,0,0,1,0,0,0,"Nibbles;1 lf minor;2 lvs minor",1,0,0,0,3,0,0
+2009000245,2956,2009,"Inbreeding",10,22,"2-10 ants;11-80 aphids",0,1,0,0,0,1,0,0,"Nibbles;1 lf minor;2 lvs minor",1,0,0,0,3,0,0
+2009000246,2956,2009,"Inbreeding",5,31,"",0,0,0,0,0,0,0,0,"Nibbles;1 lf minor;2 lvs minor",1,0,0,0,3,0,0
+2009000247,2957,2009,"Inbreeding",9,26,"2-10 ants;11-80 aphids",0,1,0,0,0,1,0,0,"Nibbles;1 lf minor",1,0,0,0,1,0,0
+2009000248,2957,2009,"Inbreeding",11,25,"2-10 ants;11-80 aphids",0,1,0,0,0,1,0,0,"Nibbles;1 lf minor",1,0,0,0,1,0,0
+2009000249,2957,2009,"Inbreeding",10,23,"2-10 ants;2-10 aphids",0,1,0,0,1,0,0,0,"",NA,NA,NA,NA,0,0,0
+2009000250,2957,2009,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2009000251,2957,2009,"Inbreeding",9,23,"2-10 ants;2-10 aphids",0,1,0,0,1,0,0,0,"",NA,NA,NA,NA,0,0,0
+2009000252,2957,2009,"Inbreeding",0,NA,"2-10 ants;1 aphid",0,1,0,1,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2009000253,2957,2009,"Inbreeding",5,15,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2009000254,2957,2009,"Inbreeding",12,23,"2-10 ants;11-80 aphids",0,1,0,0,0,1,0,0,"Nibbles;Holes;1 lf minor;2 lvs minor",1,1,0,0,3,0,0
+2009000255,2957,2009,"Inbreeding",11,23,"2-10 ants;2-10 aphids",0,1,0,0,1,0,0,0,"Nibbles;1 lf minor;2 lvs minor",1,0,0,0,3,0,0
+2009000256,2957,2009,"Inbreeding",12,22,"2-10 ants;2-10 aphids",0,1,0,0,1,0,0,0,"Nibbles;1 lf minor",1,0,0,0,1,0,0
+2009000257,2957,2009,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2009000258,2966,2009,"Inbreeding",12,20,"2-10 ants;2-10 aphids",0,1,0,0,1,0,0,0,"Nibbles;1 lf minor",1,0,0,0,1,0,0
+2009000259,2991,2009,"Inbreeding",11,18,"2-10 ants;2-10 aphids",0,1,0,0,1,0,0,0,"",NA,NA,NA,NA,0,0,0
+2009000260,2992,2009,"Inbreeding",10,20,"2-10 ants;11-80 aphids",0,1,0,0,0,1,0,0,"Nibbles;1 lf minor;2 lvs minor",1,0,0,0,3,0,0
+2009000261,2992,2009,"Inbreeding",10,20,">10 ants;11-80 aphids",0,0,1,0,0,1,0,0,"Nibbles;Holes;2 lvs minor",1,1,0,0,2,0,0
+2009000262,2993,2009,"Inbreeding",9,24,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2009000263,2993,2009,"Inbreeding",12,21,"2-10 ants;2-10 aphids",0,1,0,0,1,0,0,0,"Nibbles;1 lf minor;2 lvs minor",1,0,0,0,3,0,0
+2009000264,2993,2009,"Inbreeding",9,17,"2-10 ants;2-10 aphids",0,1,0,0,1,0,0,0,"Nibbles;2 lvs minor",1,0,0,0,2,0,0
+2009000265,2993,2009,"Inbreeding",8,19,"1 ant",1,0,0,0,0,0,0,0,"Nibbles;2 lvs minor",1,0,0,0,2,0,0
+2009000266,2993,2009,"Inbreeding",7,20,"2-10 ants;11-80 aphids",0,1,0,0,0,1,0,0,"Nibbles;1 lf minor",1,0,0,0,1,0,0
+2009000267,2993,2009,"Inbreeding",10,19,"",0,0,0,0,0,0,0,0,"Nibbles;2 lvs minor",1,0,0,0,2,0,0
+2009000268,2993,2009,"Inbreeding",8,20,"",0,0,0,0,0,0,0,0,"Nibbles;1 lf minor",1,0,0,0,1,0,0
+2009000269,2995,2009,"Inbreeding",7,31,"2-10 ants;2-10 aphids",0,1,0,0,1,0,0,0,"Nibbles;1 lf minor;2 lvs minor",1,0,0,0,3,0,0
+2009000270,2996,2009,"Inbreeding",10,30,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2009000271,2999,2009,"Inbreeding",10,25,"2-10 ants;11-80 aphids",0,1,0,0,0,1,0,0,"Nibbles;Holes;4 lvs minor",1,1,0,0,4,0,0
+2009000272,2999,2009,"Inbreeding",12,23,"1 ant;2-10 aphids",1,0,0,0,1,0,0,0,"Nibbles;1 lf minor;2 lvs minor",1,0,0,0,3,0,0
+2009000273,3013,2009,"Inbreeding",11,21,"",0,0,0,0,0,0,0,0,"Nibbles;1 lf minor",1,0,0,0,1,0,0
+2009000281,3059,2009,"Inbreeding",10,35,"2-10 ants;11-80 aphids",0,1,0,0,0,1,0,0,"",NA,NA,NA,NA,0,0,0
+2009000282,3061,2009,"Inbreeding",13,11,"1 aphid",0,0,0,1,0,0,0,0,"Nibbles;2 lvs half-gone",1,0,0,0,0,2,0
+2009000283,3061,2009,"Inbreeding",8,23,"",0,0,0,0,0,0,0,0,"Nibbles;Holes;1 lf gone;2 lvs minor",1,1,0,0,2,0,1
+2009000284,3064,2009,"Inbreeding",18,18,"1 aphid",0,0,0,1,0,0,0,0,"Nibbles;1 lf minor",1,0,0,0,1,0,0
+2009000285,3064,2009,"Inbreeding",8,22,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2009000286,3064,2009,"Inbreeding",7,23,"",0,0,0,0,0,0,0,0,"Nibbles;1 lf minor",1,0,0,0,1,0,0
+2009000287,3064,2009,"Inbreeding",9,15,"",0,0,0,0,0,0,0,0,"Nibbles;1 lf half-gone",1,0,0,0,0,1,0
+2009000288,3065,2009,"Inbreeding",9,27,">10 ants;11-80 aphids;other (Note)",0,0,1,0,0,1,0,0,"Nibbles;1 lf minor;4 lvs minor",1,0,0,0,5,0,0
+2009000289,3067,2009,"Inbreeding",8,38,"1 ant;2-10 aphids",1,0,0,0,1,0,0,0,"Nibbles;1 lf minor",1,0,0,0,1,0,0
+2009000290,3070,2009,"Inbreeding",8,25,"2-10 aphids",0,0,0,0,1,0,0,0,"Nibbles;1 lf minor",1,0,0,0,1,0,0
+2009000291,3070,2009,"Inbreeding",10,28,"1 ant",1,0,0,0,0,0,0,0,"Nibbles;2 lvs minor",1,0,0,0,2,0,0
+2009000292,3070,2009,"Inbreeding",11,26,"2-10 ants;11-80 aphids",0,1,0,0,0,1,0,0,"Nibbles;1 lf minor;1 lf half-gone;2 lvs minor",1,0,0,0,3,1,0
+2009000293,3071,2009,"Inbreeding",9,23,"2-10 aphids",0,0,0,0,1,0,0,0,"Nibbles;2 lvs minor",1,0,0,0,2,0,0
+2009000294,3073,2009,"Inbreeding",7,38,"1 ant",1,0,0,0,0,0,0,0,"Nibbles;1 lf minor;4 lvs minor",1,0,0,0,5,0,0
+2009000295,3076,2009,"Inbreeding",11,24,">10 ants;>80 aphids",0,0,1,0,0,0,1,0,"Nibbles;Holes;1 lf minor;2 lvs minor;4 lvs minor",1,1,0,0,7,0,0
+2009000296,3087,2009,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2009000297,3087,2009,"Inbreeding",8,43,"",0,0,0,0,0,0,0,0,"Nibbles;1 lf minor;1 lf half-gone;2 lvs minor;4 lvs minor",1,0,0,0,7,1,0
+2009000298,3087,2009,"Inbreeding",12,33,"",0,0,0,0,0,0,0,0,"Nibbles;1 lf minor;4 lvs minor",1,0,0,0,5,0,0
+2009000299,3091,2009,"Inbreeding",10,30,"2-10 ants;2-10 aphids",0,1,0,0,1,0,0,0,"Nibbles;2 lvs minor",1,0,0,0,2,0,0
+2009000300,3092,2009,"Inbreeding",9,17,"2-10 ants;11-80 aphids",0,1,0,0,0,1,0,0,"Nibbles;2 lvs minor",1,0,0,0,2,0,0
+2009000301,3092,2009,"Inbreeding",11,9,"",0,0,0,0,0,0,0,0,"Nibbles;1 lf minor;1 lf half-gone;2 lvs minor",1,0,0,0,3,1,0
+2009000302,3102,2009,"Inbreeding",11,23,"",0,0,0,0,0,0,0,0,"Nibbles;2 lvs minor",1,0,0,0,2,0,0
+2009000303,3111,2009,"Inbreeding",5,38,"",0,0,0,0,0,0,0,0,"Nibbles;1 lf minor;4 lvs minor",1,0,0,0,5,0,0
+2009000304,3112,2009,"Inbreeding",13,36,"",0,0,0,0,0,0,0,0,"Nibbles;Other type (Note);8 lvs minor",1,0,0,0,8,0,0
+2009000305,3126,2009,"Inbreeding",10,22,"2-10 ants",0,1,0,0,0,0,0,0,"Nibbles;1 lf minor;2 lvs minor",1,0,0,0,3,0,0
+2009000306,3127,2009,"Inbreeding",12,23,"2-10 ants",0,1,0,0,0,0,0,0,"Nibbles;1 lf minor;4 lvs minor",1,0,0,0,5,0,0
+2009000307,3127,2009,"Inbreeding",10,24,"",0,0,0,0,0,0,0,0,"Nibbles;8 lvs minor",1,0,0,0,8,0,0
+2009000308,3130,2009,"Inbreeding",11,24,"2-10 ants",0,1,0,0,0,0,0,0,"Nibbles;1 lf minor;4 lvs minor",1,0,0,0,5,0,0
+2009000309,3175,2009,"Inbreeding",11,20,"2-10 ants",0,1,0,0,0,0,0,0,"Nibbles;4 lvs minor",1,0,0,0,4,0,0
+2009000330,3191,2009,"Inbreeding",12,38,"",0,0,0,0,0,0,0,0,"Nibbles;2 lvs minor",1,0,0,0,2,0,0
+2009000331,3197,2009,"Inbreeding",7,34,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2009000332,3209,2009,"Inbreeding",8,30,">10 ants;11-80 aphids",0,0,1,0,0,1,0,0,"Nibbles;1 lf minor;2 lvs minor",1,0,0,0,3,0,0
+2009000333,3209,2009,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2009000334,3210,2009,"Inbreeding",14,27,"",0,0,0,0,0,0,0,0,"Nibbles;8 lvs minor;2 lvs minor;1 lf minor",1,0,0,0,11,0,0
+2009000335,3210,2009,"Inbreeding",10,26,"2-10 ants;2-10 aphids",0,1,0,0,1,0,0,0,"Nibbles;8 lvs minor",1,0,0,0,8,0,0
+2009000336,3210,2009,"Inbreeding",11,27,"2-10 ants;2-10 aphids",0,1,0,0,1,0,0,0,"Nibbles;8 lvs minor;1 lf minor",1,0,0,0,9,0,0
+2009000337,3211,2009,"Inbreeding",9,21,"beetle",0,0,0,0,0,0,0,0,"Nibbles;4 lvs minor",1,0,0,0,4,0,0
+2009000338,3220,2009,"Inbreeding",12,23,"2-10 ants",0,1,0,0,0,0,0,0,"Nibbles;Wrinkles;1 lf minor;2 lvs half-gone;4 lvs minor",1,0,1,0,5,2,0
+2009000339,3236,2009,"Inbreeding",10,25,"beetle",0,0,0,0,0,0,0,0,"Nibbles;1 lf minor;2 lvs minor",1,0,0,0,3,0,0
+2009000340,3237,2009,"Inbreeding",12,30,"",0,0,0,0,0,0,0,0,"Nibbles;1 lf minor;2 lvs minor",1,0,0,0,3,0,0
+2009000341,3245,2009,"Inbreeding",13,33,">10 ants;11-80 aphids",0,0,1,0,0,1,0,0,"Nibbles;4 lvs minor",1,0,0,0,4,0,0
+2009000342,3249,2009,"Inbreeding",11,20,"1 ant",1,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2009000343,3257,2009,"Inbreeding",4,36,"",0,0,0,0,0,0,0,0,"Nibbles;1 lf minor;2 lvs minor",1,0,0,0,3,0,0
+2009000344,3258,2009,"Inbreeding",10,20,"2-10 ants;2-10 aphids",0,1,0,0,1,0,0,0,"Nibbles;2 lvs minor",1,0,0,0,2,0,0
+2009000345,3258,2009,"Inbreeding",10,17,"2-10 ants;2-10 aphids",0,1,0,0,1,0,0,0,"Nibbles;4 lvs minor",1,0,0,0,4,0,0
+2009000346,3265,2009,"Inbreeding",10,22,"2-10 ants",0,1,0,0,0,0,0,0,"Nibbles;1 lf minor",1,0,0,0,1,0,0
+2009000347,3266,2009,"Inbreeding",9,21,"",0,0,0,0,0,0,0,0,"Nibbles;Wrinkles;2 lvs minor;2 lvs half-gone",1,0,1,0,2,2,0
+2009000348,3273,2009,"Inbreeding",8,15,"",0,0,0,0,0,0,0,0,"Holes;1 lf minor",0,1,0,0,1,0,0
+2009000349,3321,2009,"Inbreeding",13,28,"2-10 ants;1 aphid",0,1,0,1,0,0,0,0,"Nibbles;1 lf minor",1,0,0,0,1,0,0
+2009000350,3322,2009,"Inbreeding",10,20,"",0,0,0,0,0,0,0,0,"Nibbles;1 lf minor",1,0,0,0,1,0,0
+2009000361,3336,2009,"Inbreeding",9,27,"2-10 ants;1 aphid",0,1,0,1,0,0,0,0,"Nibbles;1 lf minor",1,0,0,0,1,0,0
+2009000362,3336,2009,"Inbreeding",10,37,"2-10 ants",0,1,0,0,0,0,0,0,"Nibbles;Holes;4 lvs minor",1,1,0,0,4,0,0
+2009000363,3336,2009,"Inbreeding",10,41,">10 ants;11-80 aphids",0,0,1,0,0,1,0,0,"Nibbles;1 lf minor;2 lvs minor",1,0,0,0,3,0,0
+2009000364,3336,2009,"Inbreeding",11,29,"2-10 ants;2-10 aphids",0,1,0,0,1,0,0,0,"Nibbles;2 lvs minor",1,0,0,0,2,0,0
+2009000365,3344,2009,"Inbreeding",11,25,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2009000366,3345,2009,"Inbreeding",8,37,"",0,0,0,0,0,0,0,0,"Nibbles;1 lf minor;4 lvs minor",1,0,0,0,5,0,0
+2009000367,3349,2009,"Inbreeding",11,23,"1 ant;2-10 aphids",1,0,0,0,1,0,0,0,"Nibbles;1 lf minor;2 lvs minor;4 lvs minor",1,0,0,0,7,0,0
+2009000368,3351,2009,"Inbreeding",10,28,"2-10 ants;2-10 aphids",0,1,0,0,1,0,0,0,"Nibbles;2 lvs minor;4 lvs minor",1,0,0,0,6,0,0
+2009000369,3353,2009,"Inbreeding",11,29,"2-10 ants;2-10 aphids",0,1,0,0,1,0,0,0,"Nibbles;2 lvs minor",1,0,0,0,2,0,0
+2009000370,3353,2009,"Inbreeding",12,31,"2-10 ants;2-10 aphids",0,1,0,0,1,0,0,0,"Nibbles;1 lf minor;2 lvs minor",1,0,0,0,3,0,0
+2009000371,3353,2009,"Inbreeding",10,30,"spider",0,0,0,0,0,0,0,0,"Nibbles;2 lvs minor",1,0,0,0,2,0,0
+2009000372,3353,2009,"Inbreeding",10,25,"",0,0,0,0,0,0,0,0,"Nibbles;1 lf minor;2 lvs minor",1,0,0,0,3,0,0
+2009000373,3353,2009,"Inbreeding",10,32,"2-10 ants;2-10 aphids",0,1,0,0,1,0,0,0,"Nibbles;1 lf minor;2 lvs minor",1,0,0,0,3,0,0
+2009000374,3353,2009,"Inbreeding",11,29,"2-10 ants;11-80 aphids",0,1,0,0,0,1,0,0,"Nibbles;1 lf half-gone;4 lvs minor",1,0,0,0,4,1,0
+2009000375,3379,2009,"Inbreeding",14,28,"2-10 ants;2-10 aphids",0,1,0,0,1,0,0,0,"Nibbles;Holes;8 lvs minor;1 lf minor;2 lvs minor",1,1,0,0,11,0,0
+2009000376,3379,2009,"Inbreeding",11,27,"2-10 ants;11-80 aphids",0,1,0,0,0,1,0,0,"Nibbles;Holes;1 lf minor;2 lvs minor",1,1,0,0,3,0,0
+2009000377,3379,2009,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2009000378,3379,2009,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2009000379,3379,2009,"Inbreeding",10,28,"2-10 ants;11-80 aphids",0,1,0,0,0,1,0,0,"Nibbles;4 lvs minor",1,0,0,0,4,0,0
+2009000380,3380,2009,"Inbreeding",6,18,"2-10 ants;2-10 aphids",0,1,0,0,1,0,0,0,"Nibbles;Holes;2 lvs minor;2 lvs half-gone",1,1,0,0,2,2,0
+2009000381,3382,2009,"Inbreeding",10,27,"2-10 ants;2-10 aphids",0,1,0,0,1,0,0,0,"Nibbles;2 lvs minor",1,0,0,0,2,0,0
+2009000382,3384,2009,"Inbreeding",4,11,"",0,0,0,0,0,0,0,0,"Nibbles;2 lvs minor",1,0,0,0,2,0,0
+2009000383,3386,2009,"Inbreeding",8,21,"",0,0,0,0,0,0,0,0,"Nibbles;1 lf minor",1,0,0,0,1,0,0
+2009000384,3386,2009,"Inbreeding",7,17,"2-10 aphids",0,0,0,0,1,0,0,0,"Nibbles;1 lf minor",1,0,0,0,1,0,0
+2009000385,3392,2009,"Inbreeding",11,21,">10 ants;11-80 aphids",0,0,1,0,0,1,0,0,"Nibbles;Holes;1 lf minor;4 lvs minor",1,1,0,0,5,0,0
+2009000386,3396,2009,"Inbreeding",6,23,"",0,0,0,0,0,0,0,0,"Nibbles;1 lf minor",1,0,0,0,1,0,0
+2009000387,3404,2009,"Inbreeding",10,24,"2-10 ants;>80 aphids",0,1,0,0,0,0,1,0,"Nibbles;1 lf minor",1,0,0,0,1,0,0
+2010000191,2922,2010,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2010000192,2926,2010,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2010000193,2933,2010,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2010000194,2933,2010,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2010000195,2933,2010,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2010000196,2935,2010,"Inbreeding",0,NA,"2-10 ants;11-80 aphids",0,1,0,0,0,1,0,0,"",NA,NA,NA,NA,0,0,0
+2010000197,2936,2010,"Inbreeding",0,NA,"1 ant;>80 aphids",1,0,0,0,0,0,1,0,"",NA,NA,NA,NA,0,0,0
+2010000198,2936,2010,"Inbreeding",0,NA,"2-10 ants;11-80 aphids",0,1,0,0,0,1,0,0,"",NA,NA,NA,NA,0,0,0
+2010000199,2936,2010,"Inbreeding",0,NA,"2-10 ants;>80 aphids",0,1,0,0,0,0,1,0,"",NA,NA,NA,NA,0,0,0
+2010000200,2937,2010,"Inbreeding",0,NA,"2-10 ants;>80 aphids",0,1,0,0,0,0,1,0,"",NA,NA,NA,NA,0,0,0
+2010000201,2937,2010,"Inbreeding",0,NA,"2-10 ants;11-80 aphids",0,1,0,0,0,1,0,0,"",NA,NA,NA,NA,0,0,0
+2010000202,2938,2010,"Inbreeding",0,NA,"ant nest",0,0,0,0,0,0,0,1,"",NA,NA,NA,NA,0,0,0
+2010000203,2938,2010,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2010000204,2938,2010,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2010000205,2939,2010,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2010000206,2939,2010,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2010000207,2940,2010,"Inbreeding",0,NA,"1 ant;2-10 aphids",1,0,0,0,1,0,0,0,"",NA,NA,NA,NA,0,0,0
+2010000208,2940,2010,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2010000209,2949,2010,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2010000210,2956,2010,"Inbreeding",0,NA,"2-10 ants;11-80 aphids",0,1,0,0,0,1,0,0,"",NA,NA,NA,NA,0,0,0
+2010000211,2956,2010,"Inbreeding",0,NA,"2-10 ants;11-80 aphids",0,1,0,0,0,1,0,0,"",NA,NA,NA,NA,0,0,0
+2010000212,2979,2010,"Inbreeding",0,NA,"2-10 ants;2-10 aphids",0,1,0,0,1,0,0,0,"",NA,NA,NA,NA,0,0,0
+2010000213,2987,2010,"Inbreeding",0,NA,"2-10 aphids",0,0,0,0,1,0,0,0,"",NA,NA,NA,NA,0,0,0
+2010000214,2989,2010,"Inbreeding",0,NA,"11-80 aphids",0,0,0,0,0,1,0,0,"",NA,NA,NA,NA,0,0,0
+2010000215,2989,2010,"Inbreeding",0,NA,"2-10 aphids",0,0,0,0,1,0,0,0,"",NA,NA,NA,NA,0,0,0
+2010000216,2989,2010,"Inbreeding",0,NA,"1 ant;11-80 aphids",1,0,0,0,0,1,0,0,"",NA,NA,NA,NA,0,0,0
+2010000217,2989,2010,"Inbreeding",0,NA,"2-10 ants;>80 aphids",0,1,0,0,0,0,1,0,"",NA,NA,NA,NA,0,0,0
+2010000218,2989,2010,"Inbreeding",0,NA,"2-10 aphids",0,0,0,0,1,0,0,0,"",NA,NA,NA,NA,0,0,0
+2010000219,2992,2010,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2010000220,2992,2010,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2010000221,2993,2010,"Inbreeding",0,NA,"1 ant",1,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2010000222,2993,2010,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2010000223,2993,2010,"Inbreeding",0,NA,"2-10 ants;11-80 aphids",0,1,0,0,0,1,0,0,"",NA,NA,NA,NA,0,0,0
+2010000224,2999,2010,"Inbreeding",0,NA,"2-10 ants;2-10 aphids",0,1,0,0,1,0,0,0,"",NA,NA,NA,NA,0,0,0
+2010000225,2999,2010,"Inbreeding",0,NA,"2-10 ants",0,1,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2010000226,3012,2010,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2010000227,3022,2010,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2010000228,3046,2010,"Inbreeding",0,NA,">10 ants;11-80 aphids",0,0,1,0,0,1,0,0,"",NA,NA,NA,NA,0,0,0
+2010000229,3046,2010,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2010000239,3065,2010,"Inbreeding",0,NA,">10 ants;11-80 aphids",0,0,1,0,0,1,0,0,"",NA,NA,NA,NA,0,0,0
+2010000240,3067,2010,"Inbreeding",0,NA,"1 ant",1,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2010000241,3070,2010,"Inbreeding",0,NA,"2-10 aphids",0,0,0,0,1,0,0,0,"",NA,NA,NA,NA,0,0,0
+2010000242,3070,2010,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2010000243,3070,2010,"Inbreeding",0,NA,">10 ants;11-80 aphids",0,0,1,0,0,1,0,0,"",NA,NA,NA,NA,0,0,0
+2010000244,3071,2010,"Inbreeding",0,NA,"2-10 ants;1 aphid",0,1,0,1,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2010000245,3071,2010,"Inbreeding",0,NA,"2-10 ants",0,1,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2010000246,3071,2010,"Inbreeding",0,NA,"1 ant;2-10 aphids",1,0,0,0,1,0,0,0,"",NA,NA,NA,NA,0,0,0
+2010000247,3087,2010,"Inbreeding",0,NA,"2-10 ants;2-10 aphids",0,1,0,0,1,0,0,0,"",NA,NA,NA,NA,0,0,0
+2010000248,3087,2010,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2010000249,3087,2010,"Inbreeding",0,NA,">10 ants;11-80 aphids",0,0,1,0,0,1,0,0,"",NA,NA,NA,NA,0,0,0
+2010000250,3112,2010,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2010000251,3114,2010,"Inbreeding",0,NA,"1 ant;2-10 aphids",1,0,0,0,1,0,0,0,"",NA,NA,NA,NA,0,0,0
+2010000252,3121,2010,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2010000253,3121,2010,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2010000254,3124,2010,"Inbreeding",0,NA,"2-10 ants;11-80 aphids",0,1,0,0,0,1,0,0,"",NA,NA,NA,NA,0,0,0
+2010000255,3124,2010,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2010000256,3128,2010,"Inbreeding",0,NA,"2-10 ants;11-80 aphids",0,1,0,0,0,1,0,0,"",NA,NA,NA,NA,0,0,0
+2010000257,3130,2010,"Inbreeding",0,NA,"2-10 ants;11-80 aphids",0,1,0,0,0,1,0,0,"",NA,NA,NA,NA,0,0,0
+2010000258,3130,2010,"Inbreeding",0,NA,">10 ants;11-80 aphids",0,0,1,0,0,1,0,0,"",NA,NA,NA,NA,0,0,0
+2010000259,3134,2010,"Inbreeding",0,NA,"2-10 ants",0,1,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2010000260,3135,2010,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2010000261,3135,2010,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2010000262,3135,2010,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2010000275,3196,2010,"Inbreeding",0,NA,"2-10 ants;11-80 aphids",0,1,0,0,0,1,0,0,"",NA,NA,NA,NA,0,0,0
+2010000276,3197,2010,"Inbreeding",0,NA,"2-10 ants;2-10 aphids",0,1,0,0,1,0,0,0,"",NA,NA,NA,NA,0,0,0
+2010000277,3197,2010,"Inbreeding",0,NA,"1 ant;2-10 aphids",1,0,0,0,1,0,0,0,"",NA,NA,NA,NA,0,0,0
+2010000278,3198,2010,"Inbreeding",0,NA,"2-10 ants;2-10 aphids",0,1,0,0,1,0,0,0,"",NA,NA,NA,NA,0,0,0
+2010000279,3205,2010,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2010000280,3209,2010,"Inbreeding",0,NA,"2-10 ants;11-80 aphids",0,1,0,0,0,1,0,0,"",NA,NA,NA,NA,0,0,0
+2010000281,3210,2010,"Inbreeding",0,NA,"2-10 ants;11-80 aphids",0,1,0,0,0,1,0,0,"",NA,NA,NA,NA,0,0,0
+2010000282,3237,2010,"Inbreeding",0,NA,"11-80 aphids",0,0,0,0,0,1,0,0,"",NA,NA,NA,NA,0,0,0
+2010000283,3243,2010,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2010000284,3243,2010,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2010000285,3244,2010,"Inbreeding",0,NA,"2-10 aphids",0,0,0,0,1,0,0,0,"",NA,NA,NA,NA,0,0,0
+2010000286,3249,2010,"Inbreeding",0,NA,"2-10 ants;2-10 aphids",0,1,0,0,1,0,0,0,"",NA,NA,NA,NA,0,0,0
+2010000287,3257,2010,"Inbreeding",0,NA,"2-10 ants;2-10 aphids",0,1,0,0,1,0,0,0,"",NA,NA,NA,NA,0,0,0
+2010000288,3261,2010,"Inbreeding",0,NA,"1 ant;11-80 aphids",1,0,0,0,0,1,0,0,"",NA,NA,NA,NA,0,0,0
+2010000289,3261,2010,"Inbreeding",0,NA,"1 ant",1,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2010000290,3262,2010,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2010000291,3264,2010,"Inbreeding",0,NA,"2-10 ants;11-80 aphids",0,1,0,0,0,1,0,0,"",NA,NA,NA,NA,0,0,0
+2010000292,3264,2010,"Inbreeding",0,NA,"2-10 ants;11-80 aphids",0,1,0,0,0,1,0,0,"",NA,NA,NA,NA,0,0,0
+2010000293,3264,2010,"Inbreeding",0,NA,"1 ant",1,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2010000294,3270,2010,"Inbreeding",0,NA,"2-10 ants;11-80 aphids",0,1,0,0,0,1,0,0,"",NA,NA,NA,NA,0,0,0
+2010000295,3273,2010,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2010000296,3278,2010,"Inbreeding",0,NA,">10 ants;>80 aphids",0,0,1,0,0,0,1,0,"",NA,NA,NA,NA,0,0,0
+2010000297,3324,2010,"Inbreeding",0,NA,"1 ant",1,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2010000310,3336,2010,"Inbreeding",0,NA,"2-10 ants;11-80 aphids",0,1,0,0,0,1,0,0,"",NA,NA,NA,NA,0,0,0
+2010000311,3345,2010,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2010000312,3345,2010,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2010000313,3346,2010,"Inbreeding",0,NA,"2-10 aphids",0,0,0,0,1,0,0,0,"",NA,NA,NA,NA,0,0,0
+2010000314,3346,2010,"Inbreeding",0,NA,"1 ant;2-10 aphids",1,0,0,0,1,0,0,0,"",NA,NA,NA,NA,0,0,0
+2010000315,3351,2010,"Inbreeding",0,NA,"1 aphid",0,0,0,1,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2010000316,3352,2010,"Inbreeding",0,NA,"2-10 ants;11-80 aphids",0,1,0,0,0,1,0,0,"",NA,NA,NA,NA,0,0,0
+2010000317,3353,2010,"Inbreeding",0,NA,"2-10 ants;11-80 aphids",0,1,0,0,0,1,0,0,"",NA,NA,NA,NA,0,0,0
+2010000318,3353,2010,"Inbreeding",0,NA,"2-10 ants;11-80 aphids",0,1,0,0,0,1,0,0,"",NA,NA,NA,NA,0,0,0
+2010000319,3353,2010,"Inbreeding",0,NA,"2-10 ants;11-80 aphids;ant nest",0,1,0,0,0,1,0,1,"",NA,NA,NA,NA,0,0,0
+2010000320,3353,2010,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2010000321,3353,2010,"Inbreeding",0,NA,"11-80 aphids",0,0,0,0,0,1,0,0,"",NA,NA,NA,NA,0,0,0
+2010000322,3354,2010,"Inbreeding",0,NA,"1 ant;2-10 aphids",1,0,0,0,1,0,0,0,"",NA,NA,NA,NA,0,0,0
+2010000323,3357,2010,"Inbreeding",0,NA,"1 ant",1,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2010000324,3375,2010,"Inbreeding",0,NA,">10 ants;11-80 aphids",0,0,1,0,0,1,0,0,"",NA,NA,NA,NA,0,0,0
+2010000325,3379,2010,"Inbreeding",0,NA,"2-10 aphids",0,0,0,0,1,0,0,0,"",NA,NA,NA,NA,0,0,0
+2010000326,3379,2010,"Inbreeding",0,NA,"11-80 aphids",0,0,0,0,0,1,0,0,"",NA,NA,NA,NA,0,0,0
+2010000327,3379,2010,"Inbreeding",0,NA,"1 ant;11-80 aphids",1,0,0,0,0,1,0,0,"",NA,NA,NA,NA,0,0,0
+2010000328,3379,2010,"Inbreeding",0,NA,"1 ant;11-80 aphids",1,0,0,0,0,1,0,0,"",NA,NA,NA,NA,0,0,0
+2010000329,3382,2010,"Inbreeding",0,NA,"2-10 ants;11-80 aphids",0,1,0,0,0,1,0,0,"",NA,NA,NA,NA,0,0,0
+2010000330,3385,2010,"Inbreeding",0,NA,"1 ant;2-10 aphids",1,0,0,0,1,0,0,0,"",NA,NA,NA,NA,0,0,0
+2010000331,3408,2010,"Inbreeding",0,NA,"2-10 ants;11-80 aphids",0,1,0,0,0,1,0,0,"",NA,NA,NA,NA,0,0,0
+2010000332,3408,2010,"Inbreeding",0,NA,"2-10 ants;11-80 aphids",0,1,0,0,0,1,0,0,"",NA,NA,NA,NA,0,0,0
+2011000244,2922,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000245,2922,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000246,2924,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000247,2924,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000248,2924,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000249,2929,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000250,2929,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000251,2929,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000252,2933,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000253,2933,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000254,2934,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000255,2934,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000256,2935,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000257,2935,2011,"Inbreeding",0,NA,"2-10 ants",0,1,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000258,2935,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000259,2936,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000260,2936,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000261,2936,2011,"Inbreeding",0,NA,"beetle",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000262,2936,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000263,2936,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000264,2937,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000265,2937,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000266,2937,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000267,2938,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000268,2938,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000269,2938,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000270,2938,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000271,2948,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000272,2948,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000273,2953,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000274,2953,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000275,2955,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000276,2955,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000277,2955,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000278,2955,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000279,2956,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000280,2956,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000281,2956,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000282,2957,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000283,2957,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000284,2957,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000285,2957,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000286,2969,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000287,2970,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000288,2975,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000289,2979,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000290,2979,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000291,2979,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000292,2985,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000293,2985,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000294,2986,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000295,2986,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000296,2986,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000297,2986,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000298,2986,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000299,2987,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000300,2991,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000301,2992,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000302,2992,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000303,2993,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000304,2993,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000305,2993,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000306,2993,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000307,2993,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000308,2993,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000309,2993,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000310,2993,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000311,2993,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000312,2995,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000313,2996,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000314,2996,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000315,2997,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000316,2997,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000317,2998,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000318,2998,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000319,2999,2011,"Inbreeding",0,NA,"beetle",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000320,2999,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000321,3020,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000322,3029,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000323,3034,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000324,3046,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000325,3046,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000376,3055,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000377,3057,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000378,3058,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000379,3059,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000380,3059,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000381,3059,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000382,3067,2011,"Inbreeding",0,NA,"other (Note)",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000383,3068,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000384,3070,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000385,3070,2011,"Inbreeding",0,NA,"other (Note)",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000386,3071,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000387,3071,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000388,3071,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000389,3072,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000390,3073,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000391,3073,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000392,3082,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000393,3082,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000394,3085,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000396,3085,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000397,3085,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000398,3085,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000400,3087,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000401,3087,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000402,3087,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000403,3087,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000404,3087,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000405,3092,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000406,3092,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000407,3092,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000408,3102,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000409,3102,2011,"Inbreeding",0,NA,"beetle",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000410,3104,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000411,3112,2011,"Inbreeding",0,NA,"beetle",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000412,3112,2011,"Inbreeding",0,NA,"beetle",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000413,3114,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000414,3114,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000415,3116,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000416,3116,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000417,3116,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000418,3124,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000419,3124,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000420,3127,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000421,3129,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000422,3129,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000423,3130,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000424,3134,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000425,3134,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000426,3134,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000427,3134,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000428,3135,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000429,3135,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000430,3135,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000431,3135,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000432,3135,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000433,3135,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000434,3175,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000435,3175,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000436,3181,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000437,3181,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000476,3191,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000477,3196,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000478,3196,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000479,3197,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000480,3197,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000481,3197,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000482,3198,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000483,3198,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000484,3198,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000485,3198,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000486,3208,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000487,3211,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000488,3217,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000489,3217,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000490,3237,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000491,3237,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000492,3239,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000493,3243,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000494,3243,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000495,3243,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000496,3244,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000497,3244,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000498,3246,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000499,3247,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000500,3247,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000501,3257,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000502,3257,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000503,3257,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000504,3257,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000505,3258,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000506,3258,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000507,3260,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000508,3260,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000509,3260,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000510,3261,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000511,3261,2011,"Inbreeding",0,NA,"1 ant",1,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000512,3261,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000513,3261,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000514,3262,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000515,3262,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000516,3264,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000517,3264,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000518,3265,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000519,3296,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000520,3296,2011,"Inbreeding",0,NA,"beetle",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000521,3304,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000565,3332,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000566,3336,2011,"Inbreeding",0,NA,"beetle",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000567,3336,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000568,3336,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000569,3341,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000570,3343,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000571,3347,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000572,3347,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000573,3349,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000574,3351,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000575,3351,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000576,3351,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000577,3351,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000578,3351,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000579,3352,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000580,3352,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000581,3352,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000582,3353,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000583,3353,2011,"Inbreeding",0,NA,"1 aphid",0,0,0,1,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000584,3353,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000585,3353,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000586,3353,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000587,3353,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000588,3353,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000589,3353,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000590,3354,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000591,3357,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000592,3357,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000593,3357,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000594,3357,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000595,3378,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000596,3379,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000597,3379,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000598,3379,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000599,3379,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000600,3382,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000601,3382,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000602,3384,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000603,3392,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000604,3392,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000605,3394,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000606,3395,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000607,3396,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000608,3396,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000609,3398,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000610,3398,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000611,3411,2011,"Inbreeding",0,NA,"other (Note)",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000612,3412,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000613,3412,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000614,3412,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000615,3413,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000616,3413,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000617,3437,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000618,3459,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011000619,3459,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011003582,2992,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011003583,3087,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2011003584,3085,2011,"Inbreeding",0,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2012000107,2924,2012,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2012000108,2933,2012,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2012000109,2933,2012,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2012000110,2935,2012,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2012000111,2935,2012,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2012000112,2935,2012,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2012000113,2936,2012,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2012000114,2937,2012,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2012000115,2939,2012,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2012000116,2956,2012,"Inbreeding",NA,NA,"2-10 ants;11-80 aphids",0,1,0,0,0,1,0,0,"",NA,NA,NA,NA,0,0,0
+2012000117,2985,2012,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2012000118,2989,2012,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2012000119,2989,2012,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2012000120,2992,2012,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2012000121,2993,2012,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2012000122,2993,2012,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2012000123,2999,2012,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2012000124,3019,2012,"Inbreeding",NA,NA,"shield bug",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2012000135,3076,2012,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2012000136,3087,2012,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2012000137,3087,2012,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2012000138,3087,2012,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2012000139,3091,2012,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2012000140,3092,2012,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2012000141,3102,2012,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2012000142,3114,2012,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2012000143,3126,2012,"Inbreeding",NA,NA,"ant nest",0,0,0,0,0,0,0,1,"",NA,NA,NA,NA,0,0,0
+2012000144,3127,2012,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2012000145,3130,2012,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2012000164,3197,2012,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2012000165,3197,2012,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2012000166,3220,2012,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2012000167,3232,2012,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2012000168,3264,2012,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2012000169,3264,2012,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2012000170,3288,2012,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2012000171,3296,2012,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2012000187,3336,2012,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2012000188,3336,2012,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2012000189,3351,2012,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2012000190,3351,2012,"Inbreeding",NA,NA,"shield bug",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2012000191,3351,2012,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2012000192,3351,2012,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2012000193,3369,2012,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2012000194,3379,2012,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2012000195,3384,2012,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2012000196,3431,2012,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000138,2922,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000139,2924,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000140,2924,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000141,2924,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000142,2924,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000143,2926,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000144,2927,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000145,2929,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000146,2929,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000147,2933,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000148,2935,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000149,2935,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000150,2935,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000151,2936,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000152,2937,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000153,2937,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000154,2939,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000155,2953,2013,"Inbreeding",NA,NA,"beetle",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000156,2956,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000157,2975,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000158,2977,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000159,2983,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000160,2985,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000161,2985,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000162,2993,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000163,2993,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000164,2996,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000165,2996,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000166,2997,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000167,2997,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000168,2998,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000169,2999,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000170,3002,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000171,3012,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000172,3012,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000173,3015,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000174,3021,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000175,3022,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000176,3034,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000177,3034,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000178,3046,2013,"Inbreeding",NA,NA,"spider",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000179,3046,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000180,3047,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000226,3055,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000227,3059,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000228,3061,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000229,3061,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000230,3067,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000231,3071,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000232,3071,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000233,3071,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000234,3071,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000235,3087,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000236,3087,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000237,3091,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000238,3091,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000239,3091,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000240,3092,2013,"Inbreeding",NA,NA,"beetle",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000241,3100,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000242,3105,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000243,3111,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000244,3111,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000245,3112,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000246,3114,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000247,3114,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000248,3118,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000249,3118,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000250,3119,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000251,3127,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000252,3128,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000253,3129,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000254,3134,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000255,3134,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000256,3135,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000257,3135,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000258,3135,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000259,3137,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000260,3181,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000261,3181,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000325,3197,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000326,3197,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000327,3208,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000328,3211,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000329,3232,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000330,3237,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000331,3243,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000332,3243,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000333,3243,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000334,3244,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000335,3244,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000336,3246,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000337,3261,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000338,3261,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000339,3261,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000340,3261,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000341,3261,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000342,3261,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000343,3261,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000344,3262,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000345,3262,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000346,3262,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000347,3264,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000348,3264,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000349,3286,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000350,3288,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000351,3288,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000352,3296,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000353,3304,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000354,3304,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000355,3322,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000400,3336,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000401,3336,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000402,3346,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000403,3346,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000404,3369,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000405,3369,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000406,3375,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000407,3375,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000408,3375,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000409,3380,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000410,3382,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000411,3384,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000412,3385,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000413,3386,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000414,3386,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000415,3386,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000416,3392,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000417,3397,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000418,3398,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000419,3398,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000420,3398,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000421,3404,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000422,3404,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000423,3404,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000424,3405,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000425,3408,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000426,3409,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000427,3409,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000428,3412,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000429,3432,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000430,3444,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013000431,3451,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013002383,3345,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013002384,3245,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013002385,3058,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013002386,3058,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013002387,3405,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013002388,3112,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013002389,3118,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013002390,2997,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013002391,3012,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013002392,3021,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013002393,3137,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013002394,2929,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013002395,2935,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013002396,2935,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013002397,2936,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013002398,2956,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013002399,2975,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013002682,2938,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013002683,2938,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
+2013002684,2938,2013,"Inbreeding",NA,NA,"",0,0,0,0,0,0,0,0,"",NA,NA,NA,NA,0,0,0
