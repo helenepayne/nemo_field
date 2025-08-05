@@ -5,11 +5,11 @@ program fend (input, output);
   {8-29-94: works for nonconsecutive numbers}
   {2-3-95: bug in non-consecutive numbering routine fixed}
 
-const r=2; {r=the max. number of traits}
-      f=40;  {the max number of families}
+const r=5; {r=the max. number of traits}
+      f=46;  {the max number of families}
       missing=-98; {Value in the dataset indicating missing phenotypic data
                     if your missing values are -99.00, then "missing" = -98}
-      nmax=400; {maximum total # of individuals in the dataset, including
+      nmax=600; {maximum total # of individuals in the dataset, including
                  those missing data}
       pos=200; {r * largest family size to be safe}
       null=0;  {ID # for relatives not present in the input data}
